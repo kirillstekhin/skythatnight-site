@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sky, That Night — Custom Star Maps of Your Exact Sky</title>
+<meta name="description" content="A museum-grade star map of the exact sky above any place on any date — real astronomy, 11,000 stars, the true moon phase of your night. Framed or print, from £39 with free UK delivery.">
+<link rel="canonical" href="https://www.skythatnight.com/">
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="Sky, That Night">
+<meta property="og:title" content="Sky, That Night — Custom Star Maps">
+<meta property="og:description" content="The exact sky above any place, on any date. Real astronomy, museum-grade print, from £39.">
+<meta property="og:url" content="https://www.skythatnight.com/">
+<meta property="og:image" content="https://www.skythatnight.com/assets/starmap/hero-midnight.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="preload" as="image" href="assets/starmap/hero-midnight.jpg">
+<style>
+/* ── Nocturne annex: page-scoped night theme ─────────────────────────── */
+.sm-night {
+  --night:#0b1733; --night-deep:#081124; --night-hi:#12203f;
+  --gold:#c9a961; --gold-soft:#a58a4e;
+  --moon:#eaf0ff; --moon-sub:#8fb0e6; --moon-faint:#5f77a5;
+  background: var(--night); color: var(--moon);
+}
+.sm-night header { background: transparent; border-bottom: 1px solid rgba(201,169,97,.18); }
+.sm-night .sm-wordmark { font-family:var(--serif); font-size:1.15rem; letter-spacing:.32em; color:var(--moon);
+  text-decoration:none; display:flex; align-items:center; white-space:nowrap; }
+.sm-night .sm-wordmark span { color:var(--gold); font-size:.9rem; }
+.sm-night .sm-wordmark:hover { color:var(--gold); }
+.sm-night header .nav a { color: var(--moon-sub); }
+.sm-night header .nav a:hover { color: var(--gold); }
+.sm-night .cart-badge { background: var(--gold); color: var(--night); }
+.sm-night footer { background: var(--night-deep); border-top: 1px solid rgba(201,169,97,.15); }
+.sm-night footer, .sm-night footer a { color: var(--moon-faint); }
+.sm-night footer a:hover { color: var(--gold); }
+.sm-night .foot-rule { color: var(--moon-sub); border-color: rgba(201,169,97,.25); }
+
+/* grain + vignette atmosphere */
+.sm-hero::before {
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+  background:
+    radial-gradient(1200px 600px at 70% -100px, rgba(79,111,168,.20), transparent 60%),
+    radial-gradient(900px 500px at 15% 30%, rgba(201,169,97,.06), transparent 55%);
+}
+.sm-night main { position:relative; z-index:1; }
+
+/* ── hero ── */
+.sm-hero { padding: clamp(3rem,7vw,6.5rem) 0 clamp(2.5rem,5vw,4.5rem); position:relative; overflow:hidden; }
+.sm-stars { position:absolute; inset:0; pointer-events:none;
+  background-image:
+    radial-gradient(1.4px 1.4px at 12% 22%, #fff 60%, transparent),
+    radial-gradient(1px 1px at 28% 64%, #fffc 60%, transparent),
+    radial-gradient(1.8px 1.8px at 41% 15%, #fff 60%, transparent),
+    radial-gradient(1px 1px at 55% 48%, #fffb 60%, transparent),
+    radial-gradient(1.3px 1.3px at 66% 28%, #fff 60%, transparent),
+    radial-gradient(1px 1px at 74% 70%, #fffa 60%, transparent),
+    radial-gradient(1.6px 1.6px at 86% 18%, #fff 60%, transparent),
+    radial-gradient(1px 1px at 92% 52%, #fffc 60%, transparent),
+    radial-gradient(1.1px 1.1px at 8% 78%, #fffb 60%, transparent),
+    radial-gradient(1.2px 1.2px at 35% 88%, #fff9 60%, transparent),
+    radial-gradient(1px 1px at 61% 84%, #fffb 60%, transparent),
+    radial-gradient(1.5px 1.5px at 81% 88%, #fffc 60%, transparent);
+}
+@keyframes smTwinkle { from{opacity:.55} to{opacity:1} }
+.sm-hero .container { display:grid; grid-template-columns: minmax(0,1.05fr) minmax(0,.95fr); gap: clamp(2rem,4vw,4rem); align-items:center; }
+@media (max-width: 900px){ .sm-hero .container { grid-template-columns: 1fr; } }
+.sm-kicker { font-family:var(--sans); font-size:.78rem; letter-spacing:.32em; text-transform:uppercase; color:var(--gold); margin-bottom:1.2rem; }
+.sm-h1 { font-family:var(--serif); font-weight:500; font-size:clamp(2.4rem,5.2vw,4.2rem); line-height:1.06; color:var(--moon); margin:0 0 1.4rem; }
+.sm-h1 em { font-style:italic; color:var(--gold); }
+.sm-lede { font-family:var(--sans); font-weight:300; font-size:clamp(1rem,1.4vw,1.15rem); line-height:1.65; color:var(--moon-sub); max-width:34rem; margin-bottom:2rem; }
+.sm-cta { display:inline-block; font-family:var(--sans); font-weight:600; letter-spacing:.08em; text-transform:uppercase; font-size:.85rem;
+  color:var(--night); background:var(--gold); padding:1rem 2.2rem; border:none; border-radius:2px; cursor:pointer; text-decoration:none; }
+.sm-cta:hover { background:#d9bc78; }
+.sm-cta-sub { display:block; margin-top:.8rem; font-size:.8rem; color:var(--moon-faint); font-family:var(--sans); }
+
+.sm-fan { position:relative; height:clamp(340px,44vw,560px); }
+.sm-fan img { position:absolute; top:50%; left:50%; width:clamp(180px,22vw,280px); border-radius:2px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(201,169,97,.12); }
+.sm-fan img:nth-child(1){ transform:translate(-88%,-52%) rotate(-7deg); z-index:1; }
+.sm-fan img:nth-child(2){ transform:translate(-50%,-50%) rotate(0deg) scale(1.12); z-index:3; }
+.sm-fan img:nth-child(3){ transform:translate(-12%,-48%) rotate(7deg); z-index:2; }
+
+/* ── configurator ── */
+.sm-config { padding: clamp(2rem,5vw,4rem) 0 clamp(3rem,6vw,5rem); }
+.sm-config .container { display:grid; grid-template-columns: minmax(0,1fr) 420px; gap:clamp(2rem,4vw,3.5rem); align-items:start; }
+@media (max-width: 980px){ .sm-config .container { grid-template-columns:1fr; } }
+.sm-preview-wrap { position:sticky; top:2rem; }
+@media (max-width: 980px){ .sm-preview-wrap { position:static; } }
+#sm-preview svg { width:100%; height:auto; display:block; border-radius:3px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
+.sm-moon-chip { margin-top:1rem; text-align:center; font-family:var(--serif); font-style:italic; font-size:1rem; color:var(--gold); }
+
+.sm-panel { background:var(--night-hi); border:1px solid rgba(201,169,97,.22); border-radius:4px; padding:1.8rem; }
+.sm-panel h2 { font-family:var(--serif); font-weight:500; font-size:1.65rem; color:var(--moon); margin:0 0 1.4rem; }
+.sm-field { margin-bottom:1.15rem; position:relative; }
+.sm-field label { display:block; font-family:var(--sans); font-size:.72rem; letter-spacing:.18em; text-transform:uppercase; color:var(--moon-faint); margin-bottom:.45rem; }
+.sm-field input { width:100%; box-sizing:border-box; background:var(--night-deep); border:1px solid rgba(143,176,230,.25); border-radius:3px;
+  color:var(--moon); font-family:var(--sans); font-size:.95rem; padding:.7rem .85rem; }
+.sm-field input:focus { outline:none; border-color:var(--gold); }
+.sm-row2 { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; }
+#sm-place-results { position:absolute; left:0; right:0; top:100%; z-index:20; margin:2px 0 0; padding:0; list-style:none;
+  background:var(--night-deep); border:1px solid rgba(201,169,97,.3); border-radius:3px; max-height:210px; overflow:auto; }
+#sm-place-results li { padding:.6rem .85rem; font-family:var(--sans); font-size:.9rem; color:var(--moon-sub); cursor:pointer; }
+#sm-place-results li:hover { background:var(--night-hi); color:var(--moon); }
+
+.sm-swatches { display:flex; flex-wrap:wrap; gap:.55rem; }
+.sm-theme { width:44px; height:44px; border-radius:50%; border:2px solid transparent; cursor:pointer; position:relative; }
+.sm-theme.active { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,169,97,.25); }
+.sm-theme span { position:absolute; inset:4px; border-radius:50%; display:block; }
+.sm-theme[data-theme="midnight"] span { background:#0b1733; box-shadow: inset 0 0 0 1px #3a5a9a; }
+.sm-theme[data-theme="luxegold"] span { background:linear-gradient(135deg,#0b1733 62%,#c9a961 62%); }
+.sm-theme[data-theme="luxesilver"] span { background:linear-gradient(135deg,#0b1733 62%,#c3ccd8 62%); }
+.sm-theme[data-theme="porcelain"] span { background:#f5f2ea; box-shadow: inset 0 0 0 1px #1c2a4a; }
+.sm-theme[data-theme="noir"] span { background:linear-gradient(135deg,#060608 62%,#c9a961 62%); }
+
+.sm-format { display:block; width:100%; text-align:left; background:var(--night-deep); border:1px solid rgba(143,176,230,.25);
+  border-radius:3px; color:var(--moon-sub); font-family:var(--sans); padding:.8rem 1rem; margin-bottom:.55rem; cursor:pointer; }
+.sm-format.active { border-color:var(--gold); color:var(--moon); background:rgba(201,169,97,.07); }
+.sm-format .f-price { float:right; font-family:var(--serif); font-size:1.08rem; color:var(--gold); }
+.sm-frame-color { background:var(--night-deep); border:1px solid rgba(143,176,230,.25); color:var(--moon-sub);
+  font-family:var(--sans); font-size:.85rem; border-radius:3px; padding:.5rem 1rem; margin-right:.5rem; cursor:pointer; }
+.sm-frame-color.active { border-color:var(--gold); color:var(--moon); }
+
+.sm-buyrow { margin-top:1.5rem; padding-top:1.35rem; border-top:1px solid rgba(201,169,97,.2); }
+#sm-price { font-family:var(--serif); font-size:2.3rem; color:var(--moon); }
+#sm-price-note { font-family:var(--sans); font-size:.8rem; color:var(--moon-faint); margin:.3rem 0 1.1rem; }
+#sm-buy { width:100%; }
+#sm-checkout-note { margin-top:1rem; font-family:var(--sans); font-size:.85rem; color:var(--moon-sub);
+  background:rgba(201,169,97,.08); border:1px dashed rgba(201,169,97,.4); border-radius:3px; padding:.9rem; }
+#sm-checkout-note code { color:var(--gold); word-break:break-all; }
+.sm-code-line { margin-top:.9rem; font-family:var(--sans); font-size:.72rem; color:var(--moon-faint); }
+.sm-code-line code { color:var(--moon-faint); }
+
+/* ── craft / gallery / occasions / faq ── */
+.sm-section { padding: clamp(2.5rem,5vw,4.5rem) 0; border-top:1px solid rgba(201,169,97,.12); }
+.sm-section .section-kicker { color:var(--gold); font-family:var(--sans); letter-spacing:.3em; text-transform:uppercase; font-size:.75rem; margin-bottom:1rem; }
+.sm-section h2 { font-family:var(--serif); font-weight:500; font-size:clamp(1.8rem,3.4vw,2.6rem); color:var(--moon); margin:0 0 2rem; }
+.sm-craft-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; }
+@media (max-width:820px){ .sm-craft-grid { grid-template-columns:1fr; } }
+.sm-craft-grid h3 { font-family:var(--serif); font-size:1.25rem; color:var(--gold); margin:0 0 .6rem; font-weight:500; }
+.sm-craft-grid p { font-family:var(--sans); font-weight:300; font-size:.95rem; line-height:1.6; color:var(--moon-sub); margin:0; }
+.sm-gallery-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.2rem; }
+@media (max-width:820px){ .sm-gallery-grid { grid-template-columns:repeat(2,1fr); } }
+.sm-gallery-grid figure { margin:0; }
+.sm-gallery-grid img { width:100%; border-radius:2px; box-shadow:0 14px 40px rgba(0,0,0,.5); }
+.sm-gallery-grid figcaption { font-family:var(--sans); font-size:.8rem; color:var(--moon-faint); margin-top:.6rem; text-align:center; letter-spacing:.06em; }
+.sm-occasions { display:flex; flex-wrap:wrap; gap:.7rem; }
+.sm-occasions span { font-family:var(--serif); font-style:italic; font-size:1.05rem; color:var(--moon-sub);
+  border:1px solid rgba(143,176,230,.3); border-radius:2rem; padding:.55rem 1.3rem; }
+.sm-faq details { border-bottom:1px solid rgba(143,176,230,.18); padding:1.1rem 0; }
+.sm-faq summary { font-family:var(--serif); font-size:1.15rem; color:var(--moon); cursor:pointer; list-style:none; }
+.sm-faq summary::-webkit-details-marker { display:none; }
+.sm-faq summary::after { content:'+'; float:right; color:var(--gold); }
+.sm-faq details[open] summary::after { content:'−'; }
+.sm-faq p { font-family:var(--sans); font-weight:300; font-size:.93rem; line-height:1.65; color:var(--moon-sub); }
+
+/* staggered reveal */
+@media (prefers-reduced-motion: no-preference) {
+  .sm-reveal { opacity:0; transform:translateY(14px); animation:smUp .8s cubic-bezier(.2,.7,.2,1) forwards; }
+  .sm-reveal:nth-child(2){ animation-delay:.12s } .sm-reveal:nth-child(3){ animation-delay:.24s }
+  @keyframes smUp { to { opacity:1; transform:none; } }
+}
+</style>
+</head>
+<body class="sm-night">
+<header>
+  <div class="container header-inner">
+    <a href="./" class="logo sm-wordmark" aria-label="Sky, That Night — home">
+      <span aria-hidden="true">✦</span>&nbsp;SKY, THAT NIGHT
+    </a>
+    <button class="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
+    <nav class="nav" id="main-nav">
+      <a href="#design">Design yours</a>
+      <a href="#craft">How it works</a>
+      <a href="#faq">FAQ</a>
+      <a href="mailto:hello@skythatnight.com">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Product","name":"Custom Star Map Print","description":"Personalised star map of the exact sky above any place on any date. Real astronomical data, museum-grade giclée print, optional handmade frame.","image":"https://www.skythatnight.com/assets/starmap/hero-midnight.jpg","sku":"star-map","brand":{"@type":"Brand","name":"Sky, That Night"},"offers":{"@type":"AggregateOffer","lowPrice":"39.00","highPrice":"64.00","priceCurrency":"GBP","availability":"https://schema.org/InStock","url":"https://www.skythatnight.com/"}}
+</script>
+
+<main>
+
+<section class="sm-hero">
+  <div class="sm-stars" aria-hidden="true"></div>
+  <div class="container">
+    <div>
+      <div class="sm-kicker sm-reveal">The Atelier · Personalised</div>
+      <h1 class="sm-h1 sm-reveal">The night everything changed,<br><em>kept forever.</em></h1>
+      <p class="sm-lede sm-reveal">The exact sky above any place, on any date — computed from real astronomical
+      data: eleven thousand stars, the constellations, and the true phase of the moon that night.
+      Printed at museum grade in the UK, framed by hand.</p>
+      <a class="sm-cta" href="#design">Design yours — from £39</a>
+      <span class="sm-cta-sub">Free UK delivery included · dispatched in 2–4 working days</span>
+    </div>
+    <div class="sm-fan" aria-hidden="true">
+      <img src="assets/starmap/hero-porcelain.jpg" alt="" loading="lazy">
+      <img src="assets/starmap/hero-midnight.jpg" alt="Custom star map poster, midnight theme">
+      <img src="assets/starmap/hero-luxe.jpg" alt="" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<section class="sm-config" id="design">
+  <div class="container">
+    <div class="sm-preview-wrap">
+      <div id="sm-preview" aria-live="polite"></div>
+      <div class="sm-moon-chip" id="sm-moon"></div>
+    </div>
+    <div class="sm-panel">
+      <h2>Your sky.</h2>
+      <div class="sm-row2">
+        <div class="sm-field">
+          <label for="sm-date">Date</label>
+          <input type="date" id="sm-date" min="1900-01-01" max="2099-12-31">
+        </div>
+        <div class="sm-field">
+          <label for="sm-time">Time</label>
+          <input type="time" id="sm-time">
+        </div>
+      </div>
+      <div class="sm-field">
+        <label for="sm-place">Place</label>
+        <input type="text" id="sm-place" placeholder="City, country" autocomplete="off">
+        <ul id="sm-place-results" hidden></ul>
+      </div>
+      <div class="sm-field">
+        <label for="sm-dedication">Dedication line <span style="text-transform:none;letter-spacing:0;">(up to 40 characters)</span></label>
+        <input type="text" id="sm-dedication" maxlength="40" placeholder="Under this sky">
+      </div>
+      <div class="sm-field">
+        <label>Theme</label>
+        <div class="sm-swatches">
+          <button class="sm-theme active" data-theme="midnight" title="Midnight" aria-label="Midnight theme"><span></span></button>
+          <button class="sm-theme" data-theme="luxegold" title="Luxe Gold" aria-label="Luxe gold theme"><span></span></button>
+          <button class="sm-theme" data-theme="luxesilver" title="Luxe Silver" aria-label="Luxe silver theme"><span></span></button>
+          <button class="sm-theme" data-theme="porcelain" title="Porcelain" aria-label="Porcelain theme"><span></span></button>
+          <button class="sm-theme" data-theme="noir" title="Noir" aria-label="Noir theme"><span></span></button>
+        </div>
+      </div>
+      <div class="sm-field">
+        <label>Format</label>
+        <button class="sm-format" data-format="print">Print only · 30×40&nbsp;cm <span class="f-price">£39</span></button>
+        <button class="sm-format active" data-format="framed">Framed · 30×40&nbsp;cm <span class="f-price">£49</span></button>
+        <button class="sm-format" data-format="framedXL">Framed large · 40×50&nbsp;cm <span class="f-price">£64</span></button>
+      </div>
+      <div class="sm-field" id="sm-frame-colors">
+        <label>Frame</label>
+        <button class="sm-frame-color active" data-color="white">White</button>
+        <button class="sm-frame-color" data-color="natural">Natural wood</button>
+      </div>
+      <div class="sm-buyrow">
+        <div id="sm-price">£49</div>
+        <div id="sm-price-note"></div>
+        <button class="sm-cta" id="sm-buy">Buy this sky</button>
+        <div id="sm-checkout-note" hidden>
+          Checkout opens shortly. Your design is saved as
+          <code></code> — email it to
+          <a href="mailto:hello@shopcienty.com" style="color:var(--gold)">hello@shopcienty.com</a>
+          and we'll send a secure payment link the same day.
+        </div>
+        <div class="sm-code-line">Design code: <code id="sm-code"></code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sm-section" id="craft">
+  <div class="container">
+    <div class="section-kicker sm-kicker">Every detail is real</div>
+    <h2>Not an illustration.<br>An astronomical record.</h2>
+    <div class="sm-craft-grid">
+      <div>
+        <h3>Real astronomy</h3>
+        <p>Your sky is computed from professional star catalogues — over 11,000 stars placed exactly
+        where they stood above your place, at your minute. The Milky Way included on print.</p>
+      </div>
+      <div>
+        <h3>The moon of your night</h3>
+        <p>Every map carries the true phase of the moon for your date — full, new, or the exact
+        crescent in between. A detail almost nobody else gets right.</p>
+      </div>
+      <div>
+        <h3>Museum-grade craft</h3>
+        <p>Giclée-printed on fine-art paper in the UK, framed by hand in responsibly sourced wood,
+        glazed with shatter-safe acrylic. Dispatched in 2–4 working days.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sm-section">
+  <div class="container">
+    <div class="section-kicker sm-kicker">Four moods</div>
+    <h2>One sky, four ways.</h2>
+    <div class="sm-gallery-grid">
+      <figure><img src="assets/starmap/hero-midnight.jpg" alt="Midnight theme star map" loading="lazy"><figcaption>Midnight</figcaption></figure>
+      <figure><img src="assets/starmap/hero-luxe.jpg" alt="Luxe gold theme star map" loading="lazy"><figcaption>Luxe · gold &amp; silver</figcaption></figure>
+      <figure><img src="assets/starmap/hero-porcelain.jpg" alt="Porcelain theme star map" loading="lazy"><figcaption>Porcelain</figcaption></figure>
+      <figure><img src="assets/starmap/hero-dense.jpg" alt="Deep-sky dense star map" loading="lazy"><figcaption>Deep sky detail</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<section class="sm-section">
+  <div class="container">
+    <div class="section-kicker sm-kicker">For the nights worth keeping</div>
+    <h2>Occasions.</h2>
+    <div class="sm-occasions">
+      <span>The night you met</span>
+      <span>A wedding sky</span>
+      <span>The night they were born</span>
+      <span>An anniversary</span>
+      <span>In loving memory</span>
+      <span>The move, the leap, the win</span>
+    </div>
+  </div>
+</section>
+
+<section class="sm-section sm-faq" id="faq">
+  <div class="container">
+    <div class="section-kicker sm-kicker">Questions</div>
+    <h2>Good to know.</h2>
+    <details>
+      <summary>How accurate is the sky?</summary>
+      <p>Genuinely accurate. We compute the position of every star from professional astronomical
+      catalogues for your exact date, time and coordinates — the same mathematics observatories use.
+      Rotate the map to your date of birth and an astronomer would recognise the sky.</p>
+    </details>
+    <details>
+      <summary>How long does delivery take?</summary>
+      <p>Your piece is made to order in a UK fine-art lab and dispatched within 2–4 working days,
+      then delivered by tracked courier. Delivery is free to any UK address and already included
+      in the price shown.</p>
+    </details>
+    <details>
+      <summary>Can I return a personalised print?</summary>
+      <p>Because each piece is made uniquely for you, personalised items are exempt from the standard
+      14-day change-of-mind return. But if your order arrives damaged, faulty or not as approved,
+      we will reprint or refund it in full — that right is never affected. Check your preview
+      carefully before ordering; what you see is what we print.</p>
+    </details>
+    <details>
+      <summary>What sizes and finishes are available?</summary>
+      <p>Print only (30×40&nbsp;cm, shipped rolled), framed 30×40&nbsp;cm, or framed 40×50&nbsp;cm.
+      Frames are handmade wood in white or natural finish with acrylic glazing. Five poster themes
+      are included at no extra cost.</p>
+    </details>
+    <details>
+      <summary>Is my exact time or place required?</summary>
+      <p>The date and place matter most. If you don't know the exact minute, pick an evening hour —
+      the constellations of your night will still be true. Any town or village worldwide works.</p>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container footer-links">
+    <div class="foot-link-col">
+      <div class="foot-rule">Sky, That Night</div>
+      <a href="#design">Design your sky</a>
+      <a href="#craft">How it works</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="foot-link-col">
+      <div class="foot-rule">Help</div>
+      <a href="mailto:hello@skythatnight.com">hello@skythatnight.com</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms &amp; Conditions</a>
+    </div>
+  </div>
+  <div class="container foot-bottom">
+    <p style="font-family:var(--sans);font-size:.75rem;">
+      SkyThatNight.com is a trading style of SHOPCIENTY LIMITED · Company No. 14960765 · VAT GB483349856 · 7 Bell Yard, London WC2A 2JR
+    </p>
+  </div>
+</footer>
+
+<script src="assets/starmap.js" defer></script>
+</body>
+</html>
