@@ -58,7 +58,7 @@ const THEMES = {
   luxesilver:{ page:'#0b1733', sky:'#0a1430', ink:'#eaf0ff', sub:'#8fb0e6', faint:'#6f8bc0',
               star:'#ffffff', ring:'#c3ccd8', grid:'#20345f', lines:'#4f6fa8', lineOp:0.34,
               accent:'#c3ccd8', lineW:0.7, label:'Luxe · Silver' },
-  porcelain:{ page:'#f5f2ea', sky:'#e9edf3', ink:'#0d1830', sub:'#33496e', faint:'#5f7396',
+  porcelain:{ page:'#f5f2ea', sky:'#f5f2ea', ink:'#0d1830', sub:'#33496e', faint:'#5f7396',
               star:'#0d1830', ring:'#0f1b33', grid:'#ccd3e0', lines:'#31497c', lineOp:0.75,
               accent:'#243a63', lineW:1.2, dotScale:1.8, opMin:0.78, opBase:0.68, label:'Porcelain' },
   noir:     { page:'#060608', sky:'#060608', ink:'#e8dcc0', sub:'#c9a961', faint:'#8a7845',
