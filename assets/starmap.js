@@ -58,9 +58,9 @@ const THEMES = {
   luxesilver:{ page:'#0b1733', sky:'#0a1430', ink:'#eaf0ff', sub:'#8fb0e6', faint:'#6f8bc0',
               star:'#ffffff', ring:'#c3ccd8', grid:'#20345f', lines:'#4f6fa8', lineOp:0.34,
               accent:'#c3ccd8', lineW:0.7, label:'Luxe · Silver' },
-  porcelain:{ page:'#f5f2ea', sky:'#f5f2ea', ink:'#1c2a4a', sub:'#5a6c8c', faint:'#8a97ad',
-              star:'#1c2a4a', ring:'#1c2a4a', grid:'#e6e1d3', lines:'#9aa8bf', lineOp:0.55,
-              accent:'#5a6c8c', lineW:0.8, label:'Porcelain' },
+  porcelain:{ page:'#f5f2ea', sky:'#edf0f4', ink:'#101c38', sub:'#3f5578', faint:'#6b7f9e',
+              star:'#101c38', ring:'#14213f', grid:'#d4dae4', lines:'#4a628f', lineOp:0.62,
+              accent:'#2c4370', lineW:0.8, dotScale:1.35, opMin:0.55, opBase:0.5, label:'Porcelain' },
   noir:     { page:'#060608', sky:'#060608', ink:'#e8dcc0', sub:'#c9a961', faint:'#8a7845',
               star:'#f5efe0', ring:'#c9a961', grid:'#1d1a12', lines:'#8a7845', lineOp:0.32,
               accent:'#c9a961', lineW:0.7, label:'Noir' },
@@ -145,8 +145,8 @@ function renderSvg(o) {
     if (alt <= 0.01) continue;
     const [x, y] = project(alt, az, cx, cy, R);
     const base = Math.max(7.2 - mag, 0.35);
-    const rad = Math.max(0.5, 0.30 * Math.pow(base, 1.25));
-    const op  = Math.max(0.25, Math.min(1, 0.30 + (7.0 - mag) * 0.11));
+    const rad = Math.max(0.5, 0.30 * Math.pow(base, 1.25)) * (t.dotScale || 1);
+    const op  = Math.max(t.opMin || 0.25, Math.min(1, (t.opBase || 0.30) + (7.0 - mag) * 0.11));
     if (mag < 1.6) s.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(rad*2.2).toFixed(1)}" fill="${t.star}" opacity="0.16"/>`);
     s.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rad.toFixed(2)}" fill="${t.star}" fill-opacity="${op.toFixed(2)}"/>`);
   }
