@@ -58,9 +58,9 @@ const THEMES = {
   luxesilver:{ page:'#0b1733', sky:'#0a1430', ink:'#eaf0ff', sub:'#8fb0e6', faint:'#6f8bc0',
               star:'#ffffff', ring:'#c3ccd8', grid:'#20345f', lines:'#4f6fa8', lineOp:0.34,
               accent:'#c3ccd8', lineW:0.7, label:'Luxe · Silver' },
-  porcelain:{ page:'#f5f2ea', sky:'#edf0f4', ink:'#101c38', sub:'#3f5578', faint:'#6b7f9e',
-              star:'#101c38', ring:'#14213f', grid:'#d4dae4', lines:'#4a628f', lineOp:0.62,
-              accent:'#2c4370', lineW:0.8, dotScale:1.35, opMin:0.55, opBase:0.5, label:'Porcelain' },
+  porcelain:{ page:'#f5f2ea', sky:'#e9edf3', ink:'#0d1830', sub:'#33496e', faint:'#5f7396',
+              star:'#0d1830', ring:'#0f1b33', grid:'#ccd3e0', lines:'#31497c', lineOp:0.75,
+              accent:'#243a63', lineW:1.2, dotScale:1.8, opMin:0.78, opBase:0.68, label:'Porcelain' },
   noir:     { page:'#060608', sky:'#060608', ink:'#e8dcc0', sub:'#c9a961', faint:'#8a7845',
               star:'#f5efe0', ring:'#c9a961', grid:'#1d1a12', lines:'#8a7845', lineOp:0.32,
               accent:'#c9a961', lineW:0.7, label:'Noir' },
@@ -185,7 +185,7 @@ function renderSvg(o) {
   const latS = Math.abs(o.lat).toFixed(4) + '°' + (o.lat >= 0 ? 'N' : 'S');
   const lonS = Math.abs(o.lon).toFixed(4) + '°' + (o.lon >= 0 ? 'E' : 'W');
   s.push(`<text x="${cx}" y="${oy+100}" fill="${t.faint}" font-family="'EB Garamond',Georgia,serif" font-size="16" letter-spacing="2" text-anchor="middle">${latS}   ${lonS}</text>`);
-  s.push(`<text x="${cx}" y="${H-58}" fill="${t.faint}" font-family="'EB Garamond',Georgia,serif" font-size="14" letter-spacing="3" text-anchor="middle">S H O P C I E N T Y</text>`);
+  s.push(`<text x="${cx}" y="${H-58}" fill="${t.faint}" font-family="'EB Garamond',Georgia,serif" font-size="14" letter-spacing="3" text-anchor="middle">S K Y ,  T H A T  N I G H T</text>`);
   s.push('</svg>');
   return { svg: s.join(''), phase };
 }
