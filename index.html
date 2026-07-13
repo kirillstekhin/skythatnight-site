@@ -11,7 +11,7 @@
 <meta property="og:title" content="Sky, That Night — Custom Star Maps">
 <meta property="og:description" content="The exact sky above any place, on any date. Real astronomy, museum-grade print, from £39.">
 <meta property="og:url" content="https://www.skythatnight.com/">
-<meta property="og:image" content="https://www.skythatnight.com/assets/starmap/hero-midnight.jpg">
+<meta property="og:image" content="https://www.skythatnight.com/assets/starmap/og-lifestyle.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -165,6 +165,20 @@
   .sm-reveal:nth-child(2){ animation-delay:.12s } .sm-reveal:nth-child(3){ animation-delay:.24s }
   @keyframes smUp { to { opacity:1; transform:none; } }
 }
+
+/* occasions gallery + film */
+.sm-occgrid { display:grid; grid-template-columns:repeat(5,1fr); gap:1.1rem; margin-top:2.2rem; }
+@media (max-width:1100px){ .sm-occgrid { grid-template-columns:repeat(3,1fr); } }
+@media (max-width:640px){ .sm-occgrid { grid-template-columns:repeat(2,1fr); } }
+.sm-occgrid figure { margin:0; }
+.sm-occgrid img { width:100%; height:auto; display:block; border-radius:3px;
+  box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
+.sm-occgrid figcaption { font-family:var(--serif); font-size:1.02rem; color:var(--moon); margin-top:.7rem; }
+.sm-occgrid .occ-sub { display:block; font-family:var(--sans); font-size:.76rem; letter-spacing:.06em; color:var(--moon-faint); margin-top:.15rem; }
+.sm-occ-more { font-family:var(--serif); font-style:italic; color:var(--moon-sub); margin-top:1.6rem; }
+.sm-film { margin-top:2.2rem; }
+.sm-film video { width:100%; height:auto; display:block; border-radius:4px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
 </style>
 </head>
 <body class="sm-night">
@@ -299,6 +313,18 @@
 
 <section class="sm-section">
   <div class="container">
+    <div class="section-kicker sm-kicker">Every love story has a sky</div>
+    <h2>Some nights deserve a frame.</h2>
+    <div class="sm-film">
+      <video autoplay muted loop playsinline preload="metadata" poster="assets/starmap/film-poster.jpg" aria-label="Framed star maps in real homes: the night we met, she said yes, our wedding sky, the day you were born, ten years of us">
+        <source src="assets/starmap/skythatnight-loop.mp4" type="video/mp4">
+      </video>
+    </div>
+  </div>
+</section>
+
+<section class="sm-section">
+  <div class="container">
     <div class="section-kicker sm-kicker">Four moods</div>
     <h2>One sky, four ways.</h2>
     <div class="sm-gallery-grid">
@@ -314,14 +340,14 @@
   <div class="container">
     <div class="section-kicker sm-kicker">For the nights worth keeping</div>
     <h2>Occasions.</h2>
-    <div class="sm-occasions">
-      <span>The night you met</span>
-      <span>A wedding sky</span>
-      <span>The night they were born</span>
-      <span>An anniversary</span>
-      <span>In loving memory</span>
-      <span>The move, the leap, the win</span>
+    <div class="sm-occgrid">
+      <figure><img src="assets/starmap/occ-met.jpg" alt="Framed star map above a bed — the night we met" loading="lazy"><figcaption>The night you met<span class="occ-sub">London · August 2019</span></figcaption></figure>
+      <figure><img src="assets/starmap/occ-proposal.jpg" alt="Framed star map on a candlelit mantelpiece — she said yes" loading="lazy"><figcaption>She said yes<span class="occ-sub">Paris · September 2023</span></figcaption></figure>
+      <figure><img src="assets/starmap/occ-wedding.jpg" alt="Framed star map above a console with wedding flowers" loading="lazy"><figcaption>A wedding sky<span class="occ-sub">Rome · June 2024</span></figcaption></figure>
+      <figure><img src="assets/starmap/occ-born.jpg" alt="Framed star map above a crib in a nursery" loading="lazy"><figcaption>The night they were born<span class="occ-sub">Edinburgh · March 2025</span></figcaption></figure>
+      <figure><img src="assets/starmap/occ-anniversary.jpg" alt="Framed star map behind an anniversary dinner table" loading="lazy"><figcaption>An anniversary<span class="occ-sub">Santorini · ten years on</span></figcaption></figure>
     </div>
+    <p class="sm-occ-more">…and every night worth keeping — in loving memory, the move, the leap, the win.</p>
   </div>
 </section>
 
@@ -386,6 +412,17 @@
   </div>
 </footer>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var v = document.querySelector('.sm-film video');
+  if (!v) return;
+  v.muted = true;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { e.isIntersecting ? v.play().catch(function(){}) : v.pause(); });
+  }, { threshold: 0.25 });
+  io.observe(v);
+});
+</script>
 <script src="assets/starmap.js?v=6" defer></script>
 </body>
 </html>
