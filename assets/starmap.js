@@ -321,6 +321,7 @@ function attachControls() {
 /* ───────────────────────── boot ───────────────────────── */
 
 document.addEventListener('DOMContentLoaded', async () => {
+  if (window.SM_PRESET) Object.assign(state, window.SM_PRESET);
   try {
     const r = await fetch('assets/starmap-data.json');
     CATALOG = await r.json();
@@ -333,6 +334,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('sm-time').value = state.timeStr;
   document.getElementById('sm-place').value = state.place;
   document.getElementById('sm-dedication').value = state.dedication;
+  document.querySelectorAll('.sm-theme').forEach(b => b.classList.toggle('active', b.dataset.theme === state.theme));
+  document.querySelectorAll('.sm-format').forEach(b => b.classList.toggle('active', b.dataset.format === state.format));
+  document.querySelectorAll('.sm-frame-color').forEach(b => b.classList.toggle('active', b.dataset.color === state.frameColor));
   attachGeocode();
   attachControls();
   refresh();

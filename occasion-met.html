@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sky, That Night — Custom Star Maps of Your Exact Sky</title>
-<meta name="description" content="A museum-grade star map of the exact sky above any place on any date — real astronomy, 11,000 stars, the true moon phase of your night. Framed or print, from £39 with free UK delivery.">
-<link rel="canonical" href="https://www.skythatnight.com/">
+<title>Star Map for the Night You Met · Sky, That Night</title>
+<meta name="description" content="A star map of the exact sky the night you met — real astronomy, museum-grade print, from £39 with free UK delivery.">
+<link rel="canonical" href="https://www.skythatnight.com/occasion-met.html">
 <meta property="og:type" content="product">
 <meta property="og:site_name" content="Sky, That Night">
-<meta property="og:title" content="Sky, That Night — Custom Star Maps">
-<meta property="og:description" content="The exact sky above any place, on any date. Real astronomy, museum-grade print, from £39.">
-<meta property="og:url" content="https://www.skythatnight.com/">
-<meta property="og:image" content="https://www.skythatnight.com/assets/starmap/og-lifestyle.jpg">
+<meta property="og:title" content="Star Map for the Night You Met">
+<meta property="og:description" content="A star map of the exact sky the night you met — real astronomy, museum-grade print, from £39 with free UK delivery.">
+<meta property="og:url" content="https://www.skythatnight.com/occasion-met.html">
+<meta property="og:image" content="https://www.skythatnight.com/assets/starmap/occ-met.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css">
-<link rel="preload" as="image" href="assets/starmap/hero-midnight.jpg">
+<link rel="preload" as="image" href="assets/starmap/occ-met.jpg">
 <style>
 /* ── Nocturne annex: page-scoped night theme ─────────────────────────── */
 .sm-night {
@@ -171,18 +171,33 @@
 @media (max-width:1100px){ .sm-occgrid { grid-template-columns:repeat(3,1fr); } }
 @media (max-width:640px){ .sm-occgrid { grid-template-columns:repeat(2,1fr); } }
 .sm-occgrid figure { margin:0; }
-.sm-occgrid a { text-decoration:none; display:block; }
-.sm-occgrid a img { transition:transform .35s ease, box-shadow .35s ease; }
-.sm-occgrid a:hover img { transform:translateY(-4px); box-shadow:0 22px 52px rgba(0,0,0,.55), 0 0 0 1px rgba(201,169,97,.28); }
-.sm-occgrid a:hover figcaption { color:var(--gold); }
 .sm-occgrid img { width:100%; height:auto; display:block; border-radius:3px;
   box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
-.sm-occgrid figcaption { font-family:var(--serif); font-size:1.02rem; color:var(--moon); margin-top:.7rem; transition:color .25s ease; }
+.sm-occgrid figcaption { font-family:var(--serif); font-size:1.02rem; color:var(--moon); margin-top:.7rem; }
 .sm-occgrid .occ-sub { display:block; font-family:var(--sans); font-size:.76rem; letter-spacing:.06em; color:var(--moon-faint); margin-top:.15rem; }
 .sm-occ-more { font-family:var(--serif); font-style:italic; color:var(--moon-sub); margin-top:1.6rem; }
 .sm-film { margin-top:2.2rem; }
 .sm-film video { width:100%; height:auto; display:block; border-radius:4px;
   box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
+
+/* occasion landing */
+.occ-hero { padding: clamp(2.4rem,5vw,4.5rem) 0 clamp(1.5rem,3vw,2.5rem); position:relative; overflow:hidden; }
+.occ-hero .container { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(2rem,4vw,4rem); align-items:center; }
+@media (max-width:860px){ .occ-hero .container { grid-template-columns:1fr; } }
+.occ-back { display:inline-block; font-family:var(--sans); font-size:.78rem; letter-spacing:.12em; text-transform:uppercase; color:var(--moon-faint); text-decoration:none; margin-bottom:1.4rem; }
+.occ-back:hover { color:var(--gold); }
+.occ-kicker { font-family:var(--sans); font-size:.78rem; letter-spacing:.32em; text-transform:uppercase; color:var(--gold); margin-bottom:1.1rem; }
+.occ-h1 { font-family:var(--serif); font-weight:500; font-size:clamp(2.2rem,4.6vw,3.6rem); line-height:1.08; color:var(--moon); margin:0 0 1.3rem; }
+.occ-story { font-family:var(--sans); font-weight:300; font-size:clamp(1rem,1.4vw,1.12rem); line-height:1.7; color:var(--moon-sub); max-width:34rem; margin-bottom:2rem; }
+.occ-hero img { width:100%; height:auto; display:block; border-radius:4px; box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
+.occ-room { margin-top:2.4rem; }
+.occ-room img { width:100%; height:auto; display:block; border-radius:4px; box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
+.occ-more-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.1rem; margin-top:2.2rem; }
+@media (max-width:860px){ .occ-more-grid { grid-template-columns:repeat(2,1fr); } }
+.occ-more-grid a { text-decoration:none; }
+.occ-more-grid img { width:100%; height:auto; display:block; border-radius:3px; box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
+.occ-more-grid figcaption { font-family:var(--serif); font-size:.98rem; color:var(--moon); margin-top:.6rem; }
+.occ-more-grid a:hover figcaption { color:var(--gold); }
 </style>
 </head>
 <body class="sm-night">
@@ -193,36 +208,29 @@
     </a>
     <button class="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
     <nav class="nav" id="main-nav">
-      <a href="#design">Design yours</a>
-      <a href="#craft">How it works</a>
-      <a href="#faq">FAQ</a>
+      <a href="./#design">Design yours</a>
+      <a href="./#craft">How it works</a>
+      <a href="./#faq">FAQ</a>
       <a href="mailto:admin@shopcienty.com">Contact</a>
     </nav>
   </div>
 </header>
 
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Product","name":"Custom Star Map Print","description":"Personalised star map of the exact sky above any place on any date. Real astronomical data, museum-grade giclée print, optional handmade frame.","image":"https://www.skythatnight.com/assets/starmap/hero-midnight.jpg","sku":"star-map","brand":{"@type":"Brand","name":"Sky, That Night"},"offers":{"@type":"AggregateOffer","lowPrice":"39.00","highPrice":"64.00","priceCurrency":"GBP","availability":"https://schema.org/InStock","url":"https://www.skythatnight.com/"}}
-</script>
-
 <main>
 
-<section class="sm-hero">
+<section class="occ-hero">
   <div class="sm-stars" aria-hidden="true"></div>
   <div class="container">
     <div>
-      <div class="sm-kicker sm-reveal">The Atelier · Personalised</div>
-      <h1 class="sm-h1 sm-reveal">The night everything changed,<br><em>kept forever.</em></h1>
-      <p class="sm-lede sm-reveal">The exact sky above any place, on any date — computed from real astronomical
-      data: eleven thousand stars, the constellations, and the true phase of the moon that night.
-      Printed at museum grade in the UK, framed by hand.</p>
-      <a class="sm-cta" href="#design">Design yours — from £39</a>
+      <a class="occ-back" href="./#occasions">← All occasions</a>
+      <div class="occ-kicker">The night you met</div>
+      <h1 class="occ-h1">The night we met</h1>
+      <p class="occ-story">Wherever your story began — a bar, a bus stop, a message at midnight — this is the exact sky that stood over it.</p>
+      <a class="sm-cta" href="#design">Design this sky — from £39</a>
       <span class="sm-cta-sub">Free UK delivery included · dispatched in 2–4 working days</span>
     </div>
-    <div class="sm-fan" aria-hidden="true">
-      <img src="assets/starmap/hero-porcelain.jpg" alt="" loading="lazy">
-      <img src="assets/starmap/hero-midnight.jpg" alt="Custom star map poster, midnight theme">
-      <img src="assets/starmap/hero-luxe.jpg" alt="" loading="lazy">
+    <div>
+      <img src="assets/starmap/occ-met.jpg" alt="The night we met — framed star map in a room">
     </div>
   </div>
 </section>
@@ -291,104 +299,26 @@
   </div>
 </section>
 
-<section class="sm-section" id="craft">
-  <div class="container">
-    <div class="section-kicker sm-kicker">Every detail is real</div>
-    <h2>Not an illustration.<br>An astronomical record.</h2>
-    <div class="sm-craft-grid">
-      <div>
-        <h3>Real astronomy</h3>
-        <p>Your sky is computed from professional star catalogues — over 11,000 stars placed exactly
-        where they stood above your place, at your minute. The Milky Way included on print.</p>
-      </div>
-      <div>
-        <h3>The moon of your night</h3>
-        <p>Every map carries the true phase of the moon for your date — full, new, or the exact
-        crescent in between. A detail almost nobody else gets right.</p>
-      </div>
-      <div>
-        <h3>Museum-grade craft</h3>
-        <p>Giclée-printed on fine-art paper in the UK, framed by hand in responsibly sourced wood,
-        glazed with shatter-safe acrylic. Dispatched in 2–4 working days.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="sm-section">
   <div class="container">
-    <div class="section-kicker sm-kicker">Every love story has a sky</div>
-    <h2>Some nights deserve a frame.</h2>
-    <div class="sm-film">
-      <video autoplay muted loop playsinline preload="metadata" poster="assets/starmap/film-poster.jpg" aria-label="Framed star maps in real homes: the night we met, she said yes, our wedding sky, the day you were born, ten years of us">
-        <source src="assets/starmap/skythatnight-loop.mp4" type="video/mp4">
-      </video>
+    <div class="section-kicker sm-kicker">Seen in the room</div>
+    <h2>The night we met, on the wall.</h2>
+    <div class="occ-room">
+      <img src="assets/starmap/occ-met.jpg" alt="The night we met framed star map, styled in a room" loading="lazy">
     </div>
   </div>
 </section>
 
-<section class="sm-section">
-  <div class="container">
-    <div class="section-kicker sm-kicker">Four moods</div>
-    <h2>One sky, four ways.</h2>
-    <div class="sm-gallery-grid">
-      <figure><img src="assets/starmap/hero-midnight.jpg" alt="Midnight theme star map" loading="lazy"><figcaption>Midnight</figcaption></figure>
-      <figure><img src="assets/starmap/hero-luxe.jpg" alt="Luxe gold theme star map" loading="lazy"><figcaption>Luxe · gold &amp; silver</figcaption></figure>
-      <figure><img src="assets/starmap/hero-porcelain.jpg" alt="Porcelain theme star map" loading="lazy"><figcaption>Porcelain</figcaption></figure>
-      <figure><img src="assets/starmap/hero-dense.jpg" alt="Deep-sky dense star map" loading="lazy"><figcaption>Deep sky detail</figcaption></figure>
-    </div>
-  </div>
-</section>
-
-<section class="sm-section" id="occasions">
+<section class="sm-section" id="more">
   <div class="container">
     <div class="section-kicker sm-kicker">For the nights worth keeping</div>
-    <h2>Occasions.</h2>
-    <div class="sm-occgrid">
-      <a href="occasion-met.html"><figure><img src="assets/starmap/occ-met.jpg" alt="Framed star map above a bed — the night we met" loading="lazy"><figcaption>The night you met<span class="occ-sub">London · August 2019</span></figcaption></figure></a>
-      <a href="occasion-proposal.html"><figure><img src="assets/starmap/occ-proposal.jpg" alt="Framed star map on a candlelit mantelpiece — she said yes" loading="lazy"><figcaption>She said yes<span class="occ-sub">Paris · September 2023</span></figcaption></figure></a>
-      <a href="occasion-wedding.html"><figure><img src="assets/starmap/occ-wedding.jpg" alt="Framed star map above a console with wedding flowers" loading="lazy"><figcaption>A wedding sky<span class="occ-sub">Rome · June 2024</span></figcaption></figure></a>
-      <a href="occasion-born.html"><figure><img src="assets/starmap/occ-born.jpg" alt="Framed star map above a crib in a nursery" loading="lazy"><figcaption>The night they were born<span class="occ-sub">Edinburgh · March 2025</span></figcaption></figure></a>
-      <a href="occasion-anniversary.html"><figure><img src="assets/starmap/occ-anniversary.jpg" alt="Framed star map behind an anniversary dinner table" loading="lazy"><figcaption>An anniversary<span class="occ-sub">Santorini · ten years on</span></figcaption></figure></a>
+    <h2>More occasions.</h2>
+    <div class="occ-more-grid">
+      <a href="occasion-proposal.html"><figure><img src="assets/starmap/occ-proposal.jpg" alt="The proposal star map mockup" loading="lazy"><figcaption>The proposal</figcaption></figure></a>
+      <a href="occasion-wedding.html"><figure><img src="assets/starmap/occ-wedding.jpg" alt="A wedding sky star map mockup" loading="lazy"><figcaption>A wedding sky</figcaption></figure></a>
+      <a href="occasion-born.html"><figure><img src="assets/starmap/occ-born.jpg" alt="The night they were born star map mockup" loading="lazy"><figcaption>The night they were born</figcaption></figure></a>
+      <a href="occasion-anniversary.html"><figure><img src="assets/starmap/occ-anniversary.jpg" alt="An anniversary star map mockup" loading="lazy"><figcaption>An anniversary</figcaption></figure></a>
     </div>
-    <p class="sm-occ-more">…and every night worth keeping — in loving memory, the move, the leap, the win.</p>
-  </div>
-</section>
-
-<section class="sm-section sm-faq" id="faq">
-  <div class="container">
-    <div class="section-kicker sm-kicker">Questions</div>
-    <h2>Good to know.</h2>
-    <details>
-      <summary>How accurate is the sky?</summary>
-      <p>Genuinely accurate. We compute the position of every star from professional astronomical
-      catalogues for your exact date, time and coordinates — the same mathematics observatories use.
-      Rotate the map to your date of birth and an astronomer would recognise the sky.</p>
-    </details>
-    <details>
-      <summary>How long does delivery take?</summary>
-      <p>Your piece is made to order in a UK fine-art lab and dispatched within 2–4 working days,
-      then delivered by tracked courier. Delivery is free to any UK address and already included
-      in the price shown.</p>
-    </details>
-    <details>
-      <summary>Can I return a personalised print?</summary>
-      <p>Because each piece is made uniquely for you, personalised items are exempt from the standard
-      14-day change-of-mind return. But if your order arrives damaged, faulty or not as approved,
-      we will reprint or refund it in full — that right is never affected. Check your preview
-      carefully before ordering; what you see is what we print.</p>
-    </details>
-    <details>
-      <summary>What sizes and finishes are available?</summary>
-      <p>Print only (30×40&nbsp;cm, shipped rolled), framed 30×40&nbsp;cm, or framed 40×50&nbsp;cm.
-      Frames are handmade wood in white or natural finish with acrylic glazing. Five poster themes
-      are included at no extra cost.</p>
-    </details>
-    <details>
-      <summary>Is my exact time or place required?</summary>
-      <p>The date and place matter most. If you don't know the exact minute, pick an evening hour —
-      the constellations of your night will still be true. Any town or village worldwide works.</p>
-    </details>
   </div>
 </section>
 
@@ -398,9 +328,9 @@
   <div class="container footer-links">
     <div class="foot-link-col">
       <div class="foot-rule">Sky, That Night</div>
-      <a href="#design">Design your sky</a>
-      <a href="#craft">How it works</a>
-      <a href="#faq">FAQ</a>
+      <a href="./#design">Design your sky</a>
+      <a href="./#craft">How it works</a>
+      <a href="./#faq">FAQ</a>
     </div>
     <div class="foot-link-col">
       <div class="foot-rule">Help</div>
@@ -416,17 +346,7 @@
   </div>
 </footer>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-  var v = document.querySelector('.sm-film video');
-  if (!v) return;
-  v.muted = true;
-  var io = new IntersectionObserver(function (es) {
-    es.forEach(function (e) { e.isIntersecting ? v.play().catch(function(){}) : v.pause(); });
-  }, { threshold: 0.25 });
-  io.observe(v);
-});
-</script>
-<script src="assets/starmap.js?v=7" defer></script>
+<script>window.SM_PRESET = {"dateStr": "2019-08-14", "timeStr": "22:30", "place": "London, United Kingdom", "lat": 51.5074, "lon": -0.1278, "iana": "Europe/London", "dedication": "The night we met", "theme": "midnight", "format": "framed", "frameColor": "white"};</script>
+<script src="assets/starmap.js?v7" defer></script>
 </body>
 </html>
