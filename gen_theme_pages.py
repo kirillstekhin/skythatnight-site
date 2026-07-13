@@ -9,7 +9,7 @@ idx = open(os.path.join(HERE, "index.html")).read()
 
 STYLE = re.search(r"<style>(.*?)</style>", idx, re.S).group(1)
 CONFIG = re.search(r'(<section class="sm-config" id="design">.*?</section>)', idx, re.S).group(1)
-CACHE = "v=8"
+CACHE = "v=9"
 
 ORDER = ["midnight", "luxe", "porcelain", "dense"]
 
