@@ -174,7 +174,7 @@ function renderSvg(o) {
   let ty = cy + R + 108;
   s.push(`<g>${moonIconSvg(cx, ty - 17, 16, phase, o.theme === 'porcelain' ? t.ink : t.star, t.accent)}</g>`);
   ty += 41;
-  const ded = (o.dedication || 'Under this sky').toUpperCase();
+  const ded = (o.dedication || 'Sky That Night').toUpperCase();
   s.push(`<text x="${cx}" y="${ty}" fill="${t.ink}" font-family="'EB Garamond',Georgia,serif" font-size="34" letter-spacing="4" text-anchor="middle">${esc(ded)}</text>`);
   const oy = ty + 26;
   s.push(`<line x1="${cx-130}" y1="${oy}" x2="${cx-14}" y2="${oy}" stroke="${t.accent}" stroke-width="0.8" opacity="0.7"/>`);
@@ -210,7 +210,7 @@ const PAYMENT_LINKS = {
 const state = {
   dateStr: '2021-06-19', timeStr: '21:45',
   place: 'London, United Kingdom', lat: 51.5074, lon: -0.1278, tz: 1, iana: 'Europe/London',
-  dedication: 'Under this sky',
+  dedication: 'Sky That Night',
   theme: 'midnight', format: 'framed', frameColor: 'white',
 };
 
