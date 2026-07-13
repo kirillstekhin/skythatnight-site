@@ -201,10 +201,10 @@ const FORMATS = {
 /* Stripe Payment Links — вставить URL после создания в Stripe Dashboard (см. STRIPE_SETUP.md).
    Каждой ссылке добавляется ?client_reference_id=<design code> автоматически. */
 const PAYMENT_LINKS = {
-  // sandbox/test links (12.07) — заменить на live после активации аккаунта
-  print:    'https://buy.stripe.com/test_8x26oH5Zn3lyfJEbCI7Vm02',
-  framed:   'https://buy.stripe.com/test_9B6fZhgE14pCeFAeOU7Vm00',
-  framedXL: 'https://buy.stripe.com/test_eVqdR987va00bto4ag7Vm01',
+  // LIVE links (13.07, account activated)
+  print:    'https://buy.stripe.com/dRm4gA3wGbitdzd2di7g400',
+  framed:   'https://buy.stripe.com/eVq5kE3wG0DP1Qv4lq7g401',
+  framedXL: 'https://buy.stripe.com/8x26oI3wGcmxeDh05a7g402',
 };
 
 const state = {
