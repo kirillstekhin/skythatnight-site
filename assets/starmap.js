@@ -97,10 +97,22 @@ function moonIconSvg(cx, cy, r, phase, fill, ring) {
   return s;
 }
 
+/* Аспект = print-area Prodigi (иначе печать обрежет постер):
+   30x40cm (12x16") → 3:4 · 40x50cm (16x20") → 4:5. Превью ОБЯЗАНО совпадать с печатью. */
+const PRINT_SIZES = { '30x40': 4 / 3, '40x50': 5 / 4 };            // H/W
+const FORMAT_SIZE = { print: '30x40', framed: '30x40', framedXL: '40x50' };
+
 function renderSvg(o) {
-  // o: {dateStr,timeStr,lat,lon,tz,place,dedication,theme}
+  // o: {dateStr,timeStr,lat,lon,tz,place,dedication,theme,format}
   const t = THEMES[o.theme] || THEMES.midnight;
-  const W = 1200, H = 1560, cx = W / 2, cy = 640, R = 500;
+  const W = 1200;
+  const H = Math.round(W * PRINT_SIZES[FORMAT_SIZE[o.format] || '30x40']);
+  const MOON_R = 16;
+  const TEXT_H = 108 + (2 * MOON_R + 9) + 136;   // круг → луна → посвящение/место/дата/координаты
+  const region = H - 58;                          // полезная высота над строкой бренда
+  const R = Math.min(0.4167 * W, (region - TEXT_H - 180) / 2);
+  const top = (region - (2 * R + TEXT_H)) / 2;    // остаток поровну → композиция сбалансирована
+  const cx = W / 2, cy = top + R;
   const { lst, jd } = lstDeg(o.dateStr, o.timeStr, o.lon, o.tz);
   const s = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">`];
   s.push(`<defs><clipPath id="skyclip"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath></defs>`);
