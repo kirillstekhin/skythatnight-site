@@ -239,12 +239,15 @@ function tzOffsetHours(iana, dateStr, timeStr) {
   } catch (e) { return Math.round(state.lon / 15); }
 }
 
+/* SM2: включает часовой пояс (Z<минуты, со знаком>). Без него сервер отрендерил бы
+   небо другого часа, чем видел клиент — печать не совпала бы с превью. */
 function designCode() {
   const d = state.dateStr.replace(/-/g, '');
   const t = state.timeStr.replace(':', '');
   const la = (state.lat >= 0 ? 'N' : 'S') + Math.abs(Math.round(state.lat * 10000));
   const lo = (state.lon >= 0 ? 'E' : 'W') + Math.abs(Math.round(state.lon * 10000));
-  return `SM1-${d}-${t}-${la}-${lo}-${state.theme.toUpperCase()}-${state.format.toUpperCase()}-${state.frameColor.toUpperCase()}`;
+  const z = 'Z' + Math.round(state.tz * 60);   // смещение в минутах, напр. Z60 / Z-300
+  return `SM2-${d}-${t}-${la}-${lo}-${z}-${state.theme.toUpperCase()}-${state.format.toUpperCase()}-${state.frameColor.toUpperCase()}`;
 }
 
 function refresh() {
