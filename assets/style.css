@@ -1188,7 +1188,7 @@ footer {
 
 /* ─── Info pages ─────────────────────────────────────────── */
 
-.info-page { padding: 3rem 0 6rem; }
+.info-page { padding: 3rem var(--gutter) 6rem; }
 .info-kicker {
   font-family: var(--sans);
   font-size: 0.7rem;
@@ -2040,3 +2040,43 @@ footer {
   .trust-icon svg { width: 18px; height: 18px; }
   .trust-label { font-size: 0.7rem; }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NIGHT THEME (shared) — <body class="sm-night">
+   index.html + occasion-*.html carry their own inline annex for hero sections;
+   this shared copy lets standalone content pages (privacy/terms) go night too.
+   Base tokens + header/footer chrome + long-form .info-* overrides.
+   ══════════════════════════════════════════════════════════════════════════ */
+.sm-night {
+  --night:#0b1733; --night-deep:#081124; --night-hi:#12203f;
+  --gold:#c9a961; --gold-soft:#a58a4e;
+  --moon:#eaf0ff; --moon-sub:#8fb0e6; --moon-faint:#5f77a5;
+  background: var(--night); color: var(--moon);
+}
+/* root canvas dark on night pages so cream --bg never peeks on overscroll */
+html:has(.sm-night) { background: #081124; }
+.sm-night header { background: transparent; border-bottom: 1px solid rgba(201,169,97,.18); }
+.sm-night .sm-wordmark { font-family:var(--serif); font-size:1.15rem; letter-spacing:.32em;
+  color:var(--moon); text-decoration:none; display:flex; align-items:center; white-space:nowrap; }
+.sm-night .sm-wordmark span { color:var(--gold); font-size:.9rem; }
+.sm-night .sm-wordmark:hover { color:var(--gold); }
+.sm-night header .nav a { color: var(--moon-sub); }
+.sm-night header .nav a:hover { color: var(--gold); }
+.sm-night .mobile-menu-btn { color: var(--moon); }
+.sm-night footer { background: var(--night-deep); border-top: 1px solid rgba(201,169,97,.15); }
+.sm-night footer, .sm-night footer a { color: var(--moon-faint); }
+.sm-night footer a:hover { color: var(--gold); }
+.sm-night .foot-rule { color: var(--moon-sub); border-color: rgba(201,169,97,.25); }
+
+/* long-form legal/info content on night */
+.sm-night .info-kicker { color: var(--gold-soft); }
+.sm-night .info-title { color: var(--moon); border-bottom-color: rgba(201,169,97,.28); }
+.sm-night .info-content h2 { color: var(--moon); border-top-color: rgba(201,169,97,.18); }
+.sm-night .info-content h3 { color: var(--moon-sub); }
+.sm-night .info-content p, .sm-night .info-content li { color: var(--moon-sub); }
+.sm-night .info-content strong { color: var(--moon); }
+.sm-night .info-content a { color: var(--gold); border-bottom: 1px solid rgba(201,169,97,.5); }
+.sm-night .info-content a:hover { opacity: .65; }
+.sm-night .info-content .info-highlight { background: var(--night-hi); border: 1px solid rgba(201,169,97,.2); }
+.sm-night .info-content .info-highlight p { color: var(--moon-sub); }
+.sm-night .info-content .info-highlight strong { color: var(--moon); }
