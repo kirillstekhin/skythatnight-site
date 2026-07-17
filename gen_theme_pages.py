@@ -87,6 +87,7 @@ FOOTER = """<footer>
     <div class="foot-link-col">
       <div class="foot-rule">Help</div>
       <a href="mailto:admin@shopcienty.com">admin@shopcienty.com</a>
+      <a href="delivery.html">Delivery &amp; Returns</a>
       <a href="privacy.html">Privacy Policy</a>
       <a href="terms.html">Terms &amp; Conditions</a>
     </div>
