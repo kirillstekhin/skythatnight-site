@@ -56,6 +56,43 @@ OCC = {
         preset=dict(dateStr="2015-07-21", timeStr="21:30", place="Santorini, Greece",
                     lat=36.3932, lon=25.4615, iana="Europe/Athens", dedication="Ten years of us",
                     theme="luxesilver", format="framed", frameColor="white")),
+
+    # ── Расширение окейжнов 18.07. img = НАШИ отрендеренные печати с правильной подписью
+    # (tools/render_occ_heroes через starmap_v3) — placeholder до реальных lifestyle-фото образцов.
+    # roomless=True → прячем секцию «Seen in the room» (bare-print, стены нет; вернём с фото).
+    # Пока НЕ в ORDER (bare-print vs room-мокапы = неровная сетка «More occasions»); ссылки — sitemap + Pinterest/Etsy/Google.
+    "birthday": dict(
+        title="The sky the day you were born", chip="A milestone birthday", roomless=True,
+        story="Thirty years, fifty, ninety — turn back to the exact sky that stood over the very first day. A birthday gift that reaches further back than any other.",
+        img="occ-birthday.jpg", metatitle="Birthday Star Map — The Sky the Day You Were Born",
+        metadesc="A personalised star map of the exact sky on the day you were born — a milestone birthday gift. Real astronomy, museum-grade print, from £39 with free UK delivery.",
+        preset=dict(dateStr="1974-05-16", timeStr="07:20", place="Manchester, United Kingdom",
+                    lat=53.4808, lon=-2.2426, iana="Europe/London", dedication="The day you were born",
+                    theme="luxegold", format="framed", frameColor="natural")),
+    "new-home": dict(
+        title="Your first night here", chip="A new home", roomless=True,
+        story="The first night under a new roof, mapped from the sky above your new front door. A housewarming gift that turns a house into the start of a story.",
+        img="occ-new-home.jpg", metatitle="New Home Star Map — The Sky Above Your New Address",
+        metadesc="A personalised star map of the sky above your new home on your first night there. A thoughtful housewarming gift, from £39 with free UK delivery.",
+        preset=dict(dateStr="2025-11-01", timeStr="20:00", place="Bristol, United Kingdom",
+                    lat=51.4545, lon=-2.5879, iana="Europe/London", dedication="Our first night here",
+                    theme="porcelain", format="framed", frameColor="white")),
+    "retirement": dict(
+        title="The end of one chapter", chip="A retirement", roomless=True,
+        story="A lifetime of early starts, and now the horizon opens. Mark the day it all wound down — or the day it began — with the sky that watched over a life's work.",
+        img="occ-retirement.jpg", metatitle="Retirement Star Map — The Sky of a Life's Work",
+        metadesc="A personalised star map to mark a retirement — the sky on the first day, the last, or a date that mattered. A meaningful retirement gift, from £39 with free UK delivery.",
+        preset=dict(dateStr="2026-03-31", timeStr="17:30", place="Edinburgh, United Kingdom",
+                    lat=55.9533, lon=-3.1883, iana="Europe/London", dedication="With gratitude, for a life's work",
+                    theme="luxesilver", format="framed", frameColor="natural")),
+    "memorial": dict(
+        title="The stars still hold that night", chip="In memory", roomless=True,
+        story="Some skies we never want to lose. Map the night they were born, or a date you shared, and keep it somewhere the light can reach — a quiet, lasting way to remember someone who mattered.",
+        img="occ-memorial.jpg", metatitle="Memorial Star Map — A Keepsake to Remember Them By",
+        metadesc="A personalised star map to remember someone — the sky the night they were born, or a date you shared. A gentle, lasting memorial keepsake, from £39 with free UK delivery.",
+        preset=dict(dateStr="1948-09-12", timeStr="21:00", place="London, United Kingdom",
+                    lat=51.5074, lon=-0.1278, iana="Europe/London", dedication="Always in our hearts",
+                    theme="midnight", format="framed", frameColor="white")),
 }
 
 EXTRA_CSS = """
@@ -136,6 +173,16 @@ def build(key, o):
             f'alt="{oo["chip"]} star map mockup" loading="lazy"><figcaption>{oo["chip"]}</figcaption></figure></a>')
     others_html = "\n".join(others)
 
+    room_html = "" if o.get("roomless") else f"""<section class="sm-section">
+  <div class="container">
+    <div class="section-kicker sm-kicker">Seen in the room</div>
+    <h2>{o['title']}, on the wall.</h2>
+    <div class="occ-room">
+      <img src="assets/starmap/{o['img']}" alt="{o['title']} framed star map, styled in a room" loading="lazy">
+    </div>
+  </div>
+</section>"""
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -183,15 +230,7 @@ def build(key, o):
 
 {config}
 
-<section class="sm-section">
-  <div class="container">
-    <div class="section-kicker sm-kicker">Seen in the room</div>
-    <h2>{o['title']}, on the wall.</h2>
-    <div class="occ-room">
-      <img src="assets/starmap/{o['img']}" alt="{o['title']} framed star map, styled in a room" loading="lazy">
-    </div>
-  </div>
-</section>
+{room_html}
 
 <section class="sm-section" id="more">
   <div class="container">
