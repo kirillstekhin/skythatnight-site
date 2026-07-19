@@ -114,6 +114,18 @@ EXTRA_CSS = """
 .occ-more-grid img { width:100%; height:auto; display:block; border-radius:3px; box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
 .occ-more-grid figcaption { font-family:var(--serif); font-size:.98rem; color:var(--moon); margin-top:.6rem; }
 .occ-more-grid a:hover figcaption { color:var(--gold); }
+/* answer capsule (GEO — прямой ответ для AI-цитирования) */
+.occ-capsule { background:rgba(201,169,97,.06); border-left:2px solid var(--gold); border-radius:4px; padding:1.05rem 1.3rem; margin:0 0 2rem; max-width:34rem; }
+.occ-capsule p { font-family:var(--sans); font-weight:300; font-size:clamp(.95rem,1.3vw,1.05rem); line-height:1.65; color:var(--moon-sub); margin:0; }
+/* occasion FAQ (видимый + FAQPage-схема) */
+.occ-faq-list { max-width:44rem; margin-top:1.4rem; }
+.occ-faq { border-bottom:1px solid rgba(201,169,97,.16); }
+.occ-faq summary { font-family:var(--serif); font-size:1.06rem; color:var(--moon); cursor:pointer; padding:.95rem 0; list-style:none; }
+.occ-faq summary::-webkit-details-marker { display:none; }
+.occ-faq summary::before { content:"+ "; color:var(--gold); }
+.occ-faq[open] summary { color:var(--gold); }
+.occ-faq[open] summary::before { content:"− "; }
+.occ-faq p { font-family:var(--sans); font-weight:300; font-size:.98rem; line-height:1.7; color:var(--moon-sub); margin:0 0 1rem; max-width:40rem; }
 """
 
 HEADER = """<header>
@@ -155,6 +167,120 @@ FOOTER = """<footer>
 </footer>"""
 
 
+OCC_WORD = {
+    "met": "star map", "proposal": "proposal", "wedding": "wedding", "born": "new-baby",
+    "anniversary": "anniversary", "birthday": "birthday", "new-home": "housewarming",
+    "retirement": "retirement", "memorial": "memorial",
+}
+
+# Shared factual FAQ (answers extractable как answer-capsules — техника GEO plmba)
+BASE_FAQ = [
+    ("How accurate is the star map?",
+     "Every map is generated from real astronomical data for the exact date, time and place you choose — the true positions of the stars, planets and the Milky Way that night, not a decorative pattern."),
+    ("What date and time should I choose?",
+     "Use the moment that matters — most people pick the evening of the event. If you don't know the exact time, any time that night still shows the correct sky; the stars shift only slightly across a few hours."),
+    ("How long does delivery take?",
+     "Free UK delivery, dispatched in 2 to 4 working days. A tracking number is emailed the moment your parcel leaves us."),
+    ("Can I return it?",
+     "Because each map is made to order to your exact date, place and wording, it's exempt from the usual change-of-mind return — so please check every detail before you order. You're still fully protected if anything's wrong: if it arrives faulty, damaged or not as described, email us within 30 days for a full refund or free replacement, return postage on us."),
+]
+
+
+def esc(s):
+    return s.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def occasion_faq(key, o):
+    w = OCC_WORD.get(key, "star map")
+    q = f"Is a star map a good {w} gift?" if w != "star map" else "Is a star map a good gift?"
+    a = (f"Yes — it is one of the most personal gifts you can give: the exact night sky over the moment "
+         f"that matters, mapped down to the minute and framed to keep. It marks the date in a way a generic gift cannot.")
+    return [(q, a)] + BASE_FAQ
+
+
+# Бес-поводные answer-капсулы (GEO): каждая ведёт ПРЯМЫМ ответом на запрос своего повода,
+# self-contained (можно процитировать без страницы), ~70-85 слов, факт+тепло. Хвост «from £39…» общий.
+TAIL = "Sky, That Night recreates it from real astronomy down to the minute, prints it museum-grade and frames it by hand. From £39, with free UK delivery, dispatched in 2 to 4 working days."
+CAPSULE = {
+    "anniversary": ("An anniversary star map is one of the most personal anniversary gifts you can give: a print of the "
+        "exact night sky over the evening your story began — the true positions of the stars above your first date, your "
+        "wedding, or any year worth marking, finished in quiet silver. " + TAIL),
+    "proposal": ("A proposal star map captures the exact sky the night you asked — the real stars over the place and "
+        "minute she said yes, kept in gold for a night that changed everything. It is an engagement gift no one else can "
+        "copy, because no two skies are ever alike. " + TAIL),
+    "wedding": ("A wedding star map is a print of the exact night sky above your wedding — the real stars over the place "
+        "and moment you married, finished in soft porcelain to suit any home. It makes a timeless wedding or "
+        "first-anniversary gift. " + TAIL),
+    "born": ("A new-baby star map shows the exact night sky the moment your baby was born — the real stars above the "
+        "hospital, down to the minute of the first breath. It is a new-baby or christening keepsake no one else can "
+        "duplicate, ready to hang in the nursery. " + TAIL),
+    "birthday": ("A birthday star map shows the exact night sky on the day someone was born — turn back thirty years, "
+        "fifty, or ninety to the real stars that stood over their very first day. It is a milestone-birthday gift that "
+        "reaches further back than any other. " + TAIL),
+    "new-home": ("A new-home star map is a print of the night sky above a new front door — the real stars over the first "
+        "night under a new roof. It is a housewarming gift that turns a house into the start of a story. " + TAIL),
+    "retirement": ("A retirement star map marks the close of a life's work with the real night sky over a date that "
+        "mattered — the last day, the first, or a moment worth keeping. It is a meaningful retirement gift for someone "
+        "who already has everything. " + TAIL),
+    # ⚠️мемориал БЕЗ коммерческого хвоста (тон важнее факта о цене/сроках — решение юзера 19.07)
+    "memorial": ("A memorial star map keeps the real night sky from a date that mattered — the night someone was born, or "
+        "a day you shared — as a quiet, lasting way to remember them. Sky, That Night recreates that sky from real "
+        "astronomy, down to the minute, and prints it museum-grade, framed by hand to hang somewhere the light can reach. "
+        "Made to order, with free UK delivery."),
+    "met": ("A star map of the night you met captures the exact sky over the moment your story started — a bar, a bus "
+        "stop, a message at midnight — in real stars, kept to the minute. As personal as the memory itself. " + TAIL),
+}
+
+
+def capsule_text(key, o):
+    if key in CAPSULE:
+        return CAPSULE[key]
+    w = OCC_WORD.get(key, "personalised")
+    lead = "A star map" if w == "star map" else f"A {w} star map"
+    return (f"{lead} from Sky, That Night is a print of the real night sky above a place and time you choose, "
+            f"recreated from astronomical data for the exact date — and minute — that matters. " + TAIL)
+
+
+def faq_jsonld(faqs):
+    import json
+    data = {"@context": "https://schema.org", "@type": "FAQPage",
+            "mainEntity": [{"@type": "Question", "name": q,
+                            "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faqs]}
+    return '<script type="application/ld+json">' + json.dumps(data, ensure_ascii=False) + '</script>'
+
+
+def product_jsonld(o, url, ogimg):
+    import json
+    data = {"@context": "https://schema.org", "@type": "Product",
+            "name": o["metatitle"], "description": o["metadesc"], "image": ogimg,
+            "brand": {"@type": "Brand", "name": "Sky, That Night"},
+            "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": "39",
+                       "availability": "https://schema.org/InStock", "url": url,
+                       "shippingDetails": {"@type": "OfferShippingDetails",
+                           "shippingRate": {"@type": "MonetaryAmount", "value": "0", "currency": "GBP"},
+                           "shippingDestination": {"@type": "DefinedRegion", "addressCountry": "GB"}}}}
+    return '<script type="application/ld+json">' + json.dumps(data, ensure_ascii=False) + '</script>'
+
+
+def faq_html(faqs):
+    items = "\n".join(
+        f'      <details class="occ-faq"><summary>{esc(q)}</summary><p>{esc(a)}</p></details>'
+        for q, a in faqs)
+    return f"""<section class="sm-section" id="faq">
+  <div class="container">
+    <div class="section-kicker sm-kicker">Good to know</div>
+    <h2>Questions, answered.</h2>
+    <div class="occ-faq-list">
+{items}
+    </div>
+  </div>
+</section>"""
+
+
+def capsule_html(text):
+    return f'<div class="occ-capsule"><p>{esc(text)}</p></div>'
+
+
 def build(key, o):
     url = f"https://www.skythatnight.com/occasion-{key}.html"
     ogimg = f"https://www.skythatnight.com/assets/starmap/{o['img']}"
@@ -183,6 +309,11 @@ def build(key, o):
   </div>
 </section>"""
 
+    faqs = occasion_faq(key, o)
+    schema = faq_jsonld(faqs) + product_jsonld(o, url, ogimg)
+    cap = capsule_html(capsule_text(key, o))
+    faqsec = faq_html(faqs)
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -205,6 +336,7 @@ def build(key, o):
 <link rel="stylesheet" href="assets/style.css?v=2">
 <link rel="preload" as="image" href="assets/starmap/{o['img']}">
 <style>{STYLE}{EXTRA_CSS}</style>
+{schema}
 </head>
 <body class="sm-night">
 {HEADER}
@@ -219,6 +351,7 @@ def build(key, o):
       <div class="occ-kicker">{o['chip']}</div>
       <h1 class="occ-h1">{o['title']}</h1>
       <p class="occ-story">{o['story']}</p>
+      {cap}
       <a class="sm-cta" href="#design">Design this sky — from £39</a>
       <span class="sm-cta-sub">Free UK delivery included · dispatched in 2–4 working days</span>
     </div>
@@ -231,6 +364,8 @@ def build(key, o):
 {config}
 
 {room_html}
+
+{faqsec}
 
 <section class="sm-section" id="more">
   <div class="container">

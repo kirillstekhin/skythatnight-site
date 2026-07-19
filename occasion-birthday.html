@@ -212,7 +212,20 @@
 .occ-more-grid img { width:100%; height:auto; display:block; border-radius:3px; box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
 .occ-more-grid figcaption { font-family:var(--serif); font-size:.98rem; color:var(--moon); margin-top:.6rem; }
 .occ-more-grid a:hover figcaption { color:var(--gold); }
+/* answer capsule (GEO — прямой ответ для AI-цитирования) */
+.occ-capsule { background:rgba(201,169,97,.06); border-left:2px solid var(--gold); border-radius:4px; padding:1.05rem 1.3rem; margin:0 0 2rem; max-width:34rem; }
+.occ-capsule p { font-family:var(--sans); font-weight:300; font-size:clamp(.95rem,1.3vw,1.05rem); line-height:1.65; color:var(--moon-sub); margin:0; }
+/* occasion FAQ (видимый + FAQPage-схема) */
+.occ-faq-list { max-width:44rem; margin-top:1.4rem; }
+.occ-faq { border-bottom:1px solid rgba(201,169,97,.16); }
+.occ-faq summary { font-family:var(--serif); font-size:1.06rem; color:var(--moon); cursor:pointer; padding:.95rem 0; list-style:none; }
+.occ-faq summary::-webkit-details-marker { display:none; }
+.occ-faq summary::before { content:"+ "; color:var(--gold); }
+.occ-faq[open] summary { color:var(--gold); }
+.occ-faq[open] summary::before { content:"− "; }
+.occ-faq p { font-family:var(--sans); font-weight:300; font-size:.98rem; line-height:1.7; color:var(--moon-sub); margin:0 0 1rem; max-width:40rem; }
 </style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is a star map a good birthday gift?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — it is one of the most personal gifts you can give: the exact night sky over the moment that matters, mapped down to the minute and framed to keep. It marks the date in a way a generic gift cannot."}}, {"@type": "Question", "name": "How accurate is the star map?", "acceptedAnswer": {"@type": "Answer", "text": "Every map is generated from real astronomical data for the exact date, time and place you choose — the true positions of the stars, planets and the Milky Way that night, not a decorative pattern."}}, {"@type": "Question", "name": "What date and time should I choose?", "acceptedAnswer": {"@type": "Answer", "text": "Use the moment that matters — most people pick the evening of the event. If you don't know the exact time, any time that night still shows the correct sky; the stars shift only slightly across a few hours."}}, {"@type": "Question", "name": "How long does delivery take?", "acceptedAnswer": {"@type": "Answer", "text": "Free UK delivery, dispatched in 2 to 4 working days. A tracking number is emailed the moment your parcel leaves us."}}, {"@type": "Question", "name": "Can I return it?", "acceptedAnswer": {"@type": "Answer", "text": "Because each map is made to order to your exact date, place and wording, it's exempt from the usual change-of-mind return — so please check every detail before you order. You're still fully protected if anything's wrong: if it arrives faulty, damaged or not as described, email us within 30 days for a full refund or free replacement, return postage on us."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "Birthday Star Map — The Sky the Day You Were Born", "description": "A personalised star map of the exact sky on the day you were born — a milestone birthday gift. Real astronomy, museum-grade print, from £39 with free UK delivery.", "image": "https://www.skythatnight.com/assets/starmap/occ-birthday.jpg", "brand": {"@type": "Brand", "name": "Sky, That Night"}, "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": "39", "availability": "https://schema.org/InStock", "url": "https://www.skythatnight.com/occasion-birthday.html", "shippingDetails": {"@type": "OfferShippingDetails", "shippingRate": {"@type": "MonetaryAmount", "value": "0", "currency": "GBP"}, "shippingDestination": {"@type": "DefinedRegion", "addressCountry": "GB"}}}}</script>
 </head>
 <body class="sm-night">
 <header>
@@ -240,6 +253,7 @@
       <div class="occ-kicker">A milestone birthday</div>
       <h1 class="occ-h1">The sky the day you were born</h1>
       <p class="occ-story">Thirty years, fifty, ninety — turn back to the exact sky that stood over the very first day. A birthday gift that reaches further back than any other.</p>
+      <div class="occ-capsule"><p>A birthday star map shows the exact night sky on the day someone was born — turn back thirty years, fifty, or ninety to the real stars that stood over their very first day. It is a milestone-birthday gift that reaches further back than any other. Sky, That Night recreates it from real astronomy down to the minute, prints it museum-grade and frames it by hand. From £39, with free UK delivery, dispatched in 2 to 4 working days.</p></div>
       <a class="sm-cta" href="#design">Design this sky — from £39</a>
       <span class="sm-cta-sub">Free UK delivery included · dispatched in 2–4 working days</span>
     </div>
@@ -314,6 +328,20 @@
 </section>
 
 
+
+<section class="sm-section" id="faq">
+  <div class="container">
+    <div class="section-kicker sm-kicker">Good to know</div>
+    <h2>Questions, answered.</h2>
+    <div class="occ-faq-list">
+      <details class="occ-faq"><summary>Is a star map a good birthday gift?</summary><p>Yes — it is one of the most personal gifts you can give: the exact night sky over the moment that matters, mapped down to the minute and framed to keep. It marks the date in a way a generic gift cannot.</p></details>
+      <details class="occ-faq"><summary>How accurate is the star map?</summary><p>Every map is generated from real astronomical data for the exact date, time and place you choose — the true positions of the stars, planets and the Milky Way that night, not a decorative pattern.</p></details>
+      <details class="occ-faq"><summary>What date and time should I choose?</summary><p>Use the moment that matters — most people pick the evening of the event. If you don't know the exact time, any time that night still shows the correct sky; the stars shift only slightly across a few hours.</p></details>
+      <details class="occ-faq"><summary>How long does delivery take?</summary><p>Free UK delivery, dispatched in 2 to 4 working days. A tracking number is emailed the moment your parcel leaves us.</p></details>
+      <details class="occ-faq"><summary>Can I return it?</summary><p>Because each map is made to order to your exact date, place and wording, it's exempt from the usual change-of-mind return — so please check every detail before you order. You're still fully protected if anything's wrong: if it arrives faulty, damaged or not as described, email us within 30 days for a full refund or free replacement, return postage on us.</p></details>
+    </div>
+  </div>
+</section>
 
 <section class="sm-section" id="more">
   <div class="container">
