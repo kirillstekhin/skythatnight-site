@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://www.skythatnight.com/</loc></url>
-  <url><loc>https://www.skythatnight.com/delivery.html</loc></url>
-  <url><loc>https://www.skythatnight.com/privacy.html</loc></url>
-  <url><loc>https://www.skythatnight.com/terms.html</loc></url>
-  <url><loc>https://www.skythatnight.com/occasion-met.html</loc></url>
-  <url><loc>https://www.skythatnight.com/occasion-proposal.html</loc></url>
-  <url><loc>https://www.skythatnight.com/occasion-wedding.html</loc></url>
-  <url><loc>https://www.skythatnight.com/occasion-born.html</loc></url>
-  <url><loc>https://www.skythatnight.com/occasion-anniversary.html</loc></url>
-  <url><loc>https://www.skythatnight.com/occasion-birthday.html</loc></url>
-  <url><loc>https://www.skythatnight.com/occasion-new-home.html</loc></url>
-  <url><loc>https://www.skythatnight.com/occasion-retirement.html</loc></url>
-  <url><loc>https://www.skythatnight.com/occasion-memorial.html</loc></url>
-  <url><loc>https://www.skythatnight.com/theme-midnight.html</loc></url>
-  <url><loc>https://www.skythatnight.com/theme-luxe.html</loc></url>
-  <url><loc>https://www.skythatnight.com/theme-porcelain.html</loc></url>
-  <url><loc>https://www.skythatnight.com/theme-dense.html</loc></url>
+  <url><loc>https://www.skythatnight.com/</loc><lastmod>2026-07-18</lastmod><priority>1.0</priority></url>
+  <url><loc>https://www.skythatnight.com/occasion-anniversary.html</loc><lastmod>2026-07-19</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.skythatnight.com/occasion-birthday.html</loc><lastmod>2026-07-19</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.skythatnight.com/occasion-born.html</loc><lastmod>2026-07-19</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.skythatnight.com/occasion-memorial.html</loc><lastmod>2026-07-19</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.skythatnight.com/occasion-met.html</loc><lastmod>2026-07-19</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.skythatnight.com/occasion-new-home.html</loc><lastmod>2026-07-19</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.skythatnight.com/occasion-proposal.html</loc><lastmod>2026-07-19</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.skythatnight.com/occasion-retirement.html</loc><lastmod>2026-07-19</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.skythatnight.com/occasion-wedding.html</loc><lastmod>2026-07-19</lastmod><priority>0.8</priority></url>
+  <url><loc>https://www.skythatnight.com/theme-dense.html</loc><lastmod>2026-07-18</lastmod><priority>0.7</priority></url>
+  <url><loc>https://www.skythatnight.com/theme-luxe.html</loc><lastmod>2026-07-18</lastmod><priority>0.7</priority></url>
+  <url><loc>https://www.skythatnight.com/theme-midnight.html</loc><lastmod>2026-07-18</lastmod><priority>0.7</priority></url>
+  <url><loc>https://www.skythatnight.com/theme-porcelain.html</loc><lastmod>2026-07-18</lastmod><priority>0.7</priority></url>
+  <url><loc>https://www.skythatnight.com/delivery.html</loc><lastmod>2026-07-17</lastmod><priority>0.3</priority></url>
+  <url><loc>https://www.skythatnight.com/privacy.html</loc><lastmod>2026-07-18</lastmod><priority>0.3</priority></url>
+  <url><loc>https://www.skythatnight.com/terms.html</loc><lastmod>2026-07-18</lastmod><priority>0.3</priority></url>
 </urlset>
