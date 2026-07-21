@@ -279,7 +279,36 @@ function refresh() {
     b.querySelector('.f-price').textContent = `£${PRICES[b.dataset.frametype][state.size].toFixed(2)}`;
   });
   renderFrameColors();
+  applyPreviewFrame();
 }
+
+/* Живая рама на превью: реальные пиксели Prodigi-шевронов (border-image, прозрачная
+   середина, slice 80 = ширина планки в ассете; углы-митры не масштабируются). */
+const FRAME_ASSETS = {
+  framed:  { white: 'frame-budget-white.png',  natural: 'frame-budget-natural.png' },
+  classic: { black: 'frame-classic-black.png', gold: 'frame-classic-gold.png', silver: 'frame-classic-silver.png' },
+};
+function applyPreviewFrame() {
+  const pv = document.getElementById('sm-preview');
+  if (!pv) return;
+  const asset = (FRAME_ASSETS[state.frameType] || {})[state.frameColor];
+  if (asset) {
+    // лицо рамы ≈ 20мм на 300мм ширины принта → ~6% ширины превью
+    const bw = Math.max(12, Math.round((pv.clientWidth || 560) * 0.06));
+    pv.style.border = bw + 'px solid transparent';
+    pv.style.borderImage = `url(assets/starmap/${asset}) 80 stretch`;
+    pv.style.background = '#0b1220';
+  } else {                                     // print only — без рамы
+    pv.style.border = 'none';
+    pv.style.borderImage = 'none';
+    pv.style.background = '';
+  }
+}
+let _rsz = null;
+window.addEventListener('resize', () => {
+  clearTimeout(_rsz);
+  _rsz = setTimeout(applyPreviewFrame, 120);
+});
 
 /* Свотчи цвета рамы зависят от формата: framed → white/natural, classic → black/gold/silver. */
 function renderFrameColors() {
