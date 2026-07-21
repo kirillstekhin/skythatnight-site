@@ -10,7 +10,7 @@ idx = open(os.path.join(HERE, "index.html")).read()
 
 STYLE = re.search(r"<style>(.*?)</style>", idx, re.S).group(1)
 CONFIG = re.search(r'(<section class="sm-config" id="design">.*?</section>)', idx, re.S).group(1)
-CACHE = "v=11"
+CACHE = "v=12"
 
 # порядок для «других поводов»
 ORDER = ["met", "proposal", "wedding", "born", "anniversary"]
@@ -20,42 +20,42 @@ OCC = {
         title="The night we met", chip="The night you met",
         story="Wherever your story began — a bar, a bus stop, a message at midnight — this is the exact sky that stood over it.",
         img="occ-met.jpg", metatitle="Star Map for the Night You Met",
-        metadesc="A star map of the exact sky the night you met — real astronomy, museum-grade print, from £39 with free UK delivery.",
+        metadesc="A star map of the exact sky the night you met — real astronomy, museum-grade print, from £26.99 with free UK delivery.",
         preset=dict(dateStr="2019-08-14", timeStr="22:30", place="London, United Kingdom",
                     lat=51.5074, lon=-0.1278, iana="Europe/London", dedication="The night we met",
-                    theme="midnight", format="framed", frameColor="white")),
+                    theme="midnight", frameType="framed", size="3040", frameColor="white")),
     "proposal": dict(
         title="She said yes", chip="The proposal",
         story="The question, the pause, the yes. Keep the stars that witnessed it — in gold, for a night that changed everything.",
         img="occ-proposal.jpg", metatitle="Star Map for a Proposal — She Said Yes",
-        metadesc="A gold star map of the exact sky the night you proposed. Real astronomy, handmade frame, from £39, free UK delivery.",
+        metadesc="A gold star map of the exact sky the night you proposed. Real astronomy, handmade frame, from £26.99, free UK delivery.",
         preset=dict(dateStr="2023-09-23", timeStr="21:00", place="Paris, France",
                     lat=48.8566, lon=2.3522, iana="Europe/Paris", dedication="She said yes",
-                    theme="luxegold", format="framed", frameColor="natural")),
+                    theme="luxegold", frameType="framed", size="3040", frameColor="natural")),
     "wedding": dict(
         title="Our wedding sky", chip="A wedding sky",
         story="The first night as married — mapped in soft porcelain to match any home. A first anniversary gift that lasts.",
         img="occ-wedding.jpg", metatitle="Wedding Star Map — The Sky of Your Wedding Night",
-        metadesc="A star map of the exact sky above your wedding. Museum-grade porcelain print, from £39, free UK delivery. A timeless anniversary gift.",
+        metadesc="A star map of the exact sky above your wedding. Museum-grade porcelain print, from £26.99, free UK delivery. A timeless anniversary gift.",
         preset=dict(dateStr="2024-06-08", timeStr="22:00", place="Rome, Italy",
                     lat=41.9028, lon=12.4964, iana="Europe/Rome", dedication="Our wedding sky",
-                    theme="porcelain", format="framed", frameColor="natural")),
+                    theme="porcelain", frameType="framed", size="3040", frameColor="natural")),
     "born": dict(
         title="The day you were born", chip="The night they were born",
         story="The precise sky over the hospital, the exact minute of the first breath. A new-baby gift no one else can copy.",
         img="occ-born.jpg", metatitle="New Baby Star Map — The Night They Were Born",
-        metadesc="A star map of the exact sky the night your baby was born — down to the minute. Museum-grade print, from £39, free UK delivery.",
+        metadesc="A star map of the exact sky the night your baby was born — down to the minute. Museum-grade print, from £26.99, free UK delivery.",
         preset=dict(dateStr="2025-03-03", timeStr="04:12", place="Edinburgh, United Kingdom",
                     lat=55.9533, lon=-3.1883, iana="Europe/London", dedication="The day you were born",
-                    theme="midnight", format="framed", frameColor="white")),
+                    theme="midnight", frameType="framed", size="3040", frameColor="white")),
     "anniversary": dict(
         title="Ten years of us", chip="An anniversary",
         story="Ten years, twenty, the very first — return to the sky of the date that started it all, finished in quiet silver.",
         img="occ-anniversary.jpg", metatitle="Anniversary Star Map — The Sky of Your Date",
-        metadesc="A silver star map of the exact sky on your anniversary. Real astronomy, handmade frame, from £39, free UK delivery.",
+        metadesc="A silver star map of the exact sky on your anniversary. Real astronomy, handmade frame, from £26.99, free UK delivery.",
         preset=dict(dateStr="2015-07-21", timeStr="21:30", place="Santorini, Greece",
                     lat=36.3932, lon=25.4615, iana="Europe/Athens", dedication="Ten years of us",
-                    theme="luxesilver", format="framed", frameColor="white")),
+                    theme="luxesilver", frameType="framed", size="3040", frameColor="white")),
 
     # ── Расширение окейжнов 18.07. img = НАШИ отрендеренные печати с правильной подписью
     # (tools/render_occ_heroes через starmap_v3) — placeholder до реальных lifestyle-фото образцов.
@@ -65,34 +65,34 @@ OCC = {
         title="The sky the day you were born", chip="A milestone birthday", roomless=True,
         story="Thirty years, fifty, ninety — turn back to the exact sky that stood over the very first day. A birthday gift that reaches further back than any other.",
         img="occ-birthday.jpg", metatitle="Birthday Star Map — The Sky the Day You Were Born",
-        metadesc="A personalised star map of the exact sky on the day you were born — a milestone birthday gift. Real astronomy, museum-grade print, from £39 with free UK delivery.",
+        metadesc="A personalised star map of the exact sky on the day you were born — a milestone birthday gift. Real astronomy, museum-grade print, from £26.99 with free UK delivery.",
         preset=dict(dateStr="1974-05-16", timeStr="07:20", place="Manchester, United Kingdom",
                     lat=53.4808, lon=-2.2426, iana="Europe/London", dedication="The day you were born",
-                    theme="luxegold", format="framed", frameColor="natural")),
+                    theme="luxegold", frameType="framed", size="3040", frameColor="natural")),
     "new-home": dict(
         title="Your first night here", chip="A new home", roomless=True,
         story="The first night under a new roof, mapped from the sky above your new front door. A housewarming gift that turns a house into the start of a story.",
         img="occ-new-home.jpg", metatitle="New Home Star Map — The Sky Above Your New Address",
-        metadesc="A personalised star map of the sky above your new home on your first night there. A thoughtful housewarming gift, from £39 with free UK delivery.",
+        metadesc="A personalised star map of the sky above your new home on your first night there. A thoughtful housewarming gift, from £26.99 with free UK delivery.",
         preset=dict(dateStr="2025-11-01", timeStr="20:00", place="Bristol, United Kingdom",
                     lat=51.4545, lon=-2.5879, iana="Europe/London", dedication="Our first night here",
-                    theme="porcelain", format="framed", frameColor="white")),
+                    theme="porcelain", frameType="framed", size="3040", frameColor="white")),
     "retirement": dict(
         title="The end of one chapter", chip="A retirement", roomless=True,
         story="A lifetime of early starts, and now the horizon opens. Mark the day it all wound down — or the day it began — with the sky that watched over a life's work.",
         img="occ-retirement.jpg", metatitle="Retirement Star Map — The Sky of a Life's Work",
-        metadesc="A personalised star map to mark a retirement — the sky on the first day, the last, or a date that mattered. A meaningful retirement gift, from £39 with free UK delivery.",
+        metadesc="A personalised star map to mark a retirement — the sky on the first day, the last, or a date that mattered. A meaningful retirement gift, from £26.99 with free UK delivery.",
         preset=dict(dateStr="2026-03-31", timeStr="17:30", place="Edinburgh, United Kingdom",
                     lat=55.9533, lon=-3.1883, iana="Europe/London", dedication="With gratitude, for a life's work",
-                    theme="luxesilver", format="framed", frameColor="natural")),
+                    theme="luxesilver", frameType="framed", size="3040", frameColor="natural")),
     "memorial": dict(
         title="The stars still hold that night", chip="In memory", roomless=True,
         story="Some skies we never want to lose. Map the night they were born, or a date you shared, and keep it somewhere the light can reach — a quiet, lasting way to remember someone who mattered.",
         img="occ-memorial.jpg", metatitle="Memorial Star Map — A Keepsake to Remember Them By",
-        metadesc="A personalised star map to remember someone — the sky the night they were born, or a date you shared. A gentle, lasting memorial keepsake, from £39 with free UK delivery.",
+        metadesc="A personalised star map to remember someone — the sky the night they were born, or a date you shared. A gentle, lasting memorial keepsake, from £26.99 with free UK delivery.",
         preset=dict(dateStr="1948-09-12", timeStr="21:00", place="London, United Kingdom",
                     lat=51.5074, lon=-0.1278, iana="Europe/London", dedication="Always in our hearts",
-                    theme="midnight", format="framed", frameColor="white")),
+                    theme="midnight", frameType="framed", size="3040", frameColor="white")),
 }
 
 EXTRA_CSS = """
@@ -199,8 +199,8 @@ def occasion_faq(key, o):
 
 
 # Бес-поводные answer-капсулы (GEO): каждая ведёт ПРЯМЫМ ответом на запрос своего повода,
-# self-contained (можно процитировать без страницы), ~70-85 слов, факт+тепло. Хвост «from £39…» общий.
-TAIL = "Sky, That Night recreates it from real astronomy down to the minute, prints it museum-grade and frames it by hand. From £39, with free UK delivery, dispatched in 2 to 4 working days."
+# self-contained (можно процитировать без страницы), ~70-85 слов, факт+тепло. Хвост «from £26.99…» общий.
+TAIL = "Sky, That Night recreates it from real astronomy down to the minute, prints it museum-grade and frames it by hand. From £26.99, with free UK delivery, dispatched in 2 to 4 working days."
 CAPSULE = {
     "anniversary": ("An anniversary star map is one of the most personal anniversary gifts you can give: a print of the "
         "exact night sky over the evening your story began — the true positions of the stars above your first date, your "
@@ -254,7 +254,7 @@ def product_jsonld(o, url, ogimg):
     data = {"@context": "https://schema.org", "@type": "Product",
             "name": o["metatitle"], "description": o["metadesc"], "image": ogimg,
             "brand": {"@type": "Brand", "name": "Sky, That Night"},
-            "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": "39",
+            "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": "26.99",
                        "availability": "https://schema.org/MadeToOrder", "url": url,
                        "shippingDetails": {"@type": "OfferShippingDetails",
                            "shippingRate": {"@type": "MonetaryAmount", "value": "0", "currency": "GBP"},
@@ -352,7 +352,7 @@ def build(key, o):
       <h1 class="occ-h1">{o['title']}</h1>
       <p class="occ-story">{o['story']}</p>
       {cap}
-      <a class="sm-cta" href="#design">Design this sky — from £39</a>
+      <a class="sm-cta" href="#design">Design this sky — from £26.99</a>
       <span class="sm-cta-sub">Free UK delivery included · dispatched in 2–4 working days</span>
     </div>
     <div>

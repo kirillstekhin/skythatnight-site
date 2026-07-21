@@ -287,15 +287,20 @@
         </div>
       </div>
       <div class="sm-field">
+        <label>Size</label>
+        <button class="sm-frame-color sm-size active" data-size="3040">30×40&nbsp;cm</button>
+        <button class="sm-frame-color sm-size" data-size="4050">40×50&nbsp;cm</button>
+        <button class="sm-frame-color sm-size" data-size="5070">50×70&nbsp;cm</button>
+      </div>
+      <div class="sm-field">
         <label>Format</label>
-        <button class="sm-format" data-format="print">Print only · 30×40&nbsp;cm <span class="f-price">£39</span></button>
-        <button class="sm-format active" data-format="framed">Framed · 30×40&nbsp;cm <span class="f-price">£49</span></button>
-        <button class="sm-format" data-format="framedXL">Framed large · 40×50&nbsp;cm <span class="f-price">£64</span></button>
+        <button class="sm-format" data-frametype="print">Print only <span class="f-price"></span></button>
+        <button class="sm-format active" data-frametype="framed">Framed <span class="f-price"></span></button>
+        <button class="sm-format" data-frametype="classic">Classic frame <span class="f-price"></span></button>
       </div>
       <div class="sm-field" id="sm-frame-colors">
         <label>Frame</label>
-        <button class="sm-frame-color active" data-color="white">White</button>
-        <button class="sm-frame-color" data-color="natural">Natural wood</button>
+        <span id="sm-frame-color-row"></span>
       </div>
       <div class="sm-buyrow">
         <div id="sm-price">£49</div>
@@ -361,6 +366,6 @@
 </footer>
 
 <script>window.SM_PRESET = {"theme": "luxegold"};</script>
-<script src="assets/starmap.js?v=11" defer></script>
+<script src="assets/starmap.js?v=12" defer></script>
 </body>
 </html>

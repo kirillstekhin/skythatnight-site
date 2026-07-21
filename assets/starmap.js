@@ -98,15 +98,15 @@ function moonIconSvg(cx, cy, r, phase, fill, ring) {
 }
 
 /* Аспект = print-area Prodigi (иначе печать обрежет постер):
-   30x40cm (12x16") → 3:4 · 40x50cm (16x20") → 4:5. Превью ОБЯЗАНО совпадать с печатью. */
-const PRINT_SIZES = { '30x40': 4 / 3, '40x50': 5 / 4 };            // H/W
-const FORMAT_SIZE = { print: '30x40', framed: '30x40', framedXL: '40x50' };
+   30x40 → 3:4 · 40x50 → 4:5 · 50x70 → 5:7. Превью ОБЯЗАНО совпадать с печатью. */
+const PRINT_SIZES = { '30x40': 4 / 3, '40x50': 5 / 4, '50x70': 7 / 5 };            // H/W
+const SIZE_CM = { '3040': '30x40', '4050': '40x50', '5070': '50x70' };
 
 function renderSvg(o) {
-  // o: {dateStr,timeStr,lat,lon,tz,place,dedication,theme,format}
+  // o: {dateStr,timeStr,lat,lon,tz,place,dedication,theme,size}
   const t = THEMES[o.theme] || THEMES.midnight;
   const W = 1200;
-  const H = Math.round(W * PRINT_SIZES[FORMAT_SIZE[o.format] || '30x40']);
+  const H = Math.round(W * PRINT_SIZES[SIZE_CM[o.size] || '30x40']);
   const MOON_R = 16;
   const TEXT_H = 108 + (2 * MOON_R + 9) + 136;   // круг → луна → посвящение/место/дата/координаты
   const region = H - 58;                          // полезная высота над строкой бренда
@@ -204,27 +204,37 @@ function renderSvg(o) {
 
 /* ───────────────────────── configurator UI ───────────────────────── */
 
-const FORMATS = {
-  print:    { label: 'Print only · 30×40 cm',       price: 39, note: 'Museum-grade giclée, shipped rolled' },
-  framed:   { label: 'Framed · 30×40 cm',           price: 49, note: 'Handmade wood frame, ready to hang' },
-  framedXL: { label: 'Framed large · 40×50 cm',     price: 64, note: 'Our statement size' },
+/* Матрица 3×3: размер × формат. Прайс 2026-07-20 (контрибуция ~£9.99/заказ на клетке). */
+const SIZES = { '3040': '30×40 cm', '4050': '40×50 cm', '5070': '50×70 cm' };
+const FRAME_TYPES = {
+  print:   { label: 'Print only',    note: 'Museum-grade giclée, shipped rolled',  colors: null },
+  framed:  { label: 'Framed',        note: 'Handmade wood frame, ready to hang',   colors: { white: 'White', natural: 'Natural wood' } },
+  classic: { label: 'Classic frame', note: 'Gallery classic frame, ready to hang', colors: { black: 'Black', gold: 'Gold', silver: 'Silver' } },
+};
+const PRICES = {
+  print:   { '3040': 26.99, '4050': 29.99, '5070': 32.99 },
+  framed:  { '3040': 44.99, '4050': 52.99, '5070': 59.99 },
+  classic: { '3040': 59.99, '4050': 69.99, '5070': 79.99 },
 };
 
-/* Stripe Payment Links — вставить URL после создания в Stripe Dashboard (см. STRIPE_SETUP.md).
-   Каждой ссылке добавляется ?client_reference_id=<design code> автоматически. */
+/* Stripe Payment Links — создать 9 LIVE-линков в Stripe Dashboard (см. STRIPE_SETUP.md)
+   и вписать сюда. Каждой ссылке добавляется ?client_reference_id=<design code> автоматически.
+   Пустой линк → показываем design-код + email (fallback-блок), деньги не теряем. */
 const PAYMENT_LINKS = {
-  // LIVE links (13.07, account activated)
-  print:    'https://buy.stripe.com/dRm4gA3wGbitdzd2di7g400',
-  framed:   'https://buy.stripe.com/eVq5kE3wG0DP1Qv4lq7g401',
-  framedXL: 'https://buy.stripe.com/8x26oI3wGcmxeDh05a7g402',
+  PRINT3040: 'https://buy.stripe.com/6oU5kE0kueuF0MrcRW7g409', PRINT4050: 'https://buy.stripe.com/28EbJ2aZ85Y9an1dW07g40a', PRINT5070: 'https://buy.stripe.com/aFa7sM3wG1HT52H2di7g40b',
+  FRAMED3040: 'https://buy.stripe.com/5kQdRa0ku1HT7aPdW07g40c', FRAMED4050: 'https://buy.stripe.com/9B6bJ27MWgCN7aP6ty7g40d', FRAMED5070: 'https://buy.stripe.com/7sY6oI0ku3Q13YD4lq7g40e',
+  CLASSIC3040: 'https://buy.stripe.com/eVqaEY7MWaep52H8BG7g40f', CLASSIC4050: 'https://buy.stripe.com/14A14o3wGfyJan119e7g40g', CLASSIC5070: 'https://buy.stripe.com/7sY3cw3wG0DP2Uz05a7g40h',
 };
 
 const state = {
   dateStr: '2021-06-19', timeStr: '21:45',
   place: 'London, United Kingdom', lat: 51.5074, lon: -0.1278, tz: 1, iana: 'Europe/London',
   dedication: 'Sky That Night',
-  theme: 'midnight', format: 'framed', frameColor: 'white',
+  theme: 'midnight', frameType: 'framed', size: '3040', frameColor: 'white',
 };
+
+/* Токен формата в design-коде: FRAMED3040 / CLASSIC5070 … — его же ждёт fulfil.py CATALOG. */
+function formatToken() { return state.frameType.toUpperCase() + state.size; }
 
 function tzOffsetHours(iana, dateStr, timeStr) {
   try {
@@ -247,7 +257,7 @@ function designCode() {
   const la = (state.lat >= 0 ? 'N' : 'S') + Math.abs(Math.round(state.lat * 10000));
   const lo = (state.lon >= 0 ? 'E' : 'W') + Math.abs(Math.round(state.lon * 10000));
   const z = 'Z' + Math.round(state.tz * 60);   // смещение в минутах, напр. Z60 / Z-300
-  return `SM2-${d}-${t}-${la}-${lo}-${z}-${state.theme.toUpperCase()}-${state.format.toUpperCase()}-${state.frameColor.toUpperCase()}`;
+  return `SM2-${d}-${t}-${la}-${lo}-${z}-${state.theme.toUpperCase()}-${formatToken()}-${state.frameColor.toUpperCase()}`;
 }
 
 function refresh() {
@@ -256,12 +266,38 @@ function refresh() {
   document.getElementById('sm-preview').innerHTML = svg;
   const chip = document.getElementById('sm-moon');
   chip.textContent = `☾ ${moonName(phase)} — the real moon of your night`;
-  const f = FORMATS[state.format];
-  document.getElementById('sm-price').textContent = `£${f.price}`;
-  document.getElementById('sm-price-note').textContent = f.note + ' · free UK delivery included';
+  const ft = FRAME_TYPES[state.frameType];
+  // ⚠️ цвет нормализуем ДО designCode: после смены формата старый цвет может быть
+  // невалиден (framed+gold) — иначе Buy в этот момент отправит код, который fulfil.py
+  // отбракует уже ПОСЛЕ оплаты.
+  if (ft.colors && !(state.frameColor in ft.colors)) state.frameColor = Object.keys(ft.colors)[0];
+  document.getElementById('sm-price').textContent = `£${PRICES[state.frameType][state.size].toFixed(2)}`;
+  document.getElementById('sm-price-note').textContent = ft.note + ' · free UK delivery included';
   document.getElementById('sm-code').textContent = designCode();
-  const frameRow = document.getElementById('sm-frame-colors');
-  frameRow.style.display = state.format === 'print' ? 'none' : '';
+  // цены на кнопках формата — для выбранного размера
+  document.querySelectorAll('.sm-format').forEach(b => {
+    b.querySelector('.f-price').textContent = `£${PRICES[b.dataset.frametype][state.size].toFixed(2)}`;
+  });
+  renderFrameColors();
+}
+
+/* Свотчи цвета рамы зависят от формата: framed → white/natural, classic → black/gold/silver. */
+function renderFrameColors() {
+  const field = document.getElementById('sm-frame-colors');
+  const row = document.getElementById('sm-frame-color-row');
+  const colors = FRAME_TYPES[state.frameType].colors;
+  field.style.display = colors ? '' : 'none';
+  if (!colors) return;
+  if (!(state.frameColor in colors)) state.frameColor = Object.keys(colors)[0];
+  row.innerHTML = '';
+  for (const [c, label] of Object.entries(colors)) {
+    const b = document.createElement('button');
+    b.className = 'sm-frame-color' + (c === state.frameColor ? ' active' : '');
+    b.dataset.color = c;
+    b.textContent = label;
+    b.addEventListener('click', () => { state.frameColor = c; refresh(); });
+    row.appendChild(b);
+  }
 }
 
 function attachGeocode() {
@@ -310,18 +346,19 @@ function attachControls() {
     document.querySelectorAll('.sm-theme').forEach(b => b.classList.toggle('active', b === btn));
     refresh();
   }));
+  document.querySelectorAll('.sm-size').forEach(btn => btn.addEventListener('click', () => {
+    state.size = btn.dataset.size;
+    document.querySelectorAll('.sm-size').forEach(b => b.classList.toggle('active', b === btn));
+    refresh();
+  }));
   document.querySelectorAll('.sm-format').forEach(btn => btn.addEventListener('click', () => {
-    state.format = btn.dataset.format;
+    state.frameType = btn.dataset.frametype;
     document.querySelectorAll('.sm-format').forEach(b => b.classList.toggle('active', b === btn));
     refresh();
   }));
-  document.querySelectorAll('.sm-frame-color').forEach(btn => btn.addEventListener('click', () => {
-    state.frameColor = btn.dataset.color;
-    document.querySelectorAll('.sm-frame-color').forEach(b => b.classList.toggle('active', b === btn));
-    refresh();
-  }));
+  // свотчи цвета рамы динамические — обработчики вешает renderFrameColors()
   document.getElementById('sm-buy').addEventListener('click', () => {
-    const link = PAYMENT_LINKS[state.format];
+    const link = PAYMENT_LINKS[formatToken()];
     const code = designCode();
     if (link) {
       window.location.href = `${link}?client_reference_id=${encodeURIComponent(code)}`;
@@ -350,8 +387,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('sm-place').value = state.place;
   document.getElementById('sm-dedication').value = state.dedication;
   document.querySelectorAll('.sm-theme').forEach(b => b.classList.toggle('active', b.dataset.theme === state.theme));
-  document.querySelectorAll('.sm-format').forEach(b => b.classList.toggle('active', b.dataset.format === state.format));
-  document.querySelectorAll('.sm-frame-color').forEach(b => b.classList.toggle('active', b.dataset.color === state.frameColor));
+  document.querySelectorAll('.sm-size').forEach(b => b.classList.toggle('active', b.dataset.size === state.size));
+  document.querySelectorAll('.sm-format').forEach(b => b.classList.toggle('active', b.dataset.frametype === state.frameType));
+  // цвета рам отрисует refresh() → renderFrameColors()
   attachGeocode();
   attachControls();
   refresh();
