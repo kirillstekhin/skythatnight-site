@@ -385,6 +385,16 @@ function attachControls() {
     document.querySelectorAll('.sm-format').forEach(b => b.classList.toggle('active', b === btn));
     refresh();
   }));
+  // мокапы «Framed by hand»: клик → конфигуратор С ЭТОЙ моделью (тема+формат+цвет)
+  document.querySelectorAll('.sm-frame-pick').forEach(a => a.addEventListener('click', () => {
+    const d = a.dataset;
+    if (d.theme) state.theme = d.theme;
+    if (d.frametype) state.frameType = d.frametype;
+    if (d.color) state.frameColor = d.color;
+    document.querySelectorAll('.sm-theme').forEach(b => b.classList.toggle('active', b.dataset.theme === state.theme));
+    document.querySelectorAll('.sm-format').forEach(b => b.classList.toggle('active', b.dataset.frametype === state.frameType));
+    refresh();                                    // якорь #design сам доскроллит
+  }));
   // свотчи цвета рамы динамические — обработчики вешает renderFrameColors()
   document.getElementById('sm-buy').addEventListener('click', () => {
     const link = PAYMENT_LINKS[formatToken()];
