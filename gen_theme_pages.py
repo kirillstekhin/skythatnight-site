@@ -19,25 +19,31 @@ TH = {
         story="Deep navy and starlight — our signature finish. Bright stars glow above a midnight-blue sky, the Milky Way drifting across it. The classic that suits every room.",
         hero="hero-midnight.jpg", room="occ-met.jpg", theme="midnight",
         metatitle="Midnight Star Map — Deep Navy & Starlight",
-        metadesc="The Midnight star map: deep navy sky, glowing stars, the Milky Way. Museum-grade print of your exact sky, from £39, free UK delivery."),
+        # ⛔⛔ ГЕНЕРАТОР ОТСТАЛ ОТ ЗАДЕПЛОЕННЫХ theme-*.html (вскрыто 29.07.2026).
+        # Живые страницы правились РУКАМИ: там `starmap.js?v=14`, `sm-price` = £49 и правила
+        # `.sm-frames-grid`. Прогон этого файла молча ОТКАТЫВАЕТ всё три — а откат кэш-версии
+        # с 14 на 11 даёт стухший JS через Cloudflare (та же болячка, что была с legal-страницами).
+        # ПЕРЕД ЗАПУСКОМ: сверить v-стамп, sm-price и CSS с текущими theme-*.html и подтянуть сюда.
+        # 29.07 цену £39→£26.99 в живых страницах правили ТЕКСТОМ, без перегенерации, именно поэтому.
+        metadesc="The Midnight star map: deep navy sky, glowing stars, the Milky Way. Museum-grade print of your exact sky, from £26.99, free UK delivery."),
     "luxe": dict(
         title="Luxe · gold &amp; silver", label="Luxe",
         story="The night sky finished in precious metal — a gold or silver horizon ring and lettering against deep navy. For an anniversary, a wedding, a milestone worth marking. Switch between gold and silver in the panel.",
         hero="hero-luxe.jpg", room="occ-proposal.jpg", theme="luxegold",
         metatitle="Luxe Gold &amp; Silver Star Map",
-        metadesc="The Luxe star map: deep navy sky with a gold or silver horizon ring and lettering. Museum-grade print of your exact sky, from £39, free UK delivery."),
+        metadesc="The Luxe star map: deep navy sky with a gold or silver horizon ring and lettering. Museum-grade print of your exact sky, from £26.99, free UK delivery."),
     "porcelain": dict(
         title="Porcelain", label="Porcelain",
         story="Ink on warm ivory — an engraved, almost antique look. Light, airy and quietly striking on a pale wall. The bright alternative to midnight.",
         hero="hero-porcelain.jpg", room="occ-wedding.jpg", theme="porcelain",
         metatitle="Porcelain Star Map — Ink on Ivory",
-        metadesc="The Porcelain star map: engraved ink constellations on warm ivory paper. Museum-grade print of your exact sky, from £39, free UK delivery."),
+        metadesc="The Porcelain star map: engraved ink constellations on warm ivory paper. Museum-grade print of your exact sky, from £26.99, free UK delivery."),
     "dense": dict(
         title="Deep sky detail", label="Deep sky",
         story="Every print carries the full sky — over 11,000 stars and the Milky Way, rendered in fine deep-sky detail. Choose Midnight and the whole galaxy comes with it.",
         hero="hero-dense.jpg", room="occ-born.jpg", theme="midnight",
         metatitle="Deep-Sky Detail Star Map — 11,000 Stars",
-        metadesc="Deep-sky detail: over 11,000 stars and the Milky Way on every print. Museum-grade star map of your exact sky, from £39, free UK delivery."),
+        metadesc="Deep-sky detail: over 11,000 stars and the Milky Way on every print. Museum-grade star map of your exact sky, from £26.99, free UK delivery."),
 }
 
 EXTRA_CSS = """
@@ -152,7 +158,7 @@ def build(key, t):
       <div class="occ-kicker">A poster style</div>
       <h1 class="occ-h1">{t['title']}</h1>
       <p class="occ-story">{t['story']}</p>
-      <a class="sm-cta" href="#design">Design in this style — from £39</a>
+      <a class="sm-cta" href="#design">Design in this style — from £26.99</a>
       <span class="sm-cta-sub">Free UK delivery included · dispatched in 2–4 working days</span>
     </div>
     <div>
