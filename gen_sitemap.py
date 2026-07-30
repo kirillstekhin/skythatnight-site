@@ -19,6 +19,10 @@ def group_meta(fn):
         return (1, "/" + fn, "0.8")
     if fn.startswith("theme-"):
         return (2, "/" + fn, "0.7")
+    if fn == "famous-nights.html":          # витрина серии
+        return (2, "/" + fn, "0.7")
+    if fn.startswith("night-"):             # страницы отдельных ночей
+        return (2, "/" + fn, "0.6")
     return (3, "/" + fn, "0.3")   # legal / other
 
 

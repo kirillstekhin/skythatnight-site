@@ -3,24 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="p:domain_verify" content="b9a7fcc929daa79409b40ede3fa80d04"/>
-
-<title>Sky, That Night — Custom Star Maps of Your Exact Sky</title>
-<meta name="description" content="A museum-grade star map of the exact sky above any place on any date — real astronomy, 11,000 stars, the true moon phase of your night. Framed or print, from £26.99 with free UK delivery.">
-<link rel="canonical" href="https://www.skythatnight.com/">
-<meta property="og:type" content="product">
+<title>The night they strung a wire between the Twin Towers · Sky, That Night</title>
+<meta name="description" content="The small hours of 7 August 1974. On two dark rooftops, Philippe Petit's crew fires a fishing line across the void and rigs a cable. At dawn he steps out…">
+<link rel="canonical" href="https://www.skythatnight.com/night-petit-wire.html">
+<meta property="og:type" content="article">
 <meta property="og:site_name" content="Sky, That Night">
-<meta property="og:title" content="Sky, That Night — Custom Star Maps">
-<meta property="og:description" content="The exact sky above any place, on any date. Real astronomy, museum-grade print, from £26.99.">
-<meta property="og:url" content="https://www.skythatnight.com/">
-<meta property="og:image" content="https://www.skythatnight.com/assets/starmap/og-lifestyle.jpg">
+<meta property="og:title" content="The night they strung a wire between the Twin Towers · Sky, That Night">
+<meta property="og:description" content="The small hours of 7 August 1974. On two dark rooftops, Philippe Petit's crew fires a fishing line across the void and rigs a cable. At dawn he steps out…">
+<meta property="og:url" content="https://www.skythatnight.com/night-petit-wire.html">
+<meta property="og:image" content="https://www.skythatnight.com/assets/social/petit-wire-morph.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/style.css?v=2">
-<link rel="preload" as="image" href="assets/starmap/hero-midnight.jpg">
+<link rel="preload" as="image" href="assets/social/petit-wire-morph.png">
 <style>
 /* ── Nocturne annex: page-scoped night theme ─────────────────────────── */
 .sm-night {
@@ -196,7 +194,35 @@
   border:1px solid rgba(201,169,97,.5); border-radius:2rem; padding:.5rem 1rem; cursor:pointer;
   display:inline-flex; align-items:center; gap:.4rem; transition:background .2s, border-color .2s, color .2s; }
 .sm-film-sound:hover { background:rgba(11,23,51,.85); border-color:var(--gold); color:var(--gold); }
+
+/* famous nights */
+.fn-hero { padding: clamp(2.4rem,5vw,4.5rem) 0 clamp(1.5rem,3vw,2.5rem); position:relative; overflow:hidden; }
+.fn-hero .container { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr); gap:clamp(2rem,4vw,4rem); align-items:center; }
+@media (max-width:860px){ .fn-hero .container { grid-template-columns:1fr; } }
+.fn-back { display:inline-block; font-family:var(--sans); font-size:.78rem; letter-spacing:.12em; text-transform:uppercase; color:var(--moon-faint); text-decoration:none; margin-bottom:1.4rem; }
+.fn-back:hover { color:var(--gold); }
+.fn-kicker { font-family:var(--sans); font-size:.78rem; letter-spacing:.32em; text-transform:uppercase; color:var(--gold); margin-bottom:1.1rem; }
+.fn-h1 { font-family:var(--serif); font-weight:500; font-size:clamp(2rem,4.2vw,3.2rem); line-height:1.1; color:var(--moon); margin:0 0 1.1rem; text-wrap:balance; }
+.fn-quote { font-family:var(--serif); font-style:italic; font-size:clamp(1.25rem,2vw,1.6rem); color:var(--gold); margin:0 0 1.3rem; }
+.fn-story { font-family:var(--sans); font-weight:300; font-size:clamp(1rem,1.4vw,1.12rem); line-height:1.7; color:var(--moon-sub); max-width:36rem; margin-bottom:1.6rem; }
+.fn-facts { font-family:var(--sans); font-size:.82rem; letter-spacing:.08em; color:var(--moon-faint); margin-bottom:2rem; }
+.fn-facts b { color:var(--moon-sub); font-weight:500; }
+.fn-hero img { width:100%; height:auto; display:block; border-radius:4px; box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
+.fn-film video { width:100%; max-width:420px; aspect-ratio:9/16; display:block; margin:2rem auto 0; border-radius:6px; background:#000; box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
+.fn-ai { font-family:var(--sans); font-size:.78rem; color:var(--moon-faint); text-align:center; max-width:34rem; margin:1rem auto 0; }
+.fn-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.1rem; margin-top:2.2rem; }
+@media (max-width:860px){ .fn-grid { grid-template-columns:repeat(2,1fr); } }
+.fn-grid a { text-decoration:none; }
+.fn-grid img { width:100%; height:auto; display:block; border-radius:3px; box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
+.fn-grid .d { font-family:var(--sans); font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--moon-faint); margin-top:.65rem; }
+.fn-grid figcaption { font-family:var(--serif); font-size:.98rem; color:var(--moon); margin-top:.2rem; }
+.fn-grid a:hover figcaption { color:var(--gold); }
+/* hub */
+.fn-hub-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.6rem; margin-top:2.6rem; }
+@media (max-width:1020px){ .fn-hub-grid { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:640px){ .fn-hub-grid { grid-template-columns:1fr; } }
 </style>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Article", "headline": "The night they strung a wire between the Twin Towers", "description": "The small hours of 7 August 1974. On two dark rooftops, Philippe Petit's crew fires a fishing line across the void and rigs a cable. At dawn he steps out…", "image": "https://www.skythatnight.com/assets/social/petit-wire-morph.png", "datePublished": "2026-07-30", "author": {"@type": "Organization", "name": "Sky, That Night"}}</script>
 </head>
 <body class="sm-night">
 <header>
@@ -206,38 +232,42 @@
     </a>
     <button class="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
     <nav class="nav" id="main-nav">
-      <a href="#design">Design yours</a>
-      <a href="#craft">How it works</a>
+      <a href="./#design">Design yours</a>
       <a href="famous-nights.html">Famous Nights</a>
-      <a href="#faq">FAQ</a>
+      <a href="./#faq">FAQ</a>
       <a href="mailto:admin@shopcienty.com">Contact</a>
     </nav>
   </div>
 </header>
 
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Product","name":"Custom Star Map Print","description":"Personalised star map of the exact sky above any place on any date. Real astronomical data, museum-grade giclée print, optional handmade frame.","image":"https://www.skythatnight.com/assets/starmap/hero-midnight.jpg","sku":"star-map","brand":{"@type":"Brand","name":"Sky, That Night"},"offers":{"@type":"AggregateOffer","lowPrice":"39.00","highPrice":"64.00","priceCurrency":"GBP","availability":"https://schema.org/InStock","url":"https://www.skythatnight.com/"}}
-</script>
-
 <main>
 
-<section class="sm-hero">
+<section class="fn-hero">
   <div class="sm-stars" aria-hidden="true"></div>
   <div class="container">
     <div>
-      <div class="sm-kicker sm-reveal">The Atelier · Personalised</div>
-      <h1 class="sm-h1 sm-reveal">The night everything changed,<br><em>kept forever.</em></h1>
-      <p class="sm-lede sm-reveal">The exact sky above any place, on any date — computed from real astronomical
-      data: eleven thousand stars, the constellations, and the true phase of the moon that night.
-      Printed at museum grade in the UK, framed by hand.</p>
-      <a class="sm-cta" href="#design">Design yours — from £26.99</a>
-      <span class="sm-cta-sub">Free UK delivery included · dispatched in 2–4 working days</span>
+      <a class="fn-back" href="famous-nights.html">← All famous nights</a>
+      <div class="fn-kicker">Famous Nights · 7 August 1974</div>
+      <h1 class="fn-h1">The night they strung a wire between the Twin Towers</h1>
+      <p class="fn-quote">«There is no why»</p>
+      <p class="fn-story">The small hours of 7 August 1974. On two dark rooftops, Philippe Petit's crew fires a fishing line across the void and rigs a cable. At dawn he steps out onto it. This was the sky over the artistic crime of the century. Every star in its true position. What's your night?</p>
+      <p class="fn-facts"><b>New York, USA</b> · 7 August 1974 · 00:30 local · 40.7128° N · 74.0060° W</p>
+      <a class="sm-cta" href="#design">Now map your own night — from £26.99</a>
+      <span class="sm-cta-sub">The configurator below is already set to this sky. Change the date to yours.</span>
     </div>
-    <div class="sm-fan" aria-hidden="true">
-      <img src="assets/starmap/hero-porcelain.jpg" alt="" loading="lazy">
-      <img src="assets/starmap/hero-midnight.jpg" alt="Custom star map poster, midnight theme">
-      <img src="assets/starmap/hero-luxe.jpg" alt="" loading="lazy">
+    <div>
+      <img src="assets/social/petit-wire-morph.png" alt="The night they strung a wire between the Twin Towers — star map art print">
     </div>
+  </div>
+</section>
+
+<section class="sm-section fn-film" id="film">
+  <div class="container">
+    <div class="section-kicker sm-kicker">The short film</div>
+    <h2>Eight seconds over New York.</h2>
+    <video controls playsinline preload="none" poster="assets/social/petit-wire-morph.png" src="assets/social/video/petit-wire_MORPH_VIDEO_9x16.mp4"></video>
+    <p class="fn-ai">The era scene is an AI reconstruction. The sky above it is not — every star is computed
+    from astronomical data for 7 August 1974, 00:30 local time.</p>
   </div>
 </section>
 
@@ -310,121 +340,22 @@
   </div>
 </section>
 
-<section class="sm-section" id="craft">
-  <div class="container">
-    <div class="section-kicker sm-kicker">Every detail is real</div>
-    <h2>Not an illustration.<br>An astronomical record.</h2>
-    <div class="sm-craft-grid">
-      <div>
-        <h3>Real astronomy</h3>
-        <p>Your sky is computed from professional star catalogues — over 11,000 stars placed exactly
-        where they stood above your place, at your minute. The Milky Way included on print.</p>
-      </div>
-      <div>
-        <h3>The moon of your night</h3>
-        <p>Every map carries the true phase of the moon for your date — full, new, or the exact
-        crescent in between. A detail almost nobody else gets right.</p>
-      </div>
-      <div>
-        <h3>Museum-grade craft</h3>
-        <p>Giclée-printed on fine-art paper in the UK, framed by hand in responsibly sourced wood,
-        glazed with shatter-safe acrylic. Dispatched in 2–4 working days.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
 <section class="sm-section">
   <div class="container">
-    <div class="section-kicker sm-kicker">Every love story has a sky</div>
-    <h2>Some nights deserve a frame.</h2>
-    <div class="sm-film">
-      <video autoplay muted loop playsinline preload="metadata" poster="assets/starmap/film-poster.jpg?v=5" aria-label="Sky, That Night film: a couple laughing on a rooftop at night, a candlelit proposal under the stars, unwrapping a framed gift, a star map on the wall, a peaceful nursery, a close-up of the moon phase and coordinates">
-        <source src="assets/starmap/skythatnight-film.mp4?v=5" type="video/mp4">
-      </video>
-      <button class="sm-film-sound" type="button" aria-label="Turn sound on">🔊 Sound</button>
+    <div class="section-kicker sm-kicker">Keep exploring</div>
+    <h2>Other famous nights.</h2>
+    <div class="fn-grid">
+      <a href="night-royal-wedding-1981.html"><figure><img src="assets/social/royal-wedding-morph.png" alt="The sky over London the night of the royal wedding, 1981" loading="lazy"><div class="d">29 July 1981</div><figcaption>A day of fireworks and fairy tales</figcaption></figure></a>
+      <a href="night-world-cup-1966.html"><figure><img src="assets/social/world-cup-1966-morph.png" alt="The sky over Wembley the night England won the World Cup" loading="lazy"><div class="d">30 July 1966</div><figcaption>They think it's all over</figcaption></figure></a>
+      <a href="night-mtv-launch.html"><figure><img src="assets/social/mtv-launch-morph.png" alt="The sky the minute MTV went on air" loading="lazy"><div class="d">1 August 1981</div><figcaption>Ladies and gentlemen, rock and roll</figcaption></figure></a>
+      <a href="night-perseids.html"><figure><img src="assets/social/perseids-morph.png" alt="Tonight: the best meteor shower of the year" loading="lazy"><div class="d">12 August 2026</div><figcaption>Look up tonight</figcaption></figure></a>
+      <a href="night-woodstock.html"><figure><img src="assets/social/woodstock-morph.png" alt="The sky over Woodstock, opening night" loading="lazy"><div class="d">15 August 1969</div><figcaption>Three days of peace and music</figcaption></figure></a>
+      <a href="night-carrington.html"><figure><img src="assets/social/carrington-morph.png" alt="The night the aurora reached London" loading="lazy"><div class="d">1 September 1859</div><figcaption>The night the sky caught fire</figcaption></figure></a>
+      <a href="night-abbey-road.html"><figure><img src="assets/social/abbey-road-morph.png" alt="The night Abbey Road arrived" loading="lazy"><div class="d">26 September 1969</div><figcaption>And in the end…</figcaption></figure></a>
+      <a href="night-columbus-landfall.html"><figure><img src="assets/social/columbus-morph.png" alt="The night a lookout shouted one word" loading="lazy"><div class="d">12 October 1492</div><figcaption>Tierra</figcaption></figure></a>
+      <a href="night-berlin-wall.html"><figure><img src="assets/social/berlin-wall-morph.png" alt="The night the gate opened" loading="lazy"><div class="d">9 November 1989</div><figcaption>Sofort, unverzüglich</figcaption></figure></a>
+      <a href="night-millennium.html"><figure><img src="assets/social/millennium-morph.png" alt="The night the century turned" loading="lazy"><div class="d">31 December 1999</div><figcaption>The lights stayed on</figcaption></figure></a>
     </div>
-  </div>
-</section>
-
-<section class="sm-section" id="moods">
-  <div class="container">
-    <div class="section-kicker sm-kicker">Four moods</div>
-    <h2>One sky, four ways.</h2>
-    <div class="sm-gallery-grid">
-      <a href="theme-midnight.html"><figure><img src="assets/starmap/hero-midnight.jpg" alt="Midnight theme star map" loading="lazy"><figcaption>Midnight</figcaption></figure></a>
-      <a href="theme-luxe.html"><figure><img src="assets/starmap/hero-luxe.jpg" alt="Luxe gold theme star map" loading="lazy"><figcaption>Luxe · gold &amp; silver</figcaption></figure></a>
-      <a href="theme-porcelain.html"><figure><img src="assets/starmap/hero-porcelain.jpg" alt="Porcelain theme star map" loading="lazy"><figcaption>Porcelain</figcaption></figure></a>
-      <a href="theme-dense.html"><figure><img src="assets/starmap/hero-dense.jpg" alt="Deep-sky dense star map" loading="lazy"><figcaption>Deep sky detail</figcaption></figure></a>
-    </div>
-  </div>
-</section>
-
-<section class="sm-section" id="frames">
-  <div class="container">
-    <div class="section-kicker sm-kicker">Framed by hand</div>
-    <h2>Your night, in the frame it deserves.</h2>
-    <div class="sm-gallery-grid sm-frames-grid">
-      <a href="#design" class="sm-frame-pick" data-theme="midnight" data-frametype="classic" data-color="black"><figure><img src="assets/starmap/mockup-classic-black.jpg" alt="Midnight star map in a classic black frame" loading="lazy"><figcaption>Midnight · classic black</figcaption></figure></a>
-      <a href="#design" class="sm-frame-pick" data-theme="luxegold" data-frametype="framed" data-color="natural"><figure><img src="assets/starmap/mockup-framed-natural-luxegold.jpg" alt="Luxe gold star map in a natural wood frame" loading="lazy"><figcaption>Luxe Gold · natural wood</figcaption></figure></a>
-      <a href="#design" class="sm-frame-pick" data-theme="noir" data-frametype="classic" data-color="gold"><figure><img src="assets/starmap/mockup-classic-gold-noir.jpg" alt="Noir star map in an antique gold classic frame" loading="lazy"><figcaption>Noir · antique gold</figcaption></figure></a>
-      <a href="#design" class="sm-frame-pick" data-theme="porcelain" data-frametype="framed" data-color="white"><figure><img src="assets/starmap/mockup-framed-white-porcelain.jpg" alt="Porcelain star map in a handmade white wood frame" loading="lazy"><figcaption>Porcelain · white wood</figcaption></figure></a>
-      <a href="#design" class="sm-frame-pick" data-theme="luxesilver" data-frametype="classic" data-color="silver"><figure><img src="assets/starmap/mockup-classic-silver.jpg" alt="Luxe silver star map in an antique silver classic frame" loading="lazy"><figcaption>Luxe Silver · antique silver</figcaption></figure></a>
-      <a href="#design" class="sm-frame-pick" data-theme="porcelain" data-frametype="framed" data-color="natural"><figure><img src="assets/starmap/mockup-framed-natural.jpg" alt="Porcelain star map in a natural wood frame" loading="lazy"><figcaption>Porcelain · natural wood</figcaption></figure></a>
-    </div>
-    <p class="sm-occ-more">Print only, handmade wood frame, or gallery classic in black, antique gold &amp; antique silver — every piece made to order in the UK.</p>
-  </div>
-</section>
-
-<section class="sm-section" id="occasions">
-  <div class="container">
-    <div class="section-kicker sm-kicker">For the nights worth keeping</div>
-    <h2>Occasions.</h2>
-    <div class="sm-occgrid">
-      <a href="occasion-met.html"><figure><img src="assets/starmap/occ-met.jpg" alt="Framed star map above a bed — the night we met" loading="lazy"><figcaption>The night you met<span class="occ-sub">London · August 2019</span></figcaption></figure></a>
-      <a href="occasion-proposal.html"><figure><img src="assets/starmap/occ-proposal.jpg" alt="Framed star map on a candlelit mantelpiece — she said yes" loading="lazy"><figcaption>She said yes<span class="occ-sub">Paris · September 2023</span></figcaption></figure></a>
-      <a href="occasion-wedding.html"><figure><img src="assets/starmap/occ-wedding.jpg" alt="Framed star map above a console with wedding flowers" loading="lazy"><figcaption>A wedding sky<span class="occ-sub">Rome · June 2024</span></figcaption></figure></a>
-      <a href="occasion-born.html"><figure><img src="assets/starmap/occ-born.jpg" alt="Framed star map above a crib in a nursery" loading="lazy"><figcaption>The night they were born<span class="occ-sub">Edinburgh · March 2025</span></figcaption></figure></a>
-      <a href="occasion-anniversary.html"><figure><img src="assets/starmap/occ-anniversary.jpg" alt="Framed star map behind an anniversary dinner table" loading="lazy"><figcaption>An anniversary<span class="occ-sub">Santorini · ten years on</span></figcaption></figure></a>
-    </div>
-    <p class="sm-occ-more">…and every night worth keeping — in loving memory, the move, the leap, the win.</p>
-  </div>
-</section>
-
-<section class="sm-section sm-faq" id="faq">
-  <div class="container">
-    <div class="section-kicker sm-kicker">Questions</div>
-    <h2>Good to know.</h2>
-    <details>
-      <summary>How accurate is the sky?</summary>
-      <p>Genuinely accurate. We compute the position of every star from professional astronomical
-      catalogues for your exact date, time and coordinates — the same mathematics observatories use.
-      Rotate the map to your date of birth and an astronomer would recognise the sky.</p>
-    </details>
-    <details>
-      <summary>How long does delivery take?</summary>
-      <p>Your piece is made to order in a UK fine-art lab and dispatched within 2–4 working days,
-      then delivered by tracked courier. Delivery is free to any UK address and already included
-      in the price shown.</p>
-    </details>
-    <details>
-      <summary>Can I return a personalised print?</summary>
-      <p>Because each piece is made uniquely for you, personalised items are exempt from the standard
-      14-day change-of-mind return. But if your order arrives damaged, faulty or not as approved,
-      we will reprint or refund it in full — that right is never affected. Check your preview
-      carefully before ordering; what you see is what we print.</p>
-    </details>
-    <details>
-      <summary>What sizes and finishes are available?</summary>
-      <p>Print only (30×40&nbsp;cm, shipped rolled), framed 30×40&nbsp;cm, or framed 40×50&nbsp;cm.
-      Frames are handmade wood in white or natural finish with acrylic glazing. Five poster themes
-      are included at no extra cost.</p>
-    </details>
-    <details>
-      <summary>Is my exact time or place required?</summary>
-      <p>The date and place matter most. If you don't know the exact minute, pick an evening hour —
-      the constellations of your night will still be true. Any town or village worldwide works.</p>
-    </details>
   </div>
 </section>
 
@@ -434,10 +365,9 @@
   <div class="container footer-links">
     <div class="foot-link-col">
       <div class="foot-rule">Sky, That Night</div>
-      <a href="#design">Design your sky</a>
-      <a href="#craft">How it works</a>
+      <a href="./#design">Design your sky</a>
       <a href="famous-nights.html">Famous Nights</a>
-      <a href="#faq">FAQ</a>
+      <a href="./#faq">FAQ</a>
     </div>
     <div class="foot-link-col">
       <div class="foot-rule">Help</div>
@@ -454,23 +384,46 @@
   </div>
 </footer>
 
+<script>window.SM_PRESET = {"dateStr": "1974-08-07", "timeStr": "00:30", "place": "New York, USA", "lat": 40.7128, "lon": -74.006, "iana": "America/New_York", "dedication": "There is no why", "theme": "noir", "frameType": "classic", "size": "3040", "frameColor": "gold"};</script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  var v = document.querySelector('.sm-film video');
-  if (!v) return;
-  v.muted = true;
+/* Автозапуск фильма по докрутке: без звука, лупом, пауза при уходе из вида.
+   Уважаем reduced-motion; как только зритель сам включил звук или перемотал —
+   больше не вмешиваемся (userTouched). preload="none" → трафик идёт только
+   когда секция реально доехала до экрана.
+   ⚠️pending-защёлка обязательна: pause() во время неразрешённого play() даёт
+   AbortError и глушит видео насовсем (поймано при проверке 30.07). Порог 0.35 —
+   на низких ландшафтных экранах половина высокого 9:16 не помещается никогда. */
+(function () {
+  var v = document.querySelector('.fn-film video');
+  if (!v || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var pending = false;
+  function outOfView() {
+    var r = v.getBoundingClientRect();
+    var vis = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+    return vis < r.height * 0.35;
+  }
+  function enter() {
+    if (v.dataset.userTouched || pending || !v.paused) return;
+    pending = true; v.muted = true; v.loop = true;
+    var p = v.play();
+    if (p && p.then) p.then(function () {
+      pending = false; if (outOfView()) v.pause();   // успел уехать, пока грузилось
+    }).catch(function () { pending = false; });
+    else pending = false;
+  }
+  function leave() {
+    if (v.dataset.userTouched || pending || v.paused) return;
+    v.pause();
+  }
   var io = new IntersectionObserver(function (es) {
-    es.forEach(function (e) { e.isIntersecting ? v.play().catch(function(){}) : v.pause(); });
-  }, { threshold: 0.25 });
+    es.forEach(function (e) { (e.isIntersecting ? enter : leave)(); });
+  }, { threshold: 0.35 });
   io.observe(v);
-  var btn = document.querySelector('.sm-film-sound');
-  if (btn) btn.addEventListener('click', function () {
-    v.muted = !v.muted;
-    if (!v.muted) { v.play().catch(function(){}); }
-    btn.textContent = v.muted ? '🔊 Sound' : '🔈 Mute';
-    btn.setAttribute('aria-label', v.muted ? 'Turn sound on' : 'Mute');
+  v.addEventListener('volumechange', function () {
+    if (!v.muted) { v.dataset.userTouched = 1; v.loop = false; }
   });
-});
+  v.addEventListener('seeking', function () { v.dataset.userTouched = 1; });
+})();
 </script>
 <script src="assets/starmap.js?v=14" defer></script>
 </body>
