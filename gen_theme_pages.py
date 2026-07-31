@@ -20,11 +20,14 @@ TH = {
         hero="hero-midnight.jpg", room="occ-met.jpg", theme="midnight",
         metatitle="Midnight Star Map — Deep Navy & Starlight",
         # ⛔⛔ ГЕНЕРАТОР ОТСТАЛ ОТ ЗАДЕПЛОЕННЫХ theme-*.html (вскрыто 29.07.2026).
-        # Живые страницы правились РУКАМИ: там `starmap.js?v=14`, `sm-price` = £49 и правила
+        # Живые страницы правились РУКАМИ: там `starmap.js?v=14`, `sm-price` = £44.99 и правила
         # `.sm-frames-grid`. Прогон этого файла молча ОТКАТЫВАЕТ всё три — а откат кэш-версии
         # с 14 на 11 даёт стухший JS через Cloudflare (та же болячка, что была с legal-страницами).
         # ПЕРЕД ЗАПУСКОМ: сверить v-стамп, sm-price и CSS с текущими theme-*.html и подтянуть сюда.
         # 29.07 цену £39→£26.99 в живых страницах правили ТЕКСТОМ, без перегенерации, именно поэтому.
+        # 31.07 так же текстом: `sm-price` £49→£44.99 на 4 theme-страницах и в 404.html — £49 был
+        # стейл-заглушкой (живой JS для той же комплектации считает £44.99, проверено в браузере),
+        # и до загрузки скрипта покупатель видел лишнюю пятёрку.
         metadesc="The Midnight star map: deep navy sky, glowing stars, the Milky Way. Museum-grade print of your exact sky, from £26.99, free UK delivery."),
     "luxe": dict(
         title="Luxe · gold &amp; silver", label="Luxe",
