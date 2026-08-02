@@ -124,6 +124,16 @@ EXTRA_CSS = """
 .occ-gallery-grid img { width:100%; height:auto; display:block; border-radius:3px; box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
 .occ-gallery-grid figcaption { font-family:var(--serif); font-size:.98rem; color:var(--moon); margin-top:.6rem; }
 .occ-gallery-grid a:hover figcaption { color:var(--gold); }
+/* лайтбокс галереи (02.08): стрелки/клавиши/свайп, без внешних либ */
+.occ-lightbox { position:fixed; inset:0; z-index:200; background:rgba(4,6,18,.93); display:flex; align-items:center; justify-content:center; }
+.occ-lightbox[hidden] { display:none; }
+.occ-lightbox img { max-width:min(90vw,1000px); max-height:82vh; width:auto; height:auto; border-radius:4px; box-shadow:0 40px 120px rgba(0,0,0,.8); }
+.lb-caption { position:absolute; bottom:4vh; left:0; right:0; text-align:center; font-family:var(--serif); font-size:1.05rem; color:var(--moon); }
+.lb-close { position:absolute; top:2vh; right:3vw; font-size:2.2rem; background:none; border:none; color:var(--moon); cursor:pointer; line-height:1; }
+.lb-prev,.lb-next { position:absolute; top:50%; transform:translateY(-50%); font-size:3rem; background:none; border:none; color:var(--moon); cursor:pointer; padding:1rem; line-height:1; font-family:var(--serif); }
+.lb-prev { left:2vw; } .lb-next { right:2vw; }
+.lb-close:hover,.lb-prev:hover,.lb-next:hover { color:var(--gold); }
+@media (max-width:860px){ .lb-prev,.lb-next { font-size:2.4rem; padding:.6rem; } .occ-lightbox img { max-width:94vw; } }
 /* answer capsule (GEO — прямой ответ для AI-цитирования) */
 .occ-capsule { background:rgba(201,169,97,.06); border-left:2px solid var(--gold); border-radius:4px; padding:1.05rem 1.3rem; margin:0 0 2rem; max-width:34rem; }
 .occ-capsule p { font-family:var(--sans); font-weight:300; font-size:clamp(.95rem,1.3vw,1.05rem); line-height:1.65; color:var(--moon-sub); margin:0; }
@@ -284,7 +294,7 @@ def faq_html(faqs):
 {items}
     </div>
   </div>
-</section>"""
+</section>""" + LIGHTBOX_HTML
 
 
 def capsule_html(text):
@@ -301,6 +311,44 @@ GALLERY_SLIDES = [
     ("sizes.jpg", "Three sizes", "Star map print sizes shown to scale — 30×40, 40×50 and 50×70 cm"),
     ("arrives.jpg", "How it arrives", "Prints ship rolled in a tube, framed pieces boxed with protected corners"),
 ]
+
+
+# HTML+JS лайтбокса. Плейн-строка (НЕ f-string — внутри JS с фигурными скобками);
+# gallery_html() конкатенирует её к секции галереи.
+LIGHTBOX_HTML = """
+<div class="occ-lightbox" id="occ-lightbox" hidden role="dialog" aria-label="Image viewer">
+  <button class="lb-close" aria-label="Close">&times;</button>
+  <button class="lb-prev" aria-label="Previous image">&#8249;</button>
+  <img src="" alt="">
+  <button class="lb-next" aria-label="Next image">&#8250;</button>
+  <div class="lb-caption"></div>
+</div>
+<script>
+(function(){
+  var grid=document.querySelector('.occ-gallery-grid'); if(!grid) return;
+  var links=[].slice.call(grid.querySelectorAll('a'));
+  var lb=document.getElementById('occ-lightbox'), img=lb.querySelector('img'),
+      cap=lb.querySelector('.lb-caption'), i=0;
+  function show(n){ i=(n+links.length)%links.length;
+    img.src=links[i].getAttribute('href');
+    img.alt=links[i].querySelector('img').alt;
+    var f=links[i].querySelector('figcaption'); cap.textContent=f?f.textContent:'';
+    lb.hidden=false; document.body.style.overflow='hidden'; }
+  function hide(){ lb.hidden=true; document.body.style.overflow=''; }
+  links.forEach(function(a,n){ a.addEventListener('click',function(e){ e.preventDefault(); show(n); }); });
+  lb.querySelector('.lb-prev').addEventListener('click',function(e){ e.stopPropagation(); show(i-1); });
+  lb.querySelector('.lb-next').addEventListener('click',function(e){ e.stopPropagation(); show(i+1); });
+  lb.querySelector('.lb-close').addEventListener('click',hide);
+  lb.addEventListener('click',function(e){ if(e.target===lb) hide(); });
+  document.addEventListener('keydown',function(e){ if(lb.hidden) return;
+    if(e.key==='Escape') hide(); else if(e.key==='ArrowLeft') show(i-1); else if(e.key==='ArrowRight') show(i+1); });
+  var tx=null;
+  lb.addEventListener('touchstart',function(e){ tx=e.touches[0].clientX; },{passive:true});
+  lb.addEventListener('touchend',function(e){ if(tx===null) return;
+    var dx=e.changedTouches[0].clientX-tx; tx=null;
+    if(Math.abs(dx)>40) show(dx>0?i-1:i+1); },{passive:true});
+})();
+</script>"""
 
 
 def gallery_html():
