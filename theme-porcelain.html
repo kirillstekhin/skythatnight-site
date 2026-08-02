@@ -243,7 +243,7 @@
 .occ-gallery-grid figcaption { font-family:var(--serif); font-size:.98rem; color:var(--moon); margin-top:.6rem; }
 .occ-gallery-grid a:hover figcaption { color:var(--gold); }
 /* лайтбокс галереи (02.08): стрелки/клавиши/свайп, без внешних либ */
-.occ-lightbox { position:fixed; inset:0; z-index:200; background:rgba(4,6,18,.93); display:flex; align-items:center; justify-content:center; }
+.occ-lightbox { position:fixed; inset:0; z-index:1000; background:rgba(4,6,18,.93); display:flex; align-items:center; justify-content:center; }
 .occ-lightbox[hidden] { display:none; }
 .occ-lightbox img { max-width:min(90vw,1000px); max-height:82vh; width:auto; height:auto; border-radius:4px; box-shadow:0 40px 120px rgba(0,0,0,.8); }
 .lb-caption { position:absolute; bottom:4vh; left:0; right:0; text-align:center; font-family:var(--serif); font-size:1.05rem; color:var(--moon); }
@@ -395,6 +395,7 @@
   var links=[].slice.call(grid.querySelectorAll('a'));
   var lb=document.getElementById('occ-lightbox'), img=lb.querySelector('img'),
       cap=lb.querySelector('.lb-caption'), i=0;
+  document.body.appendChild(lb); /* из main (stacking context z:1) в корень — иначе sticky-шапка (z:30) перекрывает крестик */
   function show(n){ i=(n+links.length)%links.length;
     img.src=links[i].getAttribute('href');
     img.alt=links[i].querySelector('img').alt;
