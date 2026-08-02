@@ -178,6 +178,23 @@
 /* occasions gallery + film */
 .sm-occgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem; margin-top:2.2rem; }
 @media (max-width:640px){ .sm-occgrid { grid-template-columns:repeat(2,1fr); } }
+/* Occasions — мозаика: 4 колонки, первая плитка 2x2. Девять карточек ложатся
+   в три ряда без пустых ячеек и секция перестаёт повторять соседние 3-в-ряд. */
+.sm-occ-mosaic { grid-template-columns:repeat(4,1fr); }
+.sm-occ-mosaic > a:first-child { grid-column:span 2; grid-row:span 2; }
+.sm-occ-mosaic > a:first-child figure { display:flex; flex-direction:column; height:100%; }
+.sm-occ-mosaic > a:first-child img { height:100%; object-fit:cover; }
+@media (max-width:1100px){ .sm-occ-mosaic { grid-template-columns:repeat(3,1fr); } }
+@media (max-width:640px){
+  .sm-occ-mosaic { grid-template-columns:repeat(2,1fr); }
+  .sm-occ-mosaic > a:first-child { grid-row:auto; }
+  .sm-occ-mosaic > a:first-child img { height:auto; object-fit:contain; }
+}
+/* Famous Nights — пять карточек одним рядом. Своя ширина: секция делит разметку
+   с Occasions, но не должна наследовать её раскладку. */
+.sm-famousgrid { grid-template-columns:repeat(5,1fr); }
+@media (max-width:1100px){ .sm-famousgrid { grid-template-columns:repeat(3,1fr); } }
+@media (max-width:640px){ .sm-famousgrid { grid-template-columns:repeat(2,1fr); } }
 .sm-occgrid figure { margin:0; }
 .sm-occgrid a { text-decoration:none; display:block; }
 .sm-occgrid a img { transition:transform .35s ease, box-shadow .35s ease; }
@@ -381,7 +398,7 @@
   <div class="container">
     <div class="section-kicker sm-kicker">For the nights worth keeping</div>
     <h2>Occasions.</h2>
-    <div class="sm-occgrid">
+    <div class="sm-occgrid sm-occ-mosaic">
       <a href="occasion-met.html"><figure><img src="assets/starmap/occ-met.jpg" alt="Framed star map above a bed — the night we met" loading="lazy"><figcaption>The night you met<span class="occ-sub">London · August 2019</span></figcaption></figure></a>
       <a href="occasion-proposal.html"><figure><img src="assets/starmap/occ-proposal.jpg" alt="Framed star map on a candlelit mantelpiece — she said yes" loading="lazy"><figcaption>She said yes<span class="occ-sub">Paris · September 2023</span></figcaption></figure></a>
       <a href="occasion-wedding.html"><figure><img src="assets/starmap/occ-wedding.jpg" alt="Framed star map above a console with wedding flowers" loading="lazy"><figcaption>A wedding sky<span class="occ-sub">Rome · June 2024</span></figcaption></figure></a>
@@ -400,7 +417,7 @@
   <div class="container">
     <div class="section-kicker sm-kicker">Famous Nights</div>
     <h2>The sky remembers every night.</h2>
-    <div class="sm-occgrid">
+    <div class="sm-occgrid sm-famousgrid">
       <a href="night-royal-wedding-1981.html"><figure><img src="assets/social/royal-wedding-morph.png" alt="The real sky over the royal wedding street party, 1981" loading="lazy"><figcaption>«A day of fireworks and fairy tales»<span class="occ-sub">London · 29 July 1981</span></figcaption></figure></a>
       <a href="night-world-cup-1966.html"><figure><img src="assets/social/world-cup-1966-morph.png" alt="The real sky over Wembley the night England won the World Cup" loading="lazy"><figcaption>«They think it's all over»<span class="occ-sub">Wembley · 30 July 1966</span></figcaption></figure></a>
       <a href="night-woodstock.html"><figure><img src="assets/social/woodstock-morph.png" alt="The real sky over Woodstock, opening night 1969" loading="lazy"><figcaption>«Three days of peace and music»<span class="occ-sub">Bethel · 15 August 1969</span></figcaption></figure></a>
