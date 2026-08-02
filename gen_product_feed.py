@@ -35,6 +35,17 @@ DESC = ("A museum-grade star map of the exact sky above any place, on any date �
         "Personalise the date, place and dedication line. {extra}. "
         "Made to order and hand-finished in the UK. Free UK delivery.")
 
+# Доп-кадры (02.08): те же слайды, что на листингах сайта/Etsy — Merchant показывает их
+# каруселью в карточке. Рамочным форматам добавляем слайд рам; интерьер — всем.
+def additional_images(fmt):
+    names = ["themes.jpg", "detail.jpg", "sizes.jpg", "arrives.jpg"]
+    if fmt != "Print":
+        names.insert(1, "frames.jpg")
+    urls = [f"{SITE}/assets/starmap/gallery/{n}" for n in names]
+    urls.append(f"{SITE}/assets/starmap/occ-met.jpg")
+    return "\n".join(f"    <g:additional_image_link>{u}</g:additional_image_link>" for u in urls)
+
+
 def item_xml(pid, fmt, size, price, extra, LINK):
     title = f"Personalised Star Map — {fmt} {size} — Your Exact Night Sky"
     d = DESC.format(extra=extra.capitalize())
@@ -44,6 +55,7 @@ def item_xml(pid, fmt, size, price, extra, LINK):
     <g:description>{html.escape(d)}</g:description>
     <g:link>{html.escape(LINK)}</g:link>
     <g:image_link>{SITE}/assets/starmap/feed/{pid}.jpg</g:image_link>
+{additional_images(fmt)}
     <g:availability>in_stock</g:availability>
     <g:price>{price:.2f} GBP</g:price>
     <g:condition>new</g:condition>
