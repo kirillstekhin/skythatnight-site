@@ -201,9 +201,26 @@ FOOTER = """<footer>
 </footer>"""
 
 
+# Product-разметка для Merchant-краула (02.08): без неё Google собирал товар из og-тегов
+# без availability и валюты → Not approved. InStock, не MadeToOrder — Merchant его не знает.
+def product_jsonld(t, url, ogimg):
+    import re as _re
+    data = {"@context": "https://schema.org", "@type": "Product",
+            "name": _re.sub("<[^>]+>", "", t["metatitle"]).replace("&amp;", "&"), "description": t["metadesc"], "image": ogimg,
+            "brand": {"@type": "Brand", "name": "Sky, That Night"},
+            "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": "26.99",
+                       "availability": "https://schema.org/InStock", "url": url,
+                       "shippingDetails": {"@type": "OfferShippingDetails",
+                           "shippingRate": {"@type": "MonetaryAmount", "value": "0", "currency": "GBP"},
+                           "shippingDestination": {"@type": "DefinedRegion", "addressCountry": "GB"}}}}
+    return '<script type="application/ld+json">' + json.dumps(data, ensure_ascii=False) + '</script>'
+
+
 def build(key, t):
+
     url = f"https://www.skythatnight.com/theme-{key}.html"
     ogimg = f"https://www.skythatnight.com/assets/starmap/{t['hero']}"
+    schema = product_jsonld(t, url, ogimg)
     preset_js = json.dumps({"theme": t["theme"]})
 
     others = []
@@ -232,6 +249,7 @@ def build(key, t):
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="{ogimg}">
 <meta name="twitter:card" content="summary_large_image">
+{schema}
 <link rel="icon" href="assets/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="assets/favicon.png?v=2">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
