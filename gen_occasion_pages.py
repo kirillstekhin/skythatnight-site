@@ -117,6 +117,13 @@ EXTRA_CSS = """
 .occ-more-grid img { width:100%; height:auto; display:block; border-radius:3px; box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
 .occ-more-grid figcaption { font-family:var(--serif); font-size:.98rem; color:var(--moon); margin-top:.6rem; }
 .occ-more-grid a:hover figcaption { color:var(--gold); }
+/* галерея деталей (перенос Etsy-пакета, 02.08): 6 слайдов из assets/starmap/gallery/ */
+.occ-gallery-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem; margin-top:2.2rem; }
+@media (max-width:860px){ .occ-gallery-grid { grid-template-columns:repeat(2,1fr); } }
+.occ-gallery-grid a { text-decoration:none; }
+.occ-gallery-grid img { width:100%; height:auto; display:block; border-radius:3px; box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
+.occ-gallery-grid figcaption { font-family:var(--serif); font-size:.98rem; color:var(--moon); margin-top:.6rem; }
+.occ-gallery-grid a:hover figcaption { color:var(--gold); }
 /* answer capsule (GEO — прямой ответ для AI-цитирования) */
 .occ-capsule { background:rgba(201,169,97,.06); border-left:2px solid var(--gold); border-radius:4px; padding:1.05rem 1.3rem; margin:0 0 2rem; max-width:34rem; }
 .occ-capsule p { font-family:var(--sans); font-weight:300; font-size:clamp(.95rem,1.3vw,1.05rem); line-height:1.65; color:var(--moon-sub); margin:0; }
@@ -284,6 +291,35 @@ def capsule_html(text):
     return f'<div class="occ-capsule"><p>{esc(text)}</p></div>'
 
 
+# Перенос Etsy-пакета на сайт (02.08): те же 6 слайдов, что в галереях листингов.
+# Источник — SKN_GALLERY (пересжатые 1200px в assets/starmap/gallery/). Клик = полный слайд.
+GALLERY_SLIDES = [
+    ("themes.jpg", "Five themes", "The same sky in five finishes — midnight, porcelain, noir, luxe gold and luxe silver"),
+    ("frames.jpg", "Five frames", "Handmade wood and gallery classic frames for a personalised star map"),
+    ("personalised.jpg", "Your night, in four lines", "What you personalise on a custom star map print"),
+    ("detail.jpg", "Every star in its true position", "Close-up of the astronomical detail on the print"),
+    ("sizes.jpg", "Three sizes", "Star map print sizes shown to scale — 30×40, 40×50 and 50×70 cm"),
+    ("arrives.jpg", "How it arrives", "Prints ship rolled in a tube, framed pieces boxed with protected corners"),
+]
+
+
+def gallery_html():
+    cells = "\n".join(
+        f'      <a href="assets/starmap/gallery/{f}" target="_blank" rel="noopener">'
+        f'<figure><img src="assets/starmap/gallery/{f}" alt="{esc(alt)}" loading="lazy">'
+        f'<figcaption>{esc(cap)}</figcaption></figure></a>'
+        for f, cap, alt in GALLERY_SLIDES)
+    return f"""<section class="sm-section">
+  <div class="container">
+    <div class="section-kicker sm-kicker">Every detail, up close</div>
+    <h2>What you're choosing from.</h2>
+    <div class="occ-gallery-grid">
+{cells}
+    </div>
+  </div>
+</section>"""
+
+
 def build(key, o):
     url = f"https://www.skythatnight.com/occasion-{key}.html"
     ogimg = f"https://www.skythatnight.com/assets/starmap/{o['img']}"
@@ -332,7 +368,9 @@ def build(key, o):
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="{ogimg}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="assets/favicon.png?v=2">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -368,6 +406,8 @@ def build(key, o):
 
 {room_html}
 
+{gallery_html()}
+
 {faqsec}
 
 <section class="sm-section" id="more">
@@ -396,3 +436,8 @@ for key, o in OCC.items():
     open(out, "w").write(build(key, o))
     print("wrote", os.path.basename(out))
 print("done")
+
+# Регенерация перезаписывает html и ВЫНОСИТ beacon аналитики (поймано 02.08:
+# после прогона 0 из 13 страниц со счётчиком). Вшиваем обратно сами — идемпотентно.
+import gen_analytics
+gen_analytics.inject(True)

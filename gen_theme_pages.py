@@ -9,7 +9,7 @@ idx = open(os.path.join(HERE, "index.html")).read()
 
 STYLE = re.search(r"<style>(.*?)</style>", idx, re.S).group(1)
 CONFIG = re.search(r'(<section class="sm-config" id="design">.*?</section>)', idx, re.S).group(1)
-CACHE = "v=11"
+CACHE = "v=15"
 
 ORDER = ["midnight", "luxe", "porcelain", "dense"]
 
@@ -19,6 +19,9 @@ TH = {
         story="Deep navy and starlight — our signature finish. Bright stars glow above a midnight-blue sky, the Milky Way drifting across it. The classic that suits every room.",
         hero="hero-midnight.jpg", room="occ-met.jpg", theme="midnight",
         metatitle="Midnight Star Map — Deep Navy & Starlight",
+        # ✅02.08.2026: генератор ДОГНАЛ живые страницы (v-стамп поднят до v=15, фавикон-блок
+        # актуализирован, ручные CSS-довески перенесены в EXTRA_CSS, цена берётся из живого
+        # index-CONFIG). История мины ниже — оставлена как урок: ПЕРЕД прогоном сверять дифф.
         # ⛔⛔ ГЕНЕРАТОР ОТСТАЛ ОТ ЗАДЕПЛОЕННЫХ theme-*.html (вскрыто 29.07.2026).
         # Живые страницы правились РУКАМИ: там `starmap.js?v=14`, `sm-price` = £44.99 и правила
         # `.sm-frames-grid`. Прогон этого файла молча ОТКАТЫВАЕТ всё три — а откат кэш-версии
@@ -68,7 +71,47 @@ EXTRA_CSS = """
 .occ-more-grid img { width:100%; height:auto; display:block; border-radius:3px; box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
 .occ-more-grid figcaption { font-family:var(--serif); font-size:.98rem; color:var(--moon); margin-top:.6rem; }
 .occ-more-grid a:hover figcaption { color:var(--gold); }
+/* ручные довески живых страниц, восстановлены 02.08 после отката прогоном */
+@media (max-width:820px){ .sm-gallery-grid { grid-template-columns:repeat(2,1fr); } }
+.sm-occgrid { display:grid; grid-template-columns:repeat(5,1fr); gap:1.1rem; margin-top:2.2rem; }
+@media (max-width:1100px){ .sm-occgrid { grid-template-columns:repeat(3,1fr); } }
+/* галерея деталей (перенос Etsy-пакета, 02.08) — как в gen_occasion_pages */
+.occ-gallery-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem; margin-top:2.2rem; }
+@media (max-width:860px){ .occ-gallery-grid { grid-template-columns:repeat(2,1fr); } }
+.occ-gallery-grid a { text-decoration:none; }
+.occ-gallery-grid img { width:100%; height:auto; display:block; border-radius:3px; box-shadow:0 16px 40px rgba(0,0,0,.45), 0 0 0 1px rgba(201,169,97,.12); }
+.occ-gallery-grid figcaption { font-family:var(--serif); font-size:.98rem; color:var(--moon); margin-top:.6rem; }
+.occ-gallery-grid a:hover figcaption { color:var(--gold); }
 """
+
+# Тот же пакет слайдов, что на occasion-страницах и в Etsy-галереях (источник SKN_GALLERY).
+GALLERY_SLIDES = [
+    ("themes.jpg", "Five themes", "The same sky in five finishes — midnight, porcelain, noir, luxe gold and luxe silver"),
+    ("frames.jpg", "Five frames", "Handmade wood and gallery classic frames for a personalised star map"),
+    ("personalised.jpg", "Your night, in four lines", "What you personalise on a custom star map print"),
+    ("detail.jpg", "Every star in its true position", "Close-up of the astronomical detail on the print"),
+    ("sizes.jpg", "Three sizes", "Star map print sizes shown to scale — 30×40, 40×50 and 50×70 cm"),
+    ("arrives.jpg", "How it arrives", "Prints ship rolled in a tube, framed pieces boxed with protected corners"),
+]
+
+
+def gallery_html():
+    def esc(s):
+        return s.replace("&", "&amp;").replace('"', "&quot;")
+    cells = "\n".join(
+        f'      <a href="assets/starmap/gallery/{f}" target="_blank" rel="noopener">'
+        f'<figure><img src="assets/starmap/gallery/{f}" alt="{esc(alt)}" loading="lazy">'
+        f'<figcaption>{esc(cap)}</figcaption></figure></a>'
+        for f, cap, alt in GALLERY_SLIDES)
+    return f"""<section class="sm-section">
+  <div class="container">
+    <div class="section-kicker sm-kicker">Every detail, up close</div>
+    <h2>What you're choosing from.</h2>
+    <div class="occ-gallery-grid">
+{cells}
+    </div>
+  </div>
+</section>"""
 
 HEADER = """<header>
   <div class="container header-inner">
@@ -140,7 +183,9 @@ def build(key, t):
 <meta property="og:url" content="{url}">
 <meta property="og:image" content="{ogimg}">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="icon" href="assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="assets/favicon.png?v=2">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -182,6 +227,8 @@ def build(key, t):
   </div>
 </section>
 
+{gallery_html()}
+
 <section class="sm-section" id="more">
   <div class="container">
     <div class="section-kicker sm-kicker">Four moods</div>
@@ -208,3 +255,8 @@ for key, t in TH.items():
     open(out, "w").write(build(key, t))
     print("wrote", os.path.basename(out))
 print("done")
+
+# Регенерация перезаписывает html и ВЫНОСИТ beacon аналитики (поймано 02.08:
+# после прогона 0 из 13 страниц со счётчиком). Вшиваем обратно сами — идемпотентно.
+import gen_analytics
+gen_analytics.inject(True)
