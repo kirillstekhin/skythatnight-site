@@ -5,10 +5,28 @@ Public pages = every *.html except the excludes; index.html is emitted as "/".
 lastmod = last git commit date of the file (YYYY-MM-DD), falling back to mtime.
 Run after regenerating pages:  python3 gen_sitemap.py
 """
-import subprocess, os, glob, datetime
+import subprocess, os, glob, datetime, re
 
 BASE = "https://www.skythatnight.com"
-EXCLUDE = {"404.html"}          # error page — never in sitemap
+EXCLUDE = {
+    "404.html",                        # error page — never in sitemap
+    "google54b69d1b03e83677.html",     # Search Console verification stub
+}
+
+# <meta name="robots" content="...noindex..."> в <head>. Страница с noindex
+# в sitemap = противоречивый сигнал: карта зовёт индексировать, тег запрещает.
+NOINDEX_RE = re.compile(
+    r'<meta[^>]+name\s*=\s*["\']robots["\'][^>]*content\s*=\s*["\'][^"\']*noindex',
+    re.I)
+
+
+def is_noindex(fn):
+    try:
+        with open(fn, encoding="utf-8", errors="ignore") as f:
+            head = f.read(8192)          # <head> всегда в начале файла
+    except OSError:
+        return False
+    return bool(NOINDEX_RE.search(head))
 
 
 def group_meta(fn):
@@ -39,8 +57,13 @@ def lastmod(fn):
 
 
 rows = []
+skipped = []
 for fn in glob.glob("*.html"):
     if fn in EXCLUDE:
+        skipped.append((fn, "exclude"))
+        continue
+    if is_noindex(fn):
+        skipped.append((fn, "noindex"))
         continue
     grp, path, pr = group_meta(fn)
     rows.append((grp, path, pr, lastmod(fn)))
@@ -54,3 +77,5 @@ for grp, path, pr, lm in rows:
 out.append('</urlset>')
 open("sitemap.xml", "w").write("\n".join(out) + "\n")
 print(f"wrote sitemap.xml — {len(rows)} URLs")
+for fn, why in sorted(skipped):
+    print(f"  skipped {fn} ({why})")
