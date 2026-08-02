@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Генерит 5 occasion-лендингов skythatnight.com из общего скелета index.html.
+"""Генерит 9 occasion-лендингов skythatnight.com из общего скелета index.html.
 Каждая страница: свой head/OG, компактный hero с мокапом, конфигуратор (предзаполнен
 через window.SM_PRESET), мокап крупно ниже + сетка «другие поводы». Запуск: python3 gen_occasion_pages.py
 """
@@ -13,7 +13,8 @@ CONFIG = re.search(r'(<section class="sm-config" id="design">.*?</section>)', id
 CACHE = "v=14"
 
 # порядок для «других поводов»
-ORDER = ["met", "proposal", "wedding", "born", "anniversary"]
+ORDER = ["met", "proposal", "wedding", "born", "anniversary",
+         "birthday", "new-home", "retirement", "memorial"]
 
 OCC = {
     "met": dict(
@@ -57,12 +58,14 @@ OCC = {
                     lat=36.3932, lon=25.4615, iana="Europe/Athens", dedication="Ten years of us",
                     theme="luxesilver", frameType="framed", size="3040", frameColor="white")),
 
-    # ── Расширение окейжнов 18.07. img = НАШИ отрендеренные печати с правильной подписью
-    # (tools/render_occ_heroes через starmap_v3) — placeholder до реальных lifestyle-фото образцов.
-    # roomless=True → прячем секцию «Seen in the room» (bare-print, стены нет; вернём с фото).
-    # Пока НЕ в ORDER (bare-print vs room-мокапы = неровная сетка «More occasions»); ссылки — sitemap + Pinterest/Etsy/Google.
+    # ── Расширение окейжнов 18.07. Изначально bare-print без комнаты → roomless=True и вне
+    # ORDER (неровная сетка «More occasions»), трафик только из sitemap/Pinterest/Etsy/Google.
+    # 02.08: комнатные мокапы собраны хромакей-композитом (LISTING_IMAGE_PIPELINE_SOP §5a):
+    # сцена gemini-3-pro-image с зелёной заглушкой + chroma_composite.py --outset 0.035,
+    # арт = прежние bare-принты (source-assets/occ-bare-prints/) → текст 1:1, координаты сверены.
+    # Сетка выровнялась, все девять в ORDER, roomless снят.
     "birthday": dict(
-        title="The sky the day you were born", chip="A milestone birthday", roomless=True,
+        title="The sky the day you were born", chip="A milestone birthday",
         story="Thirty years, fifty, ninety — turn back to the exact sky that stood over the very first day. A birthday gift that reaches further back than any other.",
         img="occ-birthday.jpg", metatitle="Birthday Star Map — The Sky the Day You Were Born",
         metadesc="A personalised star map of the exact sky on the day you were born — a milestone birthday gift. Real astronomy, museum-grade print, from £26.99 with free UK delivery.",
@@ -70,7 +73,7 @@ OCC = {
                     lat=53.4808, lon=-2.2426, iana="Europe/London", dedication="The day you were born",
                     theme="luxegold", frameType="framed", size="3040", frameColor="natural")),
     "new-home": dict(
-        title="Your first night here", chip="A new home", roomless=True,
+        title="Your first night here", chip="A new home",
         story="The first night under a new roof, mapped from the sky above your new front door. A housewarming gift that turns a house into the start of a story.",
         img="occ-new-home.jpg", metatitle="New Home Star Map — The Sky Above Your New Address",
         metadesc="A personalised star map of the sky above your new home on your first night there. A thoughtful housewarming gift, from £26.99 with free UK delivery.",
@@ -78,7 +81,7 @@ OCC = {
                     lat=51.4545, lon=-2.5879, iana="Europe/London", dedication="Our first night here",
                     theme="porcelain", frameType="framed", size="3040", frameColor="white")),
     "retirement": dict(
-        title="The end of one chapter", chip="A retirement", roomless=True,
+        title="The end of one chapter", chip="A retirement",
         story="A lifetime of early starts, and now the horizon opens. Mark the day it all wound down — or the day it began — with the sky that watched over a life's work.",
         img="occ-retirement.jpg", metatitle="Retirement Star Map — The Sky of a Life's Work",
         metadesc="A personalised star map to mark a retirement — the sky on the first day, the last, or a date that mattered. A meaningful retirement gift, from £26.99 with free UK delivery.",
@@ -86,7 +89,7 @@ OCC = {
                     lat=55.9533, lon=-3.1883, iana="Europe/London", dedication="With gratitude, for a life's work",
                     theme="luxesilver", frameType="framed", size="3040", frameColor="natural")),
     "memorial": dict(
-        title="The stars still hold that night", chip="In memory", roomless=True,
+        title="The stars still hold that night", chip="In memory",
         story="Some skies we never want to lose. Map the night they were born, or a date you shared, and keep it somewhere the light can reach — a quiet, lasting way to remember someone who mattered.",
         img="occ-memorial.jpg", metatitle="Memorial Star Map — A Keepsake to Remember Them By",
         metadesc="A personalised star map to remember someone — the sky the night they were born, or a date you shared. A gentle, lasting memorial keepsake, from £26.99 with free UK delivery.",
