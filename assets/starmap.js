@@ -122,8 +122,12 @@ function renderSvg(o) {
   s.push(`<rect x="44" y="44" width="${W-88}" height="${H-88}" fill="none" stroke="${t.accent}" stroke-width="0.6" opacity="0.7"/>`);
   s.push(`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${t.sky}"/>`);
 
+  // Небесные слои (линии/звёзды/подписи) — в группах .sky-rot: refresh() доворачивает
+  // их на ΔLST при смене даты/места (честная анимация вращения купола, 03.08).
+  // transform-box:view-box — origin в координатах viewBox, центр круга неба.
+  const rot = `class="sky-rot" style="transform-box:view-box;transform-origin:${cx}px ${cy}px"`;
   // constellation lines
-  s.push(`<g clip-path="url(#skyclip)" stroke="${t.lines}" stroke-opacity="${t.lineOp}" stroke-width="${t.lineW}" fill="none" stroke-linecap="round">`);
+  s.push(`<g ${rot}><g clip-path="url(#skyclip)" stroke="${t.lines}" stroke-opacity="${t.lineOp}" stroke-width="${t.lineW}" fill="none" stroke-linecap="round">`);
   for (const line of CATALOG.lines) {
     let path = '', pen = false, below = 0;
     for (const [ra, dec] of line) {
@@ -135,7 +139,7 @@ function renderSvg(o) {
     }
     if (below < line.length) s.push(`<path d="${path}"/>`);
   }
-  s.push('</g>');
+  s.push('</g></g>');
 
   // grid + ring + ticks
   s.push(`<circle cx="${cx}" cy="${cy}" r="${(R/3).toFixed(1)}" fill="none" stroke="${t.grid}" stroke-width="1"/>`);
@@ -151,7 +155,7 @@ function renderSvg(o) {
   }
 
   // stars
-  s.push(`<g clip-path="url(#skyclip)">`);
+  s.push(`<g ${rot}><g clip-path="url(#skyclip)">`);
   for (const [ra, dec, mag] of CATALOG.stars) {
     const [alt, az] = altAz(ra, dec, lst, o.lat);
     if (alt <= 0.01) continue;
@@ -162,9 +166,10 @@ function renderSvg(o) {
     if (mag < 1.6) s.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(rad*2.2).toFixed(1)}" fill="${t.star}" opacity="0.16"/>`);
     s.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rad.toFixed(2)}" fill="${t.star}" fill-opacity="${op.toFixed(2)}"/>`);
   }
-  s.push('</g>');
+  s.push('</g></g>');
 
-  // labels
+  // labels (едут вместе со своими звёздами; на время доворота слегка наклонены — ок)
+  s.push(`<g ${rot}>`);
   for (const [name, ra, dec, mag] of NAMED) {
     if (mag > 1.05) continue;
     const [alt, az] = altAz(ra, dec, lst, o.lat);
@@ -172,6 +177,7 @@ function renderSvg(o) {
     const [x, y] = project(alt, az, cx, cy, R);
     s.push(`<text x="${(x+7).toFixed(1)}" y="${(y+3).toFixed(1)}" fill="${t.sub}" fill-opacity="0.85" font-family="'EB Garamond',Georgia,serif" font-size="12">${name}</text>`);
   }
+  s.push('</g>');
 
   // compass
   for (const [ang, lab] of [[0,'N'],[90,'E'],[180,'S'],[270,'W']]) {
@@ -199,7 +205,7 @@ function renderSvg(o) {
   s.push(`<text x="${cx}" y="${oy+100}" fill="${t.faint}" font-family="'EB Garamond',Georgia,serif" font-size="16" letter-spacing="2" text-anchor="middle">${latS}   ${lonS}</text>`);
   s.push(`<text x="${cx}" y="${H-58}" fill="${t.faint}" font-family="'EB Garamond',Georgia,serif" font-size="14" letter-spacing="3" text-anchor="middle">S K Y ,  T H A T  N I G H T</text>`);
   s.push('</svg>');
-  return { svg: s.join(''), phase };
+  return { svg: s.join(''), phase, lst };
 }
 
 /* ───────────────────────── configurator UI ───────────────────────── */
@@ -262,8 +268,26 @@ function designCode() {
 
 function refresh() {
   state.tz = tzOffsetHours(state.iana, state.dateStr, state.timeStr);
-  const { svg, phase } = renderSvg(state);
-  document.getElementById('sm-preview').innerHTML = svg;
+  const { svg, phase, lst } = renderSvg(state);
+  const pv = document.getElementById('sm-preview');
+  pv.innerHTML = svg;
+  // Анимация «неба, доезжающего на место» (03.08, по образцу thenightsky.com, но на
+  // настоящей астрономии): новая карта стартует повёрнутой на -ΔLST и доворачивается
+  // к нулю — купол вращается ровно так, как вращалось бы небо между двумя моментами.
+  // Только при неизменных теме/размере (иначе геометрия другая — просто swap).
+  const skyKey = state.size + '|' + state.theme;
+  if (refresh._lst !== undefined && refresh._key === skyKey &&
+      !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let d = lst - refresh._lst;
+    d = ((d + 180) % 360 + 360) % 360 - 180;          // кратчайшая дуга, [-180,180)
+    if (Math.abs(d) > 0.05) {
+      const els = pv.querySelectorAll('.sky-rot');
+      els.forEach(el => { el.style.transition = 'none'; el.style.transform = `rotate(${-d}deg)`; });
+      void pv.offsetWidth;                             // зафиксировать стартовый кадр
+      els.forEach(el => { el.style.transition = 'transform 1.1s cubic-bezier(.22,.8,.24,1)'; el.style.transform = 'rotate(0deg)'; });
+    }
+  }
+  refresh._lst = lst; refresh._key = skyKey;
   const chip = document.getElementById('sm-moon');
   chip.textContent = `☾ ${moonName(phase)} — the real moon of your night`;
   const ft = FRAME_TYPES[state.frameType];
