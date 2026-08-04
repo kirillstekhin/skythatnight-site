@@ -66,6 +66,23 @@ const THEMES = {
               accent:'#c9a961', lineW:0.7, label:'Noir' },
 };
 
+// Промежуточная палитра для анимации смены темы: hex-цвета и числовые
+// параметры лерпятся, отсутствующие числа берут дефолты renderSvg.
+function mixThemes(A, B, p) {
+  const out = Object.assign({}, B);
+  const ch = (h, i) => parseInt(h.slice(i, i + 2), 16);
+  for (const k of ['page','sky','ink','sub','faint','star','ring','grid','lines','accent']) {
+    out[k] = '#' + [1, 3, 5].map(i =>
+      Math.round(ch(A[k], i) + (ch(B[k], i) - ch(A[k], i)) * p).toString(16).padStart(2, '0')).join('');
+  }
+  const D = { lineOp: 0.34, lineW: 0.7, dotScale: 1, opMin: 0.25, opBase: 0.30 };
+  for (const k in D) {
+    const a = A[k] !== undefined ? A[k] : D[k], b = B[k] !== undefined ? B[k] : D[k];
+    out[k] = a + (b - a) * p;
+  }
+  return out;
+}
+
 const NAMED = [
   ['Sirius',101.29,-16.72,-1.46],['Canopus',95.99,-52.70,-0.74],['Arcturus',213.92,19.18,-0.05],
   ['Vega',279.23,38.78,0.03],['Capella',79.17,46.00,0.08],['Rigel',78.63,-8.20,0.13],
@@ -104,7 +121,7 @@ const SIZE_CM = { '3040': '30x40', '4050': '40x50', '5070': '50x70' };
 
 function renderSvg(o) {
   // o: {dateStr,timeStr,lat,lon,tz,place,dedication,theme,size}
-  const t = THEMES[o.theme] || THEMES.midnight;
+  let t = THEMES[o.theme] || THEMES.midnight;
   const W = 1200;
   const H = Math.round(W * PRINT_SIZES[SIZE_CM[o.size] || '30x40']);
   const MOON_R = 16;
@@ -115,9 +132,11 @@ function renderSvg(o) {
   const cx = W / 2, cy = top + R;
   const { lst, jd } = lstDeg(o.dateStr, o.timeStr, o.lon, o.tz);
   // Анимация конфигуратора (см. refresh): промежуточные кадры рендерятся с
-  // интерполированными _lst/_lat — небо честно вращается вокруг полюса, как в жизни.
+  // интерполированными _lst/_lat (небо вращается вокруг полюса) и _themeMix
+  // (палитра перетекает между темами).
   const L = o._lst !== undefined ? o._lst : lst;
   const LAT = o._lat !== undefined ? o._lat : o.lat;
+  if (o._themeMix) t = o._themeMix;
   const s = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">`];
   s.push(`<defs><clipPath id="skyclip"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath></defs>`);
   s.push(`<rect width="${W}" height="${H}" fill="${t.page}"/>`);
@@ -268,48 +287,80 @@ function refresh() {
   state.tz = tzOffsetHours(state.iana, state.dateStr, state.timeStr);
   const { svg, phase, lst } = renderSvg(state);
   const pv = document.getElementById('sm-preview');
-  // Анимация «неба, перетекающего на место» (04.08, как у thenightsky.com):
-  // покадровый пересчёт проекции с интерполяцией LST (и широты при смене места).
-  // Небо честно вращается вокруг НЕБЕСНОГО ПОЛЮСА — звёзды у полюса стоят,
-  // у горизонта летят по большим дугам; никакого поворота плоской картинки.
-  // Маленький ΔLST (соседние даты ~1°/сутки) промётывается полными сутками (+360°).
-  const skyKey = state.size + '|' + state.theme;
-  const wasAnim = state._lst !== undefined;            // прервали анимацию на полпути
+  // Анимации конфигуратора (04.08, механика thenightsky.com — интерполяция данных,
+  // не CSS-повороты). Небо (дата/время/место): rAF-цикл интерполирует LST и широту,
+  // купол вращается вокруг НЕБЕСНОГО ПОЛЮСА, малый ΔLST промётывается ±360° («сутки»).
+  // Тема: тот же цикл лерпит палитру (mixThemes). Размер: геометрия другая —
+  // кроссфейд старого постера + плавная высота контейнера.
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cut = (refresh._key || '|').indexOf('|');
+  const prevSize = (refresh._key || '').slice(0, cut);
+  const prevTheme = (refresh._key || '').slice(cut + 1);
+  const wasAnim = state._lst !== undefined;            // прервали анимацию неба на полпути
   const prevLst = wasAnim ? state._lst : refresh._lst;
   const prevLat = wasAnim ? state._lat : refresh._lat;
-  delete state._lst; delete state._lat;
+  const fromTheme = state._themeMix ||                 // прервали лерп темы — старт с микса
+                    (THEMES[prevTheme] ? THEMES[prevTheme] : null);
+  delete state._lst; delete state._lat; delete state._themeMix;
   if (refresh._anim) { cancelAnimationFrame(refresh._anim); refresh._anim = null; }
+  if (refresh._xf) refresh._xf();                      // добить незавершённый кроссфейд
   let dL = prevLst === undefined ? 0 : lst - prevLst;
   dL = ((dL + 180) % 360 + 360) % 360 - 180;           // кратчайшая дуга, [-180,180)
   const dLat = prevLat === undefined ? 0 : state.lat - prevLat;
-  if (prevLst !== undefined && refresh._key === skyKey &&
-      (Math.abs(dL) > 0.05 || Math.abs(dLat) > 0.05) &&
-      !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    if (Math.abs(dLat) < 0.05 && Math.abs(dL) < 40)    // та же точка, малый сдвиг →
-      dL += dL < 0 ? -360 : 360;                       // видимый прокрут: ±сутки
-    const DUR = 2400, t0 = performance.now();
+  const skyMoves = prevLst !== undefined && (Math.abs(dL) > 0.05 || Math.abs(dLat) > 0.05);
+  const themeMoves = fromTheme && prevTheme !== state.theme;
+
+  if (prevSize && prevSize !== state.size && !reduced) {
+    // ─ размер: кроссфейд + высота ─
+    const h0 = pv.offsetHeight;
+    const oldSvg = pv.querySelector('svg');
+    pv.innerHTML = svg;
+    const h1 = pv.offsetHeight;
+    if (oldSvg && Math.abs(h1 - h0) > 1) {
+      pv.style.position = 'relative'; pv.style.overflow = 'hidden';
+      pv.style.height = h0 + 'px';
+      oldSvg.style.cssText = 'position:absolute;left:0;top:0;width:100%;transition:opacity .45s ease';
+      pv.appendChild(oldSvg);
+      void pv.offsetWidth;
+      pv.style.transition = 'height .55s cubic-bezier(.3,.6,.2,1)';
+      pv.style.height = h1 + 'px';
+      oldSvg.style.opacity = '0';
+      const done = () => { clearTimeout(tm); oldSvg.remove();
+        for (const k of ['position','overflow','height','transition']) pv.style.removeProperty(k);
+        refresh._xf = null; };
+      const tm = setTimeout(done, 660);
+      refresh._xf = done;
+    }
+  } else if ((skyMoves || themeMoves) && !reduced) {
+    // ─ небо и/или тема: покадровый пересчёт ─
+    if (skyMoves && Math.abs(dLat) < 0.05 && Math.abs(dL) < 40)
+      dL += dL < 0 ? -360 : 360;
+    const DUR = skyMoves ? 2400 : 900, THEME_DUR = 900, t0 = performance.now();
     const ease = p => p < 0.5 ? 4*p*p*p : 1 - Math.pow(-2*p + 2, 3) / 2;
+    const toTheme = THEMES[state.theme] || THEMES.midnight;
     const step = now => {
       const p = Math.min(1, (now - t0) / DUR);
       if (p < 1) {
         const e = ease(p);
-        state._lst = prevLst + dL * e;
-        state._lat = prevLat + dLat * e;
+        if (skyMoves) { state._lst = prevLst + dL * e; state._lat = prevLat + dLat * e; }
+        if (themeMoves) state._themeMix = mixThemes(fromTheme, toTheme,
+          ease(Math.min(1, (now - t0) / THEME_DUR)));
         pv.innerHTML = renderSvg(state).svg;
         refresh._anim = requestAnimationFrame(step);
       } else {
-        delete state._lst; delete state._lat;
-        pv.innerHTML = renderSvg(state).svg;           // финал — честное небо
+        delete state._lst; delete state._lat; delete state._themeMix;
+        pv.innerHTML = renderSvg(state).svg;           // финал — честный рендер
         refresh._anim = null;
       }
     };
-    state._lst = prevLst; state._lat = prevLat;
-    pv.innerHTML = renderSvg(state).svg;               // кадр 0 = прежнее небо, без скачка
+    if (skyMoves) { state._lst = prevLst; state._lat = prevLat; }
+    if (themeMoves) state._themeMix = mixThemes(fromTheme, toTheme, 0);
+    pv.innerHTML = renderSvg(state).svg;               // кадр 0 = прежний вид, без скачка
     refresh._anim = requestAnimationFrame(step);
   } else {
     pv.innerHTML = svg;
   }
-  refresh._lst = lst; refresh._lat = state.lat; refresh._key = skyKey;
+  refresh._lst = lst; refresh._lat = state.lat; refresh._key = state.size + '|' + state.theme;
   const chip = document.getElementById('sm-moon');
   chip.textContent = `☾ ${moonName(phase)} — the real moon of your night`;
   const ft = FRAME_TYPES[state.frameType];
