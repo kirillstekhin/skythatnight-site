@@ -110,6 +110,13 @@ EXTRA_CSS = """
 .occ-story { font-family:var(--sans); font-weight:300; font-size:clamp(1rem,1.4vw,1.12rem); line-height:1.7; color:var(--moon-sub); max-width:34rem; margin-bottom:2rem; }
 .occ-hero img { width:100%; height:auto; display:block; border-radius:4px; box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
 .occ-room { margin-top:2.4rem; }
+.occ-film { display:flex; justify-content:center; }
+.occ-tie { display:grid; grid-template-columns:minmax(0,300px) minmax(0,1fr); gap:2rem; align-items:center; margin-top:2.2rem; }
+@media (max-width:760px){ .occ-tie { grid-template-columns:1fr; } }
+.occ-tie-film video { width:100%; height:auto; display:block; border-radius:4px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(201,169,97,.14); background:#0b1733; }
+.occ-film video { width:100%; max-width:min(420px, 82vw); height:auto; display:block; border-radius:4px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); background:#0b1733; }
 .occ-room img { width:100%; height:auto; display:block; border-radius:4px; box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
 .occ-more-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.1rem; margin-top:2.2rem; }
 @media (max-width:860px){ .occ-more-grid { grid-template-columns:repeat(2,1fr); } }
@@ -315,6 +322,29 @@ GALLERY_SLIDES = [
 
 # HTML+JS лайтбокса. Плейн-строка (НЕ f-string — внутри JS с фигурными скобками);
 # gallery_html() конкатенирует её к секции галереи.
+FILM_JS = """
+<script>
+/* Ролик повода грузится ТОЛЬКО когда секция попала в вид: файл ~1.4 МБ, а секция
+   лежит ниже конфигуратора — тянуть его на каждый визит незачем. autoplay в разметке
+   намеренно НЕ стоит: вместе с preload="none" это противоречие, и часть браузеров
+   всё равно начинает загрузку. */
+(function(){
+  /* querySelectorAll, не querySelector: на свадьбе и помолвке роликов ДВА
+     (сюжетный + знаменитая ночь), и одиночный селектор оставил бы второй без загрузки. */
+  var vs=document.querySelectorAll('video[data-film]'); if(!vs.length) return;
+  if(!('IntersectionObserver' in window)){
+    vs.forEach(function(v){ v.preload='auto'; v.play().catch(function(){}); }); return; }
+  var io=new IntersectionObserver(function(es,o){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var v=e.target; v.preload='auto'; v.play().catch(function(){}); o.unobserve(v);
+    });
+  },{rootMargin:'200px'});
+  vs.forEach(function(v){ io.observe(v); });
+})();
+</script>
+"""
+
 LIGHTBOX_HTML = """
 <div class="occ-lightbox" id="occ-lightbox" hidden role="dialog" aria-label="Image viewer">
   <button class="lb-close" aria-label="Close">&times;</button>
@@ -352,6 +382,49 @@ LIGHTBOX_HTML = """
 </script>"""
 
 
+# Отсылка к знаменитой ночи — только там, где связь ЧЕСТНАЯ. Свадьба и помолвка ↔
+# королевская свадьба 1981: то же событие, та же механика карты, плюс перелинковка
+# на страницу ночи. Остальным поводам пары среди ночей нет, и натягивать её хуже,
+# чем не ставить вовсе.
+FAMOUS_TIE = {
+    "wedding": ("royal-wedding-1981", "The most watched wedding sky in Britain",
+                "29 July 1981, London. 750 million people watched the wedding; that evening the "
+                "city danced under this sky \u2014 street parties, fireworks over Hyde Park, and a "
+                "waning crescent rising late."),
+    "proposal": ("royal-wedding-1981", "The night the whole country looked up",
+                 "29 July 1981, London. The most watched wedding of the century, and the real sky "
+                 "that stood over the celebrations \u2014 mapped the same way we map yours."),
+}
+
+
+def famous_tie_html(key):
+    tie = FAMOUS_TIE.get(key)
+    if not tie:
+        return ""
+    slug, head, body = tie
+    if not os.path.exists(os.path.join(HERE, "assets", "starmap", f"{slug}-film.mp4")):
+        return ""
+    return f"""<section class="sm-section">
+  <div class="container">
+    <div class="section-kicker sm-kicker">A famous night</div>
+    <h2>{head}.</h2>
+    <div class="occ-tie">
+      <div class="occ-tie-film">
+        <video muted loop playsinline preload="none" data-film
+               poster="assets/starmap/{slug}-film.jpg"
+               aria-label="The sky over London on the night of the royal wedding, 1981">
+          <source src="assets/starmap/{slug}-film.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div>
+        <p class="occ-story">{body}</p>
+        <a class="occ-back" href="night-{slug}.html">See that night &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>"""
+
+
 def gallery_html():
     cells = "\n".join(
         f'      <a href="assets/starmap/gallery/{f}" target="_blank" rel="noopener">'
@@ -387,7 +460,26 @@ def build(key, o):
             f'alt="{oo["chip"]} star map mockup" loading="lazy"><figcaption>{oo["chip"]}</figcaption></figure></a>')
     others_html = "\n".join(others)
 
-    room_html = "" if o.get("roomless") else f"""<section class="sm-section">
+    # 03.08: секция «Seen in the room» показывала ТУ ЖЕ картинку, что и герой — дубль.
+    # Заменена роликом повода: он ровно про это и заканчивается постером дома.
+    # Веб-версия 720×1280 ~1.4 МБ (соц-мастер 1080×1920 ~9.5 МБ на страницу не годится).
+    # preload="none" — байты не тянутся, пока секция за экраном; постер = первый кадр,
+    # чтобы при старте воспроизведения не было скачка картинки.
+    film = os.path.join(HERE, "assets", "starmap", f"occ-{key}-film.mp4")
+    room_html = "" if o.get("roomless") else (f"""<section class="sm-section">
+  <div class="container">
+    <div class="section-kicker sm-kicker">Seen in the room</div>
+    <h2>{o['title']}, at home.</h2>
+    <div class="occ-room occ-film">
+      <video muted loop playsinline preload="none" data-film
+             poster="assets/starmap/occ-{key}-film.jpg"
+             aria-label="{o['title']}: the night itself, the real sky above it, and the finished star map at home">
+        <source src="assets/starmap/occ-{key}-film.mp4" type="video/mp4">
+        <img src="assets/starmap/{o['img']}" alt="{o['title']} framed star map, styled in a room">
+      </video>
+    </div>
+  </div>
+</section>""" if os.path.exists(film) else f"""<section class="sm-section">
   <div class="container">
     <div class="section-kicker sm-kicker">Seen in the room</div>
     <h2>{o['title']}, on the wall.</h2>
@@ -395,7 +487,7 @@ def build(key, o):
       <img src="assets/starmap/{o['img']}" alt="{o['title']} framed star map, styled in a room" loading="lazy">
     </div>
   </div>
-</section>"""
+</section>""")
 
     faqs = occasion_faq(key, o)
     schema = faq_jsonld(faqs) + product_jsonld(o, url, ogimg)
@@ -455,6 +547,8 @@ def build(key, o):
 
 {room_html}
 
+{famous_tie_html(key)}
+
 {gallery_html()}
 
 {faqsec}
@@ -474,6 +568,7 @@ def build(key, o):
 {FOOTER}
 
 <script>window.SM_PRESET = {preset_js};</script>
+{FILM_JS if os.path.exists(film) else ""}
 <script src="assets/starmap.js?{CACHE}" defer></script>
 </body>
 </html>

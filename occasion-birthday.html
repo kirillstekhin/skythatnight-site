@@ -224,6 +224,13 @@
 .occ-story { font-family:var(--sans); font-weight:300; font-size:clamp(1rem,1.4vw,1.12rem); line-height:1.7; color:var(--moon-sub); max-width:34rem; margin-bottom:2rem; }
 .occ-hero img { width:100%; height:auto; display:block; border-radius:4px; box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
 .occ-room { margin-top:2.4rem; }
+.occ-film { display:flex; justify-content:center; }
+.occ-tie { display:grid; grid-template-columns:minmax(0,300px) minmax(0,1fr); gap:2rem; align-items:center; margin-top:2.2rem; }
+@media (max-width:760px){ .occ-tie { grid-template-columns:1fr; } }
+.occ-tie-film video { width:100%; height:auto; display:block; border-radius:4px;
+  box-shadow:0 24px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(201,169,97,.14); background:#0b1733; }
+.occ-film video { width:100%; max-width:min(420px, 82vw); height:auto; display:block; border-radius:4px;
+  box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); background:#0b1733; }
 .occ-room img { width:100%; height:auto; display:block; border-radius:4px; box-shadow:0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
 .occ-more-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.1rem; margin-top:2.2rem; }
 @media (max-width:860px){ .occ-more-grid { grid-template-columns:repeat(2,1fr); } }
@@ -371,12 +378,19 @@
 <section class="sm-section">
   <div class="container">
     <div class="section-kicker sm-kicker">Seen in the room</div>
-    <h2>The sky the day you were born, on the wall.</h2>
-    <div class="occ-room">
-      <img src="assets/starmap/occ-birthday.jpg" alt="The sky the day you were born framed star map, styled in a room" loading="lazy">
+    <h2>The sky the day you were born, at home.</h2>
+    <div class="occ-room occ-film">
+      <video muted loop playsinline preload="none" data-film
+             poster="assets/starmap/occ-birthday-film.jpg"
+             aria-label="The sky the day you were born: the night itself, the real sky above it, and the finished star map at home">
+        <source src="assets/starmap/occ-birthday-film.mp4" type="video/mp4">
+        <img src="assets/starmap/occ-birthday.jpg" alt="The sky the day you were born framed star map, styled in a room">
+      </video>
     </div>
   </div>
 </section>
+
+
 
 <section class="sm-section">
   <div class="container">
@@ -484,6 +498,28 @@
 </footer>
 
 <script>window.SM_PRESET = {"dateStr": "1974-05-16", "timeStr": "07:20", "place": "Manchester, United Kingdom", "lat": 53.4808, "lon": -2.2426, "iana": "Europe/London", "dedication": "The day you were born", "theme": "luxegold", "frameType": "framed", "size": "3040", "frameColor": "natural"};</script>
+
+<script>
+/* Ролик повода грузится ТОЛЬКО когда секция попала в вид: файл ~1.4 МБ, а секция
+   лежит ниже конфигуратора — тянуть его на каждый визит незачем. autoplay в разметке
+   намеренно НЕ стоит: вместе с preload="none" это противоречие, и часть браузеров
+   всё равно начинает загрузку. */
+(function(){
+  /* querySelectorAll, не querySelector: на свадьбе и помолвке роликов ДВА
+     (сюжетный + знаменитая ночь), и одиночный селектор оставил бы второй без загрузки. */
+  var vs=document.querySelectorAll('video[data-film]'); if(!vs.length) return;
+  if(!('IntersectionObserver' in window)){
+    vs.forEach(function(v){ v.preload='auto'; v.play().catch(function(){}); }); return; }
+  var io=new IntersectionObserver(function(es,o){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var v=e.target; v.preload='auto'; v.play().catch(function(){}); o.unobserve(v);
+    });
+  },{rootMargin:'200px'});
+  vs.forEach(function(v){ io.observe(v); });
+})();
+</script>
+
 <script src="assets/starmap.js?v=17" defer></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
 </body>
