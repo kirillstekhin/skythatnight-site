@@ -114,6 +114,10 @@ function renderSvg(o) {
   const top = (region - (2 * R + TEXT_H)) / 2;    // остаток поровну → композиция сбалансирована
   const cx = W / 2, cy = top + R;
   const { lst, jd } = lstDeg(o.dateStr, o.timeStr, o.lon, o.tz);
+  // Анимация конфигуратора (см. refresh): промежуточные кадры рендерятся с
+  // интерполированными _lst/_lat — небо честно вращается вокруг полюса, как в жизни.
+  const L = o._lst !== undefined ? o._lst : lst;
+  const LAT = o._lat !== undefined ? o._lat : o.lat;
   const s = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">`];
   s.push(`<defs><clipPath id="skyclip"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath></defs>`);
   s.push(`<rect width="${W}" height="${H}" fill="${t.page}"/>`);
@@ -122,16 +126,12 @@ function renderSvg(o) {
   s.push(`<rect x="44" y="44" width="${W-88}" height="${H-88}" fill="none" stroke="${t.accent}" stroke-width="0.6" opacity="0.7"/>`);
   s.push(`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${t.sky}"/>`);
 
-  // Небесные слои (линии/звёзды/подписи) — в группах .sky-rot: refresh() доворачивает
-  // их на ΔLST при смене даты/места (честная анимация вращения купола, 03.08).
-  // transform-box:view-box — origin в координатах viewBox, центр круга неба.
-  const rot = `class="sky-rot" style="transform-box:view-box;transform-origin:${cx}px ${cy}px"`;
   // constellation lines
-  s.push(`<g ${rot}><g clip-path="url(#skyclip)" stroke="${t.lines}" stroke-opacity="${t.lineOp}" stroke-width="${t.lineW}" fill="none" stroke-linecap="round">`);
+  s.push(`<g clip-path="url(#skyclip)" stroke="${t.lines}" stroke-opacity="${t.lineOp}" stroke-width="${t.lineW}" fill="none" stroke-linecap="round">`);
   for (const line of CATALOG.lines) {
     let path = '', pen = false, below = 0;
     for (const [ra, dec] of line) {
-      const [alt, az] = altAz(ra, dec, lst, o.lat);
+      const [alt, az] = altAz(ra, dec, L, LAT);
       if (alt < -0.14) { below++; }
       const [x, y] = project(alt, az, cx, cy, R);
       path += (pen ? 'L' : 'M') + x.toFixed(1) + ',' + y.toFixed(1);
@@ -139,7 +139,7 @@ function renderSvg(o) {
     }
     if (below < line.length) s.push(`<path d="${path}"/>`);
   }
-  s.push('</g></g>');
+  s.push('</g>');
 
   // grid + ring + ticks
   s.push(`<circle cx="${cx}" cy="${cy}" r="${(R/3).toFixed(1)}" fill="none" stroke="${t.grid}" stroke-width="1"/>`);
@@ -155,9 +155,9 @@ function renderSvg(o) {
   }
 
   // stars
-  s.push(`<g ${rot}><g clip-path="url(#skyclip)">`);
+  s.push(`<g clip-path="url(#skyclip)">`);
   for (const [ra, dec, mag] of CATALOG.stars) {
-    const [alt, az] = altAz(ra, dec, lst, o.lat);
+    const [alt, az] = altAz(ra, dec, L, LAT);
     if (alt <= 0.01) continue;
     const [x, y] = project(alt, az, cx, cy, R);
     const base = Math.max(7.2 - mag, 0.35);
@@ -166,18 +166,16 @@ function renderSvg(o) {
     if (mag < 1.6) s.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(rad*2.2).toFixed(1)}" fill="${t.star}" opacity="0.16"/>`);
     s.push(`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${rad.toFixed(2)}" fill="${t.star}" fill-opacity="${op.toFixed(2)}"/>`);
   }
-  s.push('</g></g>');
+  s.push('</g>');
 
-  // labels (едут вместе со своими звёздами; на время доворота слегка наклонены — ок)
-  s.push(`<g ${rot}>`);
+  // labels
   for (const [name, ra, dec, mag] of NAMED) {
     if (mag > 1.05) continue;
-    const [alt, az] = altAz(ra, dec, lst, o.lat);
+    const [alt, az] = altAz(ra, dec, L, LAT);
     if (alt < 0.07) continue;
     const [x, y] = project(alt, az, cx, cy, R);
     s.push(`<text x="${(x+7).toFixed(1)}" y="${(y+3).toFixed(1)}" fill="${t.sub}" fill-opacity="0.85" font-family="'EB Garamond',Georgia,serif" font-size="12">${name}</text>`);
   }
-  s.push('</g>');
 
   // compass
   for (const [ang, lab] of [[0,'N'],[90,'E'],[180,'S'],[270,'W']]) {
@@ -270,24 +268,48 @@ function refresh() {
   state.tz = tzOffsetHours(state.iana, state.dateStr, state.timeStr);
   const { svg, phase, lst } = renderSvg(state);
   const pv = document.getElementById('sm-preview');
-  pv.innerHTML = svg;
-  // Анимация «неба, доезжающего на место» (03.08, по образцу thenightsky.com, но на
-  // настоящей астрономии): новая карта стартует повёрнутой на -ΔLST и доворачивается
-  // к нулю — купол вращается ровно так, как вращалось бы небо между двумя моментами.
-  // Только при неизменных теме/размере (иначе геометрия другая — просто swap).
+  // Анимация «неба, перетекающего на место» (04.08, как у thenightsky.com):
+  // покадровый пересчёт проекции с интерполяцией LST (и широты при смене места).
+  // Небо честно вращается вокруг НЕБЕСНОГО ПОЛЮСА — звёзды у полюса стоят,
+  // у горизонта летят по большим дугам; никакого поворота плоской картинки.
+  // Маленький ΔLST (соседние даты ~1°/сутки) промётывается полными сутками (+360°).
   const skyKey = state.size + '|' + state.theme;
-  if (refresh._lst !== undefined && refresh._key === skyKey &&
+  const wasAnim = state._lst !== undefined;            // прервали анимацию на полпути
+  const prevLst = wasAnim ? state._lst : refresh._lst;
+  const prevLat = wasAnim ? state._lat : refresh._lat;
+  delete state._lst; delete state._lat;
+  if (refresh._anim) { cancelAnimationFrame(refresh._anim); refresh._anim = null; }
+  let dL = prevLst === undefined ? 0 : lst - prevLst;
+  dL = ((dL + 180) % 360 + 360) % 360 - 180;           // кратчайшая дуга, [-180,180)
+  const dLat = prevLat === undefined ? 0 : state.lat - prevLat;
+  if (prevLst !== undefined && refresh._key === skyKey &&
+      (Math.abs(dL) > 0.05 || Math.abs(dLat) > 0.05) &&
       !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let d = lst - refresh._lst;
-    d = ((d + 180) % 360 + 360) % 360 - 180;          // кратчайшая дуга, [-180,180)
-    if (Math.abs(d) > 0.05) {
-      const els = pv.querySelectorAll('.sky-rot');
-      els.forEach(el => { el.style.transition = 'none'; el.style.transform = `rotate(${-d}deg)`; });
-      void pv.offsetWidth;                             // зафиксировать стартовый кадр
-      els.forEach(el => { el.style.transition = 'transform 1.1s cubic-bezier(.22,.8,.24,1)'; el.style.transform = 'rotate(0deg)'; });
-    }
+    if (Math.abs(dLat) < 0.05 && Math.abs(dL) < 40)    // та же точка, малый сдвиг →
+      dL += dL < 0 ? -360 : 360;                       // видимый прокрут: ±сутки
+    const DUR = 2400, t0 = performance.now();
+    const ease = p => p < 0.5 ? 4*p*p*p : 1 - Math.pow(-2*p + 2, 3) / 2;
+    const step = now => {
+      const p = Math.min(1, (now - t0) / DUR);
+      if (p < 1) {
+        const e = ease(p);
+        state._lst = prevLst + dL * e;
+        state._lat = prevLat + dLat * e;
+        pv.innerHTML = renderSvg(state).svg;
+        refresh._anim = requestAnimationFrame(step);
+      } else {
+        delete state._lst; delete state._lat;
+        pv.innerHTML = renderSvg(state).svg;           // финал — честное небо
+        refresh._anim = null;
+      }
+    };
+    state._lst = prevLst; state._lat = prevLat;
+    pv.innerHTML = renderSvg(state).svg;               // кадр 0 = прежнее небо, без скачка
+    refresh._anim = requestAnimationFrame(step);
+  } else {
+    pv.innerHTML = svg;
   }
-  refresh._lst = lst; refresh._key = skyKey;
+  refresh._lst = lst; refresh._lat = state.lat; refresh._key = skyKey;
   const chip = document.getElementById('sm-moon');
   chip.textContent = `☾ ${moonName(phase)} — the real moon of your night`;
   const ft = FRAME_TYPES[state.frameType];
