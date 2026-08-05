@@ -177,6 +177,9 @@ HEADER = """<header>
   </div>
 </header>"""
 
+# email_off: КРАУЛЕР Google должен видеть email в открытую — Cloudflare
+# Email Obfuscation превращал его в [email protected], что попало в претензию
+# Misrepresentation (нет способа связаться). Комментарий отключает обфускацию точечно.
 FOOTER = """<footer>
   <div class="container footer-links">
     <div class="foot-link-col">
@@ -187,7 +190,7 @@ FOOTER = """<footer>
     </div>
     <div class="foot-link-col">
       <div class="foot-rule" id="contact" style="scroll-margin-top:100px">Help</div>
-      <a href="mailto:admin@shopcienty.com">admin@shopcienty.com</a>
+      <!--email_off--><a href="mailto:admin@shopcienty.com">admin@shopcienty.com</a><!--/email_off-->
       <a href="delivery.html">Delivery &amp; Returns</a>
       <a href="privacy.html">Privacy Policy</a>
       <a href="terms.html">Terms &amp; Conditions</a>

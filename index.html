@@ -38,6 +38,13 @@
 .sm-night .sm-wordmark:hover { color:var(--gold); }
 .sm-night header .nav a { color: var(--moon-sub); }
 .sm-night header .nav a:hover { color: var(--gold); }
+/* ── product tabs (Star Map | The Moon) ── */
+.sm-prodtabs { display:flex; gap:.5rem; margin-bottom:1.1rem; }
+.sm-prodtab { flex:1; text-align:center; padding:.55rem .9rem; border:1px solid rgba(201,169,97,.35);
+  border-radius:.4rem; color:var(--moon-sub); text-decoration:none; font-size:.95rem;
+  letter-spacing:.06em; transition:all .2s; }
+.sm-prodtab:hover { color:var(--gold); border-color:var(--gold); }
+.sm-prodtab.active { color:var(--gold); border-color:var(--gold); background:rgba(201,169,97,.08); }
 .sm-night .cart-badge { background: var(--gold); color: var(--night); }
 .sm-night footer { background: var(--night-deep); border-top: 1px solid rgba(201,169,97,.15); }
 .sm-night footer, .sm-night footer a { color: var(--moon-faint); }
@@ -266,6 +273,10 @@
       <div class="sm-moon-chip" id="sm-moon"></div>
     </div>
     <div class="sm-panel">
+      <div class="sm-prodtabs" role="tablist" aria-label="Product">
+        <a class="sm-prodtab active" href="#design" aria-current="page">✦ Star Map</a>
+        <a class="sm-prodtab" href="moon.html#design">☾ The Moon</a>
+      </div>
       <h2>Your sky.</h2>
       <div class="sm-row2">
         <div class="sm-field">
@@ -319,7 +330,7 @@
         <div id="sm-checkout-note" hidden>
           Checkout opens shortly. Your design is saved as
           <code></code> — email it to
-          <a href="mailto:admin@shopcienty.com" style="color:var(--gold)">admin@shopcienty.com</a>
+          <!--email_off--><a href="mailto:admin@shopcienty.com" style="color:var(--gold)">admin@shopcienty.com</a><!--/email_off-->
           and we'll send a secure payment link the same day.
         </div>
         <div class="sm-code-line">Design code: <code id="sm-code"></code></div>
@@ -479,7 +490,7 @@
     </div>
     <div class="foot-link-col">
       <div class="foot-rule" id="contact" style="scroll-margin-top:100px">Help</div>
-      <a href="mailto:admin@shopcienty.com">admin@shopcienty.com</a>
+      <!--email_off--><a href="mailto:admin@shopcienty.com">admin@shopcienty.com</a><!--/email_off-->
       <a href="delivery.html">Delivery &amp; Returns</a>
       <a href="privacy.html">Privacy Policy</a>
       <a href="terms.html">Terms &amp; Conditions</a>
