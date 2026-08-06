@@ -9,10 +9,20 @@ import html
 from datetime import date
 
 SITE = "https://www.skythatnight.com"
-FEEDS = [
-    ("feed.xml", SITE + "/?utm_source=google&utm_medium=shopping"),
-    ("feed-pinterest.xml", SITE + "/?utm_source=pinterest&utm_medium=shopping"),
+# ⛔ 06.08.2026: РАНЬШЕ ЗДЕСЬ БЫЛА ОДНА ССЫЛКА НА ГЛАВНУЮ ДЛЯ ВСЕХ 9 ПОЗИЦИЙ.
+# Робот Merchant Center брал из фида «SKN-FRAMED-5070 = £59.99», шёл по ссылке и
+# попадал на главную с AggregateOffer 26.99–79.99 — товара за £59.99 там нет.
+# Несовпадение по всем девяти = пункт «match your product data with your online
+# store», вклад в бан Misrepresentation 05.08. Теперь у каждой позиции свой
+# лендинг product-<id>.html (gen_product_pages.py), UTM остаётся в query.
+FEED_UTM = [
+    ("feed.xml", "utm_source=google&utm_medium=shopping"),
+    ("feed-pinterest.xml", "utm_source=pinterest&utm_medium=shopping"),
 ]
+
+
+def item_link(pid, utm):
+    return f"{SITE}/product-{pid.lower()}.html?{utm}"
 
 # (id, формат, размер, цена, доп-описание формата)
 # Картинка НЕ задаётся здесь: у каждой позиции свой квадрат 1600×1600 по имени id,
@@ -70,8 +80,9 @@ def item_xml(pid, fmt, size, price, extra, LINK):
     </g:shipping>
   </item>"""
 
-for fname, link in FEEDS:
-    body = "\n".join(item_xml(*it, link) for it in ITEMS)
+for fname, utm in FEED_UTM:
+    # ссылка теперь СВОЯ у каждой позиции — см. комментарий у FEED_UTM
+    body = "\n".join(item_xml(*it, item_link(it[0], utm)) for it in ITEMS)
     feed = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
 <channel>

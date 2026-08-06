@@ -1,0 +1,4 @@
+# gen_product_pages.py импортирует gen_product_feed.py как модуль (единый источник цен) —
+# Python кладёт рядом __pycache__. В GitHub Pages ему делать нечего.
+__pycache__/
+*.pyc
