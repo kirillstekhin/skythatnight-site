@@ -100,7 +100,15 @@ def check_configurator_prices():
 
 
 def jsonld(pid, fmt, size, price, url, img):
-    """Product с ОДНОЙ ценой — не AggregateOffer. Робот сверяет её с фидом."""
+    """Product с ОДНОЙ ценой — не AggregateOffer. Робот сверяет её с фидом.
+
+    ⚠ ВОЗВРАТ: `MerchantReturnNotPermitted`, а НЕ 14 дней. Первая версия этих страниц
+    объявляла FiniteReturnWindow/14/FreeReturn, хотя delivery.html и FAQ главной прямо
+    говорят обратное: персонализированные товары освобождены от 14-дневного права на
+    отказ (Consumer Contracts Regulations 2013). Робот, сверяющий заявления с политикой
+    магазина, увидел бы ровно то, за что нас и забанили, — только вторым пунктом.
+    Права на брак/повреждение (30 дней на отказ, репринт/возврат) сюда не входят:
+    returnPolicyCategory описывает отказ по передумал, законные права он не отменяет."""
     return f"""<script type="application/ld+json">{{
 "@context":"https://schema.org","@type":"Product",
 "name":"Personalised Star Map — {fmt} {size}",
@@ -115,9 +123,8 @@ def jsonld(pid, fmt, size, price, url, img):
 "shippingRate":{{"@type":"MonetaryAmount","value":"0","currency":"GBP"}},
 "shippingDestination":{{"@type":"DefinedRegion","addressCountry":"GB"}}}},
 "hasMerchantReturnPolicy":{{"@type":"MerchantReturnPolicy",
-"applicableCountry":"GB","returnPolicyCategory":"https://schema.org/MerchantReturnFiniteReturnWindow",
-"merchantReturnDays":14,"returnMethod":"https://schema.org/ReturnByMail",
-"returnFees":"https://schema.org/FreeReturn"}}}}}}</script>"""
+"applicableCountry":"GB","returnPolicyCategory":"https://schema.org/MerchantReturnNotPermitted",
+"merchantReturnLink":"{SITE}/delivery.html"}}}}}}</script>"""
 
 
 def others_html(cur_id):
@@ -185,7 +192,7 @@ def build(pid, fmt, size, price, extra):
 {incl}
       </ul>
       <a class="sm-cta" href="#design">Design this sky — £{price:.2f}</a>
-      <span class="sm-cta-sub">Free UK delivery included · 14-day returns</span>
+      <span class="sm-cta-sub">Free UK delivery included · personalised, so no change-of-mind returns — damaged or not as approved, we reprint or refund in full · <a href="delivery.html">Delivery &amp; returns</a></span>
     </div>
     <div>
       <img src="assets/starmap/feed/{pid}.jpg" alt="{esc(fmt)} {esc(size)} personalised star map, £{price:.2f}">
