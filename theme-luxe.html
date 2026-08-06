@@ -37,6 +37,13 @@
 .sm-night .sm-wordmark:hover { color:var(--gold); }
 .sm-night header .nav a { color: var(--moon-sub); }
 .sm-night header .nav a:hover { color: var(--gold); }
+/* ── product tabs (Star Map | The Moon) ── */
+.sm-prodtabs { display:flex; gap:.5rem; margin-bottom:1.1rem; }
+.sm-prodtab { flex:1; text-align:center; padding:.55rem .9rem; border:1px solid rgba(201,169,97,.35);
+  border-radius:.4rem; color:var(--moon-sub); text-decoration:none; font-size:.95rem;
+  letter-spacing:.06em; transition:all .2s; }
+.sm-prodtab:hover { color:var(--gold); border-color:var(--gold); }
+.sm-prodtab.active { color:var(--gold); border-color:var(--gold); background:rgba(201,169,97,.08); }
 .sm-night .cart-badge { background: var(--gold); color: var(--night); }
 .sm-night footer { background: var(--night-deep); border-top: 1px solid rgba(201,169,97,.15); }
 .sm-night footer, .sm-night footer a { color: var(--moon-faint); }
@@ -213,6 +220,16 @@
   border:1px solid rgba(201,169,97,.5); border-radius:2rem; padding:.5rem 1rem; cursor:pointer;
   display:inline-flex; align-items:center; gap:.4rem; transition:background .2s, border-color .2s, color .2s; }
 .sm-film-sound:hover { background:rgba(11,23,51,.85); border-color:var(--gold); color:var(--gold); }
+/* сетка цен (#prices) — разметка генерится, см. маркеры SM_PRICE_GRID */
+.sm-pricegrid { display:grid; grid-template-columns:repeat(3,1fr); gap:.9rem; margin-top:2rem; }
+@media (max-width:820px){ .sm-pricegrid { grid-template-columns:1fr; } }
+.sm-pg-cell { display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;
+  padding:1.1rem 1.25rem; border:1px solid rgba(201,169,97,.25); border-radius:3px;
+  text-decoration:none; transition:border-color .2s, background .2s; }
+.sm-pg-cell:hover { border-color:var(--gold); background:rgba(201,169,97,.05); }
+.sm-pg-fmt { font-family:var(--serif); font-size:1.05rem; color:var(--moon); }
+.sm-pg-size { font-family:var(--sans); font-weight:300; font-size:.85rem; color:var(--moon-sub); }
+.sm-pg-price { font-family:var(--serif); font-size:1.15rem; color:var(--gold); margin-left:auto; }
 
 /* theme / occasion landing */
 .occ-hero { padding: clamp(2.4rem,5vw,4.5rem) 0 clamp(1.5rem,3vw,2.5rem); position:relative; overflow:hidden; }
@@ -266,7 +283,7 @@
       <a href="./#design">Design yours</a>
       <a href="./#craft">How it works</a>
       <a href="./#faq">FAQ</a>
-      <a href="contact.html">Contact</a>
+      <a href="#contact">Contact</a>
     </nav>
   </div>
 </header>
@@ -297,6 +314,10 @@
       <div class="sm-moon-chip" id="sm-moon"></div>
     </div>
     <div class="sm-panel">
+      <div class="sm-prodtabs" role="tablist" aria-label="Product">
+        <a class="sm-prodtab active" href="#design" aria-current="page">✦ Star Map</a>
+        <a class="sm-prodtab" href="moon.html#design">☾ The Moon</a>
+      </div>
       <h2>Your sky.</h2>
       <div class="sm-row2">
         <div class="sm-field">
@@ -442,8 +463,8 @@
     </div>
     <div class="foot-link-col">
       <div class="foot-rule" id="contact" style="scroll-margin-top:100px">Help</div>
-      <a href="contact.html">Contact Us</a>
       <!--email_off--><a href="mailto:admin@shopcienty.com">admin@shopcienty.com</a><!--/email_off-->
+      <a href="about.html">About Us</a>
       <a href="delivery.html">Delivery &amp; Returns</a>
       <a href="privacy.html">Privacy Policy</a>
       <a href="terms.html">Terms &amp; Conditions</a>
