@@ -38,6 +38,15 @@ IANA = {
     "carrington": "Europe/London", "abbey-road": "Europe/London",
     "columbus-landfall": "America/Nassau", "berlin-wall": "Europe/Berlin",
     "millennium": "Europe/London",
+    # ── добавлено 06.08.2026: ночи из плана, которым не хватало пояса ──
+    "gertrude-ederle": "Europe/London",          # Kingsdown, Kent
+    "matthew-webb": "Europe/London",             # Dover
+    "full-moon-august": "Europe/London",
+    "beatles-last-concert": "America/Los_Angeles",  # Candlestick Park, SF
+    "voyager-1": "America/New_York",             # Cape Canaveral
+    "roald-dahl": "Europe/London",               # Llandaff, Cardiff
+    "equinox-autumn": "Europe/London",
+    "neptune": "Europe/Berlin",
 }
 
 # Рама для пресета — по теме ночи (пары из канона мокапов: gold на luxegold/noir, black на midnight).
@@ -166,8 +175,8 @@ def head(title, desc, path, ogimg, extra_schema="", preload=None):
 def others_grid(current):
     cells = []
     for p in plan["posts"]:
-        if p["slug"] == current:
-            continue
+        if p["slug"] == current or p["slug"] not in nights:
+            continue                       # occ-* и прочие не-«ночи» страниц не имеют
         n = nights[p["slug"]]
         cells.append(
             f'      <a href="night-{p["slug"]}.html"><figure>'
@@ -297,6 +306,8 @@ def night_page(p):
 def hub_page():
     cells = []
     for p in plan["posts"]:
+        if p["slug"] not in nights:      # occ-* постам страниц не делаем (см. main)
+            continue
         n = nights[p["slug"]]["render"]
         cells.append(
             f'      <a href="night-{p["slug"]}.html"><figure>'
@@ -354,10 +365,20 @@ def hub_page():
 
 
 def main():
+    # ⚠️ В плане постинга живут не только «ночи», но и occasion-посты (occ-wedding,
+    # occ-born…) — у них нет записи в famous_nights.json. Раньше цикл падал на первом
+    # таком слаге с KeyError, и ВСЕ страницы после него (включая gertrude-ederle) не
+    # создавались молча — пины ссылались бы на 404 (найдено 06.08.2026).
+    skipped = []
     for p in plan["posts"]:
+        if p["slug"] not in nights:
+            skipped.append(p["slug"])
+            continue
         fn = f'night-{p["slug"]}.html'
         open(os.path.join(HERE, fn), "w").write(night_page(p))
         print("wrote", fn)
+    if skipped:
+        print("· без страницы (нет в famous_nights.json):", ", ".join(skipped))
     open(os.path.join(HERE, "famous-nights.html"), "w").write(hub_page())
     print("wrote famous-nights.html")
 

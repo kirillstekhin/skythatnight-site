@@ -13,9 +13,7 @@
 <meta property="og:url" content="https://www.skythatnight.com/famous-nights.html">
 <meta property="og:image" content="https://www.skythatnight.com/assets/social/royal-wedding-morph.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="assets/favicon.ico" sizes="any">
-  <link rel="icon" type="image/png" href="assets/favicon.png?v=2">
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -35,6 +33,13 @@
 .sm-night .sm-wordmark:hover { color:var(--gold); }
 .sm-night header .nav a { color: var(--moon-sub); }
 .sm-night header .nav a:hover { color: var(--gold); }
+/* ── product tabs (Star Map | The Moon) ── */
+.sm-prodtabs { display:flex; gap:.5rem; margin-bottom:1.1rem; }
+.sm-prodtab { flex:1; text-align:center; padding:.55rem .9rem; border:1px solid rgba(201,169,97,.35);
+  border-radius:.4rem; color:var(--moon-sub); text-decoration:none; font-size:.95rem;
+  letter-spacing:.06em; transition:all .2s; }
+.sm-prodtab:hover { color:var(--gold); border-color:var(--gold); }
+.sm-prodtab.active { color:var(--gold); border-color:var(--gold); background:rgba(201,169,97,.08); }
 .sm-night .cart-badge { background: var(--gold); color: var(--night); }
 .sm-night footer { background: var(--night-deep); border-top: 1px solid rgba(201,169,97,.15); }
 .sm-night footer, .sm-night footer a { color: var(--moon-faint); }
@@ -173,9 +178,25 @@
 }
 
 /* occasions gallery + film */
-.sm-occgrid { display:grid; grid-template-columns:repeat(5,1fr); gap:1.1rem; margin-top:2.2rem; }
-@media (max-width:1100px){ .sm-occgrid { grid-template-columns:repeat(3,1fr); } }
+.sm-occgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem; margin-top:2.2rem; }
 @media (max-width:640px){ .sm-occgrid { grid-template-columns:repeat(2,1fr); } }
+/* Occasions — мозаика: 4 колонки, первая плитка 2x2. Девять карточек ложатся
+   в три ряда без пустых ячеек и секция перестаёт повторять соседние 3-в-ряд. */
+.sm-occ-mosaic { grid-template-columns:repeat(4,1fr); }
+.sm-occ-mosaic > a:first-child { grid-column:span 2; grid-row:span 2; }
+.sm-occ-mosaic > a:first-child figure { display:flex; flex-direction:column; height:100%; }
+.sm-occ-mosaic > a:first-child img { height:100%; object-fit:cover; }
+@media (max-width:1100px){ .sm-occ-mosaic { grid-template-columns:repeat(3,1fr); } }
+@media (max-width:640px){
+  .sm-occ-mosaic { grid-template-columns:repeat(2,1fr); }
+  .sm-occ-mosaic > a:first-child { grid-row:auto; }
+  .sm-occ-mosaic > a:first-child img { height:auto; object-fit:contain; }
+}
+/* Famous Nights — пять карточек одним рядом. Своя ширина: секция делит разметку
+   с Occasions, но не должна наследовать её раскладку. */
+.sm-famousgrid { grid-template-columns:repeat(5,1fr); }
+@media (max-width:1100px){ .sm-famousgrid { grid-template-columns:repeat(3,1fr); } }
+@media (max-width:640px){ .sm-famousgrid { grid-template-columns:repeat(2,1fr); } }
 .sm-occgrid figure { margin:0; }
 .sm-occgrid a { text-decoration:none; display:block; }
 .sm-occgrid a img { transition:transform .35s ease, box-shadow .35s ease; }
@@ -195,6 +216,16 @@
   border:1px solid rgba(201,169,97,.5); border-radius:2rem; padding:.5rem 1rem; cursor:pointer;
   display:inline-flex; align-items:center; gap:.4rem; transition:background .2s, border-color .2s, color .2s; }
 .sm-film-sound:hover { background:rgba(11,23,51,.85); border-color:var(--gold); color:var(--gold); }
+/* сетка цен (#prices) — разметка генерится, см. маркеры SM_PRICE_GRID */
+.sm-pricegrid { display:grid; grid-template-columns:repeat(3,1fr); gap:.9rem; margin-top:2rem; }
+@media (max-width:820px){ .sm-pricegrid { grid-template-columns:1fr; } }
+.sm-pg-cell { display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;
+  padding:1.1rem 1.25rem; border:1px solid rgba(201,169,97,.25); border-radius:3px;
+  text-decoration:none; transition:border-color .2s, background .2s; }
+.sm-pg-cell:hover { border-color:var(--gold); background:rgba(201,169,97,.05); }
+.sm-pg-fmt { font-family:var(--serif); font-size:1.05rem; color:var(--moon); }
+.sm-pg-size { font-family:var(--sans); font-weight:300; font-size:.85rem; color:var(--moon-sub); }
+.sm-pg-price { font-family:var(--serif); font-size:1.15rem; color:var(--gold); margin-left:auto; }
 
 /* famous nights */
 .fn-hero { padding: clamp(2.4rem,5vw,4.5rem) 0 clamp(1.5rem,3vw,2.5rem); position:relative; overflow:hidden; }
@@ -223,7 +254,7 @@
 @media (max-width:1020px){ .fn-hub-grid { grid-template-columns:repeat(2,1fr); } }
 @media (max-width:640px){ .fn-hub-grid { grid-template-columns:1fr; } }
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "ItemList", "name": "Famous Nights", "itemListElement": [{"@type": "ListItem", "position": 1, "url": "https://www.skythatnight.com/night-royal-wedding-1981.html"}, {"@type": "ListItem", "position": 2, "url": "https://www.skythatnight.com/night-world-cup-1966.html"}, {"@type": "ListItem", "position": 3, "url": "https://www.skythatnight.com/night-mtv-launch.html"}, {"@type": "ListItem", "position": 4, "url": "https://www.skythatnight.com/night-petit-wire.html"}, {"@type": "ListItem", "position": 5, "url": "https://www.skythatnight.com/night-perseids.html"}, {"@type": "ListItem", "position": 6, "url": "https://www.skythatnight.com/night-woodstock.html"}, {"@type": "ListItem", "position": 7, "url": "https://www.skythatnight.com/night-carrington.html"}, {"@type": "ListItem", "position": 8, "url": "https://www.skythatnight.com/night-abbey-road.html"}, {"@type": "ListItem", "position": 9, "url": "https://www.skythatnight.com/night-columbus-landfall.html"}, {"@type": "ListItem", "position": 10, "url": "https://www.skythatnight.com/night-berlin-wall.html"}, {"@type": "ListItem", "position": 11, "url": "https://www.skythatnight.com/night-millennium.html"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "ItemList", "name": "Famous Nights", "itemListElement": [{"@type": "ListItem", "position": 1, "url": "https://www.skythatnight.com/night-royal-wedding-1981.html"}, {"@type": "ListItem", "position": 2, "url": "https://www.skythatnight.com/night-world-cup-1966.html"}, {"@type": "ListItem", "position": 3, "url": "https://www.skythatnight.com/night-gertrude-ederle.html"}, {"@type": "ListItem", "position": 4, "url": "https://www.skythatnight.com/night-perseids.html"}, {"@type": "ListItem", "position": 5, "url": "https://www.skythatnight.com/night-woodstock.html"}, {"@type": "ListItem", "position": 6, "url": "https://www.skythatnight.com/night-occ-wedding.html"}, {"@type": "ListItem", "position": 7, "url": "https://www.skythatnight.com/night-matthew-webb.html"}, {"@type": "ListItem", "position": 8, "url": "https://www.skythatnight.com/night-full-moon-august.html"}, {"@type": "ListItem", "position": 9, "url": "https://www.skythatnight.com/night-beatles-last-concert.html"}, {"@type": "ListItem", "position": 10, "url": "https://www.skythatnight.com/night-carrington.html"}, {"@type": "ListItem", "position": 11, "url": "https://www.skythatnight.com/night-voyager-1.html"}, {"@type": "ListItem", "position": 12, "url": "https://www.skythatnight.com/night-occ-born.html"}, {"@type": "ListItem", "position": 13, "url": "https://www.skythatnight.com/night-roald-dahl.html"}, {"@type": "ListItem", "position": 14, "url": "https://www.skythatnight.com/night-occ-anniversary.html"}, {"@type": "ListItem", "position": 15, "url": "https://www.skythatnight.com/night-equinox-autumn.html"}, {"@type": "ListItem", "position": 16, "url": "https://www.skythatnight.com/night-neptune.html"}, {"@type": "ListItem", "position": 17, "url": "https://www.skythatnight.com/night-abbey-road.html"}, {"@type": "ListItem", "position": 18, "url": "https://www.skythatnight.com/night-occ-new-home.html"}, {"@type": "ListItem", "position": 19, "url": "https://www.skythatnight.com/night-occ-birthday.html"}, {"@type": "ListItem", "position": 20, "url": "https://www.skythatnight.com/night-columbus-landfall.html"}, {"@type": "ListItem", "position": 21, "url": "https://www.skythatnight.com/night-occ-met.html"}, {"@type": "ListItem", "position": 22, "url": "https://www.skythatnight.com/night-occ-retirement.html"}, {"@type": "ListItem", "position": 23, "url": "https://www.skythatnight.com/night-occ-proposal.html"}, {"@type": "ListItem", "position": 24, "url": "https://www.skythatnight.com/night-berlin-wall.html"}, {"@type": "ListItem", "position": 25, "url": "https://www.skythatnight.com/night-occ-memorial.html"}, {"@type": "ListItem", "position": 26, "url": "https://www.skythatnight.com/night-millennium.html"}]}</script>
 </head>
 <body class="sm-night">
 <header>
@@ -236,7 +267,7 @@
       <a href="./#design">Design yours</a>
       <a href="famous-nights.html">Famous Nights</a>
       <a href="./#faq">FAQ</a>
-      <a href="contact.html">Contact</a>
+      <a href="#contact">Contact</a>
     </nav>
   </div>
 </header>
@@ -265,11 +296,17 @@
     <div class="fn-hub-grid fn-grid" style="grid-template-columns:repeat(3,1fr)">
       <a href="night-royal-wedding-1981.html"><figure><img src="assets/social/royal-wedding-morph.png" alt="The sky over London the night of the royal wedding, 1981" loading="lazy"><div class="d">29 July 1981 · London</div><figcaption>«A day of fireworks and fairy tales»</figcaption></figure></a>
       <a href="night-world-cup-1966.html"><figure><img src="assets/social/world-cup-1966-morph.png" alt="The sky over Wembley the night England won the World Cup" loading="lazy"><div class="d">30 July 1966 · London</div><figcaption>«They think it's all over»</figcaption></figure></a>
-      <a href="night-mtv-launch.html"><figure><img src="assets/social/mtv-launch-morph.png" alt="The sky the minute MTV went on air" loading="lazy"><div class="d">1 August 1981 · New York</div><figcaption>«Ladies and gentlemen, rock and roll»</figcaption></figure></a>
-      <a href="night-petit-wire.html"><figure><img src="assets/social/petit-wire-morph.png" alt="The night they strung a wire between the Twin Towers" loading="lazy"><div class="d">7 August 1974 · New York</div><figcaption>«There is no why»</figcaption></figure></a>
+      <a href="night-gertrude-ederle.html"><figure><img src="assets/social/gertrude-ederle-morph.png" alt="The night she walked out of the sea" loading="lazy"><div class="d">6 August 1926 · Kingsdown</div><figcaption>«She swam the Channel»</figcaption></figure></a>
       <a href="night-perseids.html"><figure><img src="assets/social/perseids-morph.png" alt="Tonight: the best meteor shower of the year" loading="lazy"><div class="d">12 August 2026 · Lake District</div><figcaption>«Look up tonight»</figcaption></figure></a>
       <a href="night-woodstock.html"><figure><img src="assets/social/woodstock-morph.png" alt="The sky over Woodstock, opening night" loading="lazy"><div class="d">15 August 1969 · Bethel</div><figcaption>«Three days of peace and music»</figcaption></figure></a>
+      <a href="night-matthew-webb.html"><figure><img src="assets/social/matthew-webb-morph.png" alt="The night the Channel was crossed for the first time" loading="lazy"><div class="d">24 August 1875 · Dover</div><figcaption>«Nothing great is easy»</figcaption></figure></a>
+      <a href="night-full-moon-august.html"><figure><img src="assets/social/full-moon-august-morph.png" alt="Tonight the moon is full" loading="lazy"><div class="d">28 August 2026 · London</div><figcaption>«The night the moon was whole»</figcaption></figure></a>
+      <a href="night-beatles-last-concert.html"><figure><img src="assets/social/beatles-last-concert-morph.png" alt="The night the Beatles played live for the last time" loading="lazy"><div class="d">29 August 1966 · San Francisco</div><figcaption>«The last time they played»</figcaption></figure></a>
       <a href="night-carrington.html"><figure><img src="assets/social/carrington-morph.png" alt="The night the aurora reached London" loading="lazy"><div class="d">1 September 1859 · London</div><figcaption>«The night the sky caught fire»</figcaption></figure></a>
+      <a href="night-voyager-1.html"><figure><img src="assets/social/voyager-1-morph.png" alt="The night Voyager left — and never came back" loading="lazy"><div class="d">5 September 1977 · Cape Canaveral</div><figcaption>«Sounds of Earth»</figcaption></figure></a>
+      <a href="night-roald-dahl.html"><figure><img src="assets/social/roald-dahl-morph.png" alt="The sky the night Roald Dahl was born" loading="lazy"><div class="d">13 September 1916 · Llandaff</div><figcaption>«The night a storyteller arrived»</figcaption></figure></a>
+      <a href="night-equinox-autumn.html"><figure><img src="assets/social/equinox-autumn-morph.png" alt="Tonight the night equals the day" loading="lazy"><div class="d">23 September 2026 · London</div><figcaption>«The night summer ended»</figcaption></figure></a>
+      <a href="night-neptune.html"><figure><img src="assets/social/neptune-morph.png" alt="The night we found Neptune" loading="lazy"><div class="d">23 September 1846 · Berlin</div><figcaption>«Exactly where the maths said»</figcaption></figure></a>
       <a href="night-abbey-road.html"><figure><img src="assets/social/abbey-road-morph.png" alt="The night Abbey Road arrived" loading="lazy"><div class="d">26 September 1969 · London</div><figcaption>«And in the end…»</figcaption></figure></a>
       <a href="night-columbus-landfall.html"><figure><img src="assets/social/columbus-morph.png" alt="The night a lookout shouted one word" loading="lazy"><div class="d">12 October 1492 · San Salvador</div><figcaption>«Tierra»</figcaption></figure></a>
       <a href="night-berlin-wall.html"><figure><img src="assets/social/berlin-wall-morph.png" alt="The night the gate opened" loading="lazy"><div class="d">9 November 1989 · Berlin</div><figcaption>«Sofort, unverzüglich»</figcaption></figure></a>
@@ -290,9 +327,8 @@
     </div>
     <div class="foot-link-col">
       <div class="foot-rule" id="contact" style="scroll-margin-top:100px">Help</div>
-      <a href="about.html">About Us</a>
-      <a href="contact.html">Contact Us</a>
       <!--email_off--><a href="mailto:admin@shopcienty.com">admin@shopcienty.com</a><!--/email_off-->
+      <a href="about.html">About Us</a>
       <a href="delivery.html">Delivery &amp; Returns</a>
       <a href="privacy.html">Privacy Policy</a>
       <a href="terms.html">Terms &amp; Conditions</a>
@@ -304,6 +340,5 @@
     </p>
   </div>
 </footer>
-  <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
 </body>
 </html>
