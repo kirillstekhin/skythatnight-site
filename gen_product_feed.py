@@ -45,6 +45,17 @@ DESC = ("A museum-grade star map of the exact sky above any place, on any date �
         "Personalise the date, place and dedication line. {extra}. "
         "Made to order and hand-finished in the UK. Free UK delivery.")
 
+# ⏱ СРОКИ ДОСТАВКИ В ФИДЕ (12.08.2026). Раньше отдавали только цену доставки (0.00) —
+# Google знал, что она бесплатная, но НЕ знал, когда товар приедет, и потому не мог
+# написать на карточке «Free delivery by <дата>». Это одна из немногих бесплатных
+# аннотаций, которая меняет вид карточки в выдаче; Merchant сам просил её («Show your
+# fastest shipping options»).
+# Числа НЕ придуманы: handling 2–4 рабочих дня = то, что обещает delivery.html
+# («dispatched within 2–4 working days»), transit 1–3 = Evri Next Day 24 с запасом.
+# Сверка по реальному заказу Rachel & Tom: оплата 04.08 → отгрузка 06.08 (2 дня) →
+# доставка 08.08 (2 дня). ⛔Не занижать: обещание в фиде — это обещание покупателю,
+# а Merchant сверяет заявления с фактом.
+#
 # Доп-кадры (02.08): те же слайды, что на листингах сайта/Etsy — Merchant показывает их
 # каруселью в карточке. Рамочным форматам добавляем слайд рам; интерьер — всем.
 def additional_images(fmt, moon=False):
@@ -81,14 +92,36 @@ MOON_DESC = ("A portrait of the real Moon exactly as it hung over your night —
              "Made to order and hand-finished in the UK. Free UK delivery.")
 
 
+# ═══ ЗАГОЛОВКИ: ПОД ЗАПРОС, А НЕ ПОД ОПИСАНИЕ ТОВАРА (12.08.2026) ═══
+# В Google Shopping ранжирование в первую очередь сопоставляет ЗАПРОС с title. Старые
+# заголовки («Personalised Star Map — Classic Frame 50×70 cm — Your Exact Night Sky»)
+# описывали товар, а не то, что человек набирает: повод в них не попадал вообще, хотя
+# star-map покупают именно поводом. В соседних карточках выдачи 12.08 — «The Night We
+# Met - Star Map…», «Name a Star Gift Set…»: у конкурентов повод в заголовке есть.
+# Структура: [что это] — [чем отличается] — [формат+размер] — [повод].
+#  • первые ~70 знаков видны в выдаче → туда главный запрос и отличие;
+#  • формат и размер ОБЯЗАТЕЛЬНЫ в середине: 18 позиций различаются только ими, без них
+#    Google склеит их в дубли;
+#  • повод в хвосте — он индексируется, даже когда обрезан на экране;
+#  • ⛔ноль промо-текста («SALE», «best») — это прямой запрет в правилах фида.
+# Слово «Print» в формате заменено, иначе у голого принта выходило «Star Map Print …
+# Print 30×40 cm».
+FMT_TITLE = {"Print": "Unframed", "Framed": "Wood Frame", "Classic Frame": "Gallery Frame"}
+
+
 def item_xml(pid, fmt, size, price, extra, LINK):
     moon = pid.startswith("SKN-MOON-")
+    ff = FMT_TITLE[fmt]
     if moon:
-        title = f"Personalised Moon Phase Print — {fmt} {size} — The Moon on Your Date"
+        title = (f"Personalised Moon Phase Print — The Real Moon of Your Date — "
+                 f"{ff} {size} — Anniversary & Birthday Gift")
         d = MOON_DESC.format(extra=extra.capitalize())
     else:
-        title = f"Personalised Star Map — {fmt} {size} — Your Exact Night Sky"
+        title = (f"Personalised Star Map Print — The Night Sky of Any Date and Place — "
+                 f"{ff} {size} — Anniversary & Wedding Gift")
         d = DESC.format(extra=extra.capitalize())
+    if len(title) > 150:                      # жёсткий лимит Google на title
+        raise SystemExit(f"⛔ {pid}: заголовок {len(title)} знаков, лимит 150")
     return f"""  <item>
     <g:id>{pid}</g:id>
     <g:title>{html.escape(title)}</g:title>
@@ -106,7 +139,12 @@ def item_xml(pid, fmt, size, price, extra, LINK):
     <g:item_group_id>{"SKN-MOON" if moon else "SKN-STARMAP"}</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>"""
 

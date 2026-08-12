@@ -3,10 +3,10 @@
 <channel>
   <title>SKY, THAT NIGHT — Personalised Star Maps</title>
   <link>https://www.skythatnight.com/</link>
-  <description>Custom star maps and moon phase prints of your exact night. Generated 2026-08-11.</description>
+  <description>Custom star maps and moon phase prints of your exact night. Generated 2026-08-12.</description>
   <item>
     <g:id>SKN-PRINT-3040</g:id>
-    <g:title>Personalised Star Map — Print 30×40 cm — Your Exact Night Sky</g:title>
+    <g:title>Personalised Star Map Print — The Night Sky of Any Date and Place — Unframed 30×40 cm — Anniversary &amp; Wedding Gift</g:title>
     <g:description>A museum-grade star map of the exact sky above any place, on any date — 11,000 real stars, true constellations and the actual moon phase of your night. Personalise the date, place and dedication line. Museum-grade giclée print, shipped rolled. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-print-3040.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-PRINT-3040.jpg</g:image_link>
@@ -25,12 +25,17 @@
     <g:item_group_id>SKN-STARMAP</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-PRINT-4050</g:id>
-    <g:title>Personalised Star Map — Print 40×50 cm — Your Exact Night Sky</g:title>
+    <g:title>Personalised Star Map Print — The Night Sky of Any Date and Place — Unframed 40×50 cm — Anniversary &amp; Wedding Gift</g:title>
     <g:description>A museum-grade star map of the exact sky above any place, on any date — 11,000 real stars, true constellations and the actual moon phase of your night. Personalise the date, place and dedication line. Museum-grade giclée print, shipped rolled. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-print-4050.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-PRINT-4050.jpg</g:image_link>
@@ -49,12 +54,17 @@
     <g:item_group_id>SKN-STARMAP</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-PRINT-5070</g:id>
-    <g:title>Personalised Star Map — Print 50×70 cm — Your Exact Night Sky</g:title>
+    <g:title>Personalised Star Map Print — The Night Sky of Any Date and Place — Unframed 50×70 cm — Anniversary &amp; Wedding Gift</g:title>
     <g:description>A museum-grade star map of the exact sky above any place, on any date — 11,000 real stars, true constellations and the actual moon phase of your night. Personalise the date, place and dedication line. Museum-grade giclée print, shipped rolled. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-print-5070.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-PRINT-5070.jpg</g:image_link>
@@ -73,12 +83,17 @@
     <g:item_group_id>SKN-STARMAP</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-FRAMED-3040</g:id>
-    <g:title>Personalised Star Map — Framed 30×40 cm — Your Exact Night Sky</g:title>
+    <g:title>Personalised Star Map Print — The Night Sky of Any Date and Place — Wood Frame 30×40 cm — Anniversary &amp; Wedding Gift</g:title>
     <g:description>A museum-grade star map of the exact sky above any place, on any date — 11,000 real stars, true constellations and the actual moon phase of your night. Personalise the date, place and dedication line. Handmade wood frame (white or natural), ready to hang. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-framed-3040.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-FRAMED-3040.jpg</g:image_link>
@@ -98,12 +113,17 @@
     <g:item_group_id>SKN-STARMAP</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-FRAMED-4050</g:id>
-    <g:title>Personalised Star Map — Framed 40×50 cm — Your Exact Night Sky</g:title>
+    <g:title>Personalised Star Map Print — The Night Sky of Any Date and Place — Wood Frame 40×50 cm — Anniversary &amp; Wedding Gift</g:title>
     <g:description>A museum-grade star map of the exact sky above any place, on any date — 11,000 real stars, true constellations and the actual moon phase of your night. Personalise the date, place and dedication line. Handmade wood frame (white or natural), ready to hang. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-framed-4050.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-FRAMED-4050.jpg</g:image_link>
@@ -123,12 +143,17 @@
     <g:item_group_id>SKN-STARMAP</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-FRAMED-5070</g:id>
-    <g:title>Personalised Star Map — Framed 50×70 cm — Your Exact Night Sky</g:title>
+    <g:title>Personalised Star Map Print — The Night Sky of Any Date and Place — Wood Frame 50×70 cm — Anniversary &amp; Wedding Gift</g:title>
     <g:description>A museum-grade star map of the exact sky above any place, on any date — 11,000 real stars, true constellations and the actual moon phase of your night. Personalise the date, place and dedication line. Handmade wood frame (white or natural), ready to hang. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-framed-5070.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-FRAMED-5070.jpg</g:image_link>
@@ -148,12 +173,17 @@
     <g:item_group_id>SKN-STARMAP</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-CLASSIC-3040</g:id>
-    <g:title>Personalised Star Map — Classic Frame 30×40 cm — Your Exact Night Sky</g:title>
+    <g:title>Personalised Star Map Print — The Night Sky of Any Date and Place — Gallery Frame 30×40 cm — Anniversary &amp; Wedding Gift</g:title>
     <g:description>A museum-grade star map of the exact sky above any place, on any date — 11,000 real stars, true constellations and the actual moon phase of your night. Personalise the date, place and dedication line. Gallery classic frame in black, antique gold or antique silver. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-classic-3040.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-CLASSIC-3040.jpg</g:image_link>
@@ -173,12 +203,17 @@
     <g:item_group_id>SKN-STARMAP</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-CLASSIC-4050</g:id>
-    <g:title>Personalised Star Map — Classic Frame 40×50 cm — Your Exact Night Sky</g:title>
+    <g:title>Personalised Star Map Print — The Night Sky of Any Date and Place — Gallery Frame 40×50 cm — Anniversary &amp; Wedding Gift</g:title>
     <g:description>A museum-grade star map of the exact sky above any place, on any date — 11,000 real stars, true constellations and the actual moon phase of your night. Personalise the date, place and dedication line. Gallery classic frame in black, antique gold or antique silver. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-classic-4050.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-CLASSIC-4050.jpg</g:image_link>
@@ -198,12 +233,17 @@
     <g:item_group_id>SKN-STARMAP</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-CLASSIC-5070</g:id>
-    <g:title>Personalised Star Map — Classic Frame 50×70 cm — Your Exact Night Sky</g:title>
+    <g:title>Personalised Star Map Print — The Night Sky of Any Date and Place — Gallery Frame 50×70 cm — Anniversary &amp; Wedding Gift</g:title>
     <g:description>A museum-grade star map of the exact sky above any place, on any date — 11,000 real stars, true constellations and the actual moon phase of your night. Personalise the date, place and dedication line. Gallery classic frame in black, antique gold or antique silver. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-classic-5070.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-CLASSIC-5070.jpg</g:image_link>
@@ -223,12 +263,17 @@
     <g:item_group_id>SKN-STARMAP</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-MOON-PRINT-3040</g:id>
-    <g:title>Personalised Moon Phase Print — Print 30×40 cm — The Moon on Your Date</g:title>
+    <g:title>Personalised Moon Phase Print — The Real Moon of Your Date — Unframed 30×40 cm — Anniversary &amp; Birthday Gift</g:title>
     <g:description>A portrait of the real Moon exactly as it hung over your night — the true phase of your date, rendered from NASA lunar photography, not a drawing. Personalise the date, place and dedication line. Museum-grade giclée print, shipped rolled. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-moon-print-3040.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-MOON-PRINT-3040.jpg</g:image_link>
@@ -247,12 +292,17 @@
     <g:item_group_id>SKN-MOON</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-MOON-PRINT-4050</g:id>
-    <g:title>Personalised Moon Phase Print — Print 40×50 cm — The Moon on Your Date</g:title>
+    <g:title>Personalised Moon Phase Print — The Real Moon of Your Date — Unframed 40×50 cm — Anniversary &amp; Birthday Gift</g:title>
     <g:description>A portrait of the real Moon exactly as it hung over your night — the true phase of your date, rendered from NASA lunar photography, not a drawing. Personalise the date, place and dedication line. Museum-grade giclée print, shipped rolled. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-moon-print-4050.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-MOON-PRINT-4050.jpg</g:image_link>
@@ -271,12 +321,17 @@
     <g:item_group_id>SKN-MOON</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-MOON-PRINT-5070</g:id>
-    <g:title>Personalised Moon Phase Print — Print 50×70 cm — The Moon on Your Date</g:title>
+    <g:title>Personalised Moon Phase Print — The Real Moon of Your Date — Unframed 50×70 cm — Anniversary &amp; Birthday Gift</g:title>
     <g:description>A portrait of the real Moon exactly as it hung over your night — the true phase of your date, rendered from NASA lunar photography, not a drawing. Personalise the date, place and dedication line. Museum-grade giclée print, shipped rolled. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-moon-print-5070.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-MOON-PRINT-5070.jpg</g:image_link>
@@ -295,12 +350,17 @@
     <g:item_group_id>SKN-MOON</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-MOON-FRAMED-3040</g:id>
-    <g:title>Personalised Moon Phase Print — Framed 30×40 cm — The Moon on Your Date</g:title>
+    <g:title>Personalised Moon Phase Print — The Real Moon of Your Date — Wood Frame 30×40 cm — Anniversary &amp; Birthday Gift</g:title>
     <g:description>A portrait of the real Moon exactly as it hung over your night — the true phase of your date, rendered from NASA lunar photography, not a drawing. Personalise the date, place and dedication line. Handmade wood frame (white or natural), ready to hang. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-moon-framed-3040.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-MOON-FRAMED-3040.jpg</g:image_link>
@@ -319,12 +379,17 @@
     <g:item_group_id>SKN-MOON</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-MOON-FRAMED-4050</g:id>
-    <g:title>Personalised Moon Phase Print — Framed 40×50 cm — The Moon on Your Date</g:title>
+    <g:title>Personalised Moon Phase Print — The Real Moon of Your Date — Wood Frame 40×50 cm — Anniversary &amp; Birthday Gift</g:title>
     <g:description>A portrait of the real Moon exactly as it hung over your night — the true phase of your date, rendered from NASA lunar photography, not a drawing. Personalise the date, place and dedication line. Handmade wood frame (white or natural), ready to hang. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-moon-framed-4050.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-MOON-FRAMED-4050.jpg</g:image_link>
@@ -343,12 +408,17 @@
     <g:item_group_id>SKN-MOON</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-MOON-FRAMED-5070</g:id>
-    <g:title>Personalised Moon Phase Print — Framed 50×70 cm — The Moon on Your Date</g:title>
+    <g:title>Personalised Moon Phase Print — The Real Moon of Your Date — Wood Frame 50×70 cm — Anniversary &amp; Birthday Gift</g:title>
     <g:description>A portrait of the real Moon exactly as it hung over your night — the true phase of your date, rendered from NASA lunar photography, not a drawing. Personalise the date, place and dedication line. Handmade wood frame (white or natural), ready to hang. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-moon-framed-5070.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-MOON-FRAMED-5070.jpg</g:image_link>
@@ -367,12 +437,17 @@
     <g:item_group_id>SKN-MOON</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-MOON-CLASSIC-3040</g:id>
-    <g:title>Personalised Moon Phase Print — Classic Frame 30×40 cm — The Moon on Your Date</g:title>
+    <g:title>Personalised Moon Phase Print — The Real Moon of Your Date — Gallery Frame 30×40 cm — Anniversary &amp; Birthday Gift</g:title>
     <g:description>A portrait of the real Moon exactly as it hung over your night — the true phase of your date, rendered from NASA lunar photography, not a drawing. Personalise the date, place and dedication line. Gallery classic frame in black, antique gold or antique silver. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-moon-classic-3040.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-MOON-CLASSIC-3040.jpg</g:image_link>
@@ -391,12 +466,17 @@
     <g:item_group_id>SKN-MOON</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-MOON-CLASSIC-4050</g:id>
-    <g:title>Personalised Moon Phase Print — Classic Frame 40×50 cm — The Moon on Your Date</g:title>
+    <g:title>Personalised Moon Phase Print — The Real Moon of Your Date — Gallery Frame 40×50 cm — Anniversary &amp; Birthday Gift</g:title>
     <g:description>A portrait of the real Moon exactly as it hung over your night — the true phase of your date, rendered from NASA lunar photography, not a drawing. Personalise the date, place and dedication line. Gallery classic frame in black, antique gold or antique silver. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-moon-classic-4050.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-MOON-CLASSIC-4050.jpg</g:image_link>
@@ -415,12 +495,17 @@
     <g:item_group_id>SKN-MOON</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
   <item>
     <g:id>SKN-MOON-CLASSIC-5070</g:id>
-    <g:title>Personalised Moon Phase Print — Classic Frame 50×70 cm — The Moon on Your Date</g:title>
+    <g:title>Personalised Moon Phase Print — The Real Moon of Your Date — Gallery Frame 50×70 cm — Anniversary &amp; Birthday Gift</g:title>
     <g:description>A portrait of the real Moon exactly as it hung over your night — the true phase of your date, rendered from NASA lunar photography, not a drawing. Personalise the date, place and dedication line. Gallery classic frame in black, antique gold or antique silver. Made to order and hand-finished in the UK. Free UK delivery.</g:description>
     <g:link>https://www.skythatnight.com/product-skn-moon-classic-5070.html?utm_source=pinterest&amp;utm_medium=shopping</g:link>
     <g:image_link>https://www.skythatnight.com/assets/starmap/feed/SKN-MOON-CLASSIC-5070.jpg</g:image_link>
@@ -439,7 +524,12 @@
     <g:item_group_id>SKN-MOON</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
+      <g:service>Free standard delivery</g:service>
       <g:price>0.00 GBP</g:price>
+      <g:min_handling_time>2</g:min_handling_time>
+      <g:max_handling_time>4</g:max_handling_time>
+      <g:min_transit_time>1</g:min_transit_time>
+      <g:max_transit_time>3</g:max_transit_time>
     </g:shipping>
   </item>
 </channel>
