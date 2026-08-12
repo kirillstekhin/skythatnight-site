@@ -35,6 +35,37 @@ _feed = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_feed)          # ⚠ побочно перегенерит feed.xml — так и надо: цены едины
 ITEMS = _feed.ITEMS
 
+# ═══ ДВА ПРОДУКТА, ОДНА ГРАММАТИКА СТРАНИЦЫ (11.08.2026) ═══
+# У луны своя секция конфигуратора (moon.html + moon.js + пресет MN_PRESET) и свои кадры,
+# но лендинг обязан быть устроен ТАК ЖЕ: видимая цена = цена фида = цена в Product JSON-LD.
+# Иначе повторяется бан 05.08 — только теперь по девяти лунным позициям.
+_moon_html = open(os.path.join(HERE, "moon.html")).read()
+
+PRODUCTS = {
+    "star": dict(
+        items=ITEMS,
+        config=CONFIG,
+        script="starmap.js", preset_var="SM_PRESET", cache=CACHE,
+        kind="Star Map",
+        h1=lambda size: f"Your exact night sky, {size.replace(' cm', ' centimetres')}",
+        blurb="Every star in its true position for the date, time and place you choose — "
+              "11,000 stars, real constellations and the actual moon phase of your night.",
+        jsonld_desc="A museum-grade star map of the exact sky above any place, on any date.",
+        others_title="Nine ways to hang the same night.",
+        cta="Design this sky"),
+    "moon": dict(
+        items=_feed.MOON_ITEMS,
+        config=re.search(r'(<section class="sm-config" id="design">.*?</section>)', _moon_html, re.S).group(1),
+        script="moon.js", preset_var="MN_PRESET", cache="v=1",
+        kind="Moon Phase Print",
+        h1=lambda size: f"The Moon of your night, {size.replace(' cm', ' centimetres')}",
+        blurb="The real Moon in the true phase of your date — rendered from NASA lunar "
+              "photography, not drawn. Your words, your date, your place beneath it.",
+        jsonld_desc="A museum-grade portrait of the real Moon in the true phase of your night.",
+        others_title="Nine ways to hang the same moon.",
+        cta="Design this moon"),
+}
+
 # формат из фида → ключ конфигуратора (frameType) и человеческое описание
 FMT = {
     "Print":         dict(key="print",   what="Museum-grade giclée print, shipped rolled in a protective tube.",
@@ -99,7 +130,7 @@ def check_configurator_prices():
     print(f"✓ цены сверены с конфигуратором: {len(ITEMS)}/{len(ITEMS)}")
 
 
-def jsonld(pid, fmt, size, price, url, img):
+def jsonld(prod, pid, fmt, size, price, url, img):
     """Product с ОДНОЙ ценой — не AggregateOffer. Робот сверяет её с фидом.
 
     ⚠ ВОЗВРАТ: `MerchantReturnNotPermitted`, а НЕ 14 дней. Первая версия этих страниц
@@ -109,12 +140,13 @@ def jsonld(pid, fmt, size, price, url, img):
     магазина, увидел бы ровно то, за что нас и забанили, — только вторым пунктом.
     Права на брак/повреждение (30 дней на отказ, репринт/возврат) сюда не входят:
     returnPolicyCategory описывает отказ по передумал, законные права он не отменяет."""
+    P = PRODUCTS[prod]
     return f"""<script type="application/ld+json">{{
 "@context":"https://schema.org","@type":"Product",
-"name":"Personalised Star Map — {fmt} {size}",
+"name":"Personalised {P['kind']} — {fmt} {size}",
 "sku":"{pid}","mpn":"{pid}","brand":{{"@type":"Brand","name":"Sky, That Night"}},
 "image":"{img}","url":"{url}",
-"description":"A museum-grade star map of the exact sky above any place, on any date. {esc(FMT[fmt]['what'])}",
+"description":"{esc(P['jsonld_desc'])} {esc(FMT[fmt]['what'])}",
 "offers":{{"@type":"Offer","price":"{price:.2f}","priceCurrency":"GBP",
 "availability":"https://schema.org/InStock","itemCondition":"https://schema.org/NewCondition",
 "url":"{url}","priceValidUntil":"2027-12-31",
@@ -127,9 +159,9 @@ def jsonld(pid, fmt, size, price, url, img):
 "merchantReturnLink":"{SITE}/delivery.html"}}}}}}</script>"""
 
 
-def others_html(cur_id):
+def others_html(prod, cur_id):
     cells = []
-    for pid, fmt, size, price, _ in ITEMS:
+    for pid, fmt, size, price, _ in PRODUCTS[prod]["items"]:
         if pid == cur_id:
             continue
         cells.append(f'      <a href="product-{pid.lower()}.html">{esc(fmt)} · {esc(size)}<br>'
@@ -137,13 +169,17 @@ def others_html(cur_id):
     return "\n".join(cells)
 
 
-def build(pid, fmt, size, price, extra):
+def build(prod, pid, fmt, size, price, extra):
+    P = PRODUCTS[prod]
     slug = f"product-{pid.lower()}.html"
     url = f"{SITE}/{slug}"
     img = f"{SITE}/assets/starmap/feed/{pid}.jpg"
     info = FMT[fmt]
-    title = f"Personalised Star Map — {fmt} {size} — £{price:.2f}"
-    desc = (f"{fmt} {size} personalised star map of the exact sky above any place on any date. "
+    title = f"Personalised {P['kind']} — {fmt} {size} — £{price:.2f}"
+    subject = ("moon phase print showing the true phase of any date and place"
+               if prod == "moon" else
+               "star map of the exact sky above any place on any date")
+    desc = (f"{fmt} {size} personalised {subject}. "
             f"£{price:.2f} including free UK delivery. Made to order in the UK.")
     incl = "\n".join(f"        <li>{esc(x)}</li>" for x in info["incl"])
     preset = f'{{"frameType":"{info["key"]}","size":"{SIZEKEY[size]}"}}'
@@ -172,7 +208,7 @@ def build(pid, fmt, size, price, extra):
 <link rel="stylesheet" href="assets/style.css?v=2">
 <link rel="preload" as="image" href="assets/starmap/feed/{pid}.jpg">
 <style>{STYLE}{EXTRA_CSS}</style>
-{jsonld(pid, fmt, size, price, url, img)}
+{jsonld(prod, pid, fmt, size, price, url, img)}
 </head>
 <body class="sm-night">
 {HEADER}
@@ -184,30 +220,30 @@ def build(pid, fmt, size, price, extra):
   <div class="container">
     <div>
       <div class="pp-kicker">{esc(fmt)} · {esc(size)}</div>
-      <h1 class="pp-h1">Your exact night sky, {esc(size.replace(' cm', ' centimetres'))}</h1>
+      <h1 class="pp-h1">{esc(P['h1'](size))}</h1>
       <p class="pp-price">£{price:.2f}</p>
       <p class="pp-avail">In stock · free UK delivery · made to order, dispatched in 2–4 working days</p>
-      <p class="pp-what">{esc(info['what'])} Every star in its true position for the date, time and place you choose — 11,000 stars, real constellations and the actual moon phase of your night.</p>
+      <p class="pp-what">{esc(info['what'])} {esc(P['blurb'])}</p>
       <ul class="pp-incl">
 {incl}
       </ul>
-      <a class="sm-cta" href="#design">Design this sky — £{price:.2f}</a>
+      <a class="sm-cta" href="#design">{esc(P['cta'])} — £{price:.2f}</a>
       <span class="sm-cta-sub">Free UK delivery included · personalised, so no change-of-mind returns — damaged or not as approved, we reprint or refund in full · <a href="delivery.html">Delivery &amp; returns</a></span>
     </div>
     <div>
-      <img src="assets/starmap/feed/{pid}.jpg" alt="{esc(fmt)} {esc(size)} personalised star map, £{price:.2f}">
+      <img src="assets/starmap/feed/{pid}.jpg" alt="{esc(fmt)} {esc(size)} personalised {esc(P['kind'].lower())}, £{price:.2f}">
     </div>
   </div>
 </section>
 
-{CONFIG}
+{P['config']}
 
 <section class="sm-section">
   <div class="container">
     <div class="section-kicker sm-kicker">Other sizes and finishes</div>
-    <h2>Nine ways to hang the same night.</h2>
+    <h2>{esc(P['others_title'])}</h2>
     <div class="pp-others">
-{others_html(pid)}
+{others_html(prod, pid)}
     </div>
   </div>
 </section>
@@ -215,8 +251,8 @@ def build(pid, fmt, size, price, extra):
 </main>
 
 {FOOTER}
-<script>window.SM_PRESET = {preset};</script>
-<script src="assets/starmap.js?{CACHE}" defer></script>
+<script>window.{P['preset_var']} = {preset};</script>
+<script src="assets/{P['script']}?{P['cache']}" defer></script>
 </body>
 </html>
 """
@@ -267,14 +303,30 @@ def update_index():
 def main():
     check_configurator_prices()
     written = []
-    for pid, fmt, size, price, extra in ITEMS:
-        slug, page = build(pid, fmt, size, price, extra)
-        open(os.path.join(HERE, slug), "w").write(page)
-        written.append((slug, price))
+    for prod, P in PRODUCTS.items():
+        for pid, fmt, size, price, extra in P["items"]:
+            slug, page = build(prod, pid, fmt, size, price, extra)
+            open(os.path.join(HERE, slug), "w").write(page)
+            written.append((prod, slug, price))
     update_index()
+    _reinject()
     print(f"✅ страниц товаров: {len(written)}")
-    for slug, price in written:
-        print(f"   {slug:32} £{price:.2f}")
+    for prod, slug, price in written:
+        print(f"   [{prod:4}] {slug:38} £{price:.2f}")
+
+
+def _reinject():
+    """Новые страницы рождаются БЕЗ счётчика и без Google-тега — вернуть сразу.
+
+    ⚠ Мина 02.08 (аналитика) и 11.08 (gtag): свежесгенерированный лендинг без тега
+    молча не считает конверсии, и в кабинете Google это выглядит как «реклама не
+    работает», хотя заказы идут.
+    """
+    for name in ("gen_analytics", "gen_gtag"):
+        sp = importlib.util.spec_from_file_location(name, os.path.join(HERE, f"{name}.py"))
+        mod = importlib.util.module_from_spec(sp)
+        sp.loader.exec_module(mod)
+        mod.inject(True)
 
 
 if __name__ == "__main__":

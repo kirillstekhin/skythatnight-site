@@ -47,7 +47,17 @@ DESC = ("A museum-grade star map of the exact sky above any place, on any date �
 
 # Доп-кадры (02.08): те же слайды, что на листингах сайта/Etsy — Merchant показывает их
 # каруселью в карточке. Рамочным форматам добавляем слайд рам; интерьер — всем.
-def additional_images(fmt):
+def additional_images(fmt, moon=False):
+    if moon:
+        # ⚠ Лунным позициям НЕЛЬЗЯ отдавать звёздные слайды галереи (themes/detail/sizes):
+        # на них нарисована звёздная карта, а карточка обещает луну — это ровно то
+        # несовпадение «product data vs online store», за которое был бан 05.08.
+        # Даём три реальных лунных кадра сайта: они и есть этот товар.
+        urls = [f"{SITE}/assets/starmap/{n}"
+                for n in ("moon-porcelain.jpg", "moon-noir.jpg", "moon-crescent.jpg")]
+        # плюс общие для обоих продуктов: рамы и «как приходит» — они про упаковку, не про рисунок
+        urls += [f"{SITE}/assets/starmap/gallery/{n}" for n in ("frames.jpg", "arrives.jpg")]
+        return "\n".join(f"    <g:additional_image_link>{u}</g:additional_image_link>" for u in urls)
     names = ["themes.jpg", "detail.jpg", "sizes.jpg", "arrives.jpg"]
     if fmt != "Print":
         names.insert(1, "frames.jpg")
@@ -56,42 +66,64 @@ def additional_images(fmt):
     return "\n".join(f"    <g:additional_image_link>{u}</g:additional_image_link>" for u in urls)
 
 
+# ═══ ВТОРОЙ ПРОДУКТ: THE MOON THAT NIGHT (11.08.2026) ═══
+# Луна живёт на сайте с 06.08, но в Google её не было вообще: фид отдавал только
+# звёздную матрицу. Формат/размер/цена ОБЩИЕ со звёздным (тот же постер, тот же
+# Prodigi-SKU, те же Stripe-линки) — отличается только рисунок, поэтому это отдельная
+# товарная группа `SKN-MOON`, а не вариант звёздной: у Google `item_group_id` группирует
+# варианты ОДНОГО товара, и смешать их значило бы показывать луну по запросу «star map».
+MOON_ITEMS = [(pid.replace("SKN-", "SKN-MOON-"), fmt, size, price, extra)
+              for pid, fmt, size, price, extra in ITEMS]
+
+MOON_DESC = ("A portrait of the real Moon exactly as it hung over your night — the true phase "
+             "of your date, rendered from NASA lunar photography, not a drawing. "
+             "Personalise the date, place and dedication line. {extra}. "
+             "Made to order and hand-finished in the UK. Free UK delivery.")
+
+
 def item_xml(pid, fmt, size, price, extra, LINK):
-    title = f"Personalised Star Map — {fmt} {size} — Your Exact Night Sky"
-    d = DESC.format(extra=extra.capitalize())
+    moon = pid.startswith("SKN-MOON-")
+    if moon:
+        title = f"Personalised Moon Phase Print — {fmt} {size} — The Moon on Your Date"
+        d = MOON_DESC.format(extra=extra.capitalize())
+    else:
+        title = f"Personalised Star Map — {fmt} {size} — Your Exact Night Sky"
+        d = DESC.format(extra=extra.capitalize())
     return f"""  <item>
     <g:id>{pid}</g:id>
     <g:title>{html.escape(title)}</g:title>
     <g:description>{html.escape(d)}</g:description>
     <g:link>{html.escape(LINK)}</g:link>
     <g:image_link>{SITE}/assets/starmap/feed/{pid}.jpg</g:image_link>
-{additional_images(fmt)}
+{additional_images(fmt, moon)}
     <g:availability>in_stock</g:availability>
     <g:price>{price:.2f} GBP</g:price>
     <g:condition>new</g:condition>
     <g:brand>SKY, THAT NIGHT</g:brand>
     <g:identifier_exists>no</g:identifier_exists>
     <g:google_product_category>500044</g:google_product_category>
-    <g:product_type>Home &amp; Living &gt; Wall Art &gt; Personalised Star Maps</g:product_type>
-    <g:item_group_id>SKN-STARMAP</g:item_group_id>
+    <g:product_type>Home &amp; Living &gt; Wall Art &gt; {"Personalised Moon Phase Prints" if moon else "Personalised Star Maps"}</g:product_type>
+    <g:item_group_id>{"SKN-MOON" if moon else "SKN-STARMAP"}</g:item_group_id>
     <g:shipping>
       <g:country>GB</g:country>
       <g:price>0.00 GBP</g:price>
     </g:shipping>
   </item>"""
 
+ALL_ITEMS = ITEMS + MOON_ITEMS
+
 for fname, utm in FEED_UTM:
     # ссылка теперь СВОЯ у каждой позиции — см. комментарий у FEED_UTM
-    body = "\n".join(item_xml(*it, item_link(it[0], utm)) for it in ITEMS)
+    body = "\n".join(item_xml(*it, item_link(it[0], utm)) for it in ALL_ITEMS)
     feed = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">
 <channel>
   <title>SKY, THAT NIGHT — Personalised Star Maps</title>
   <link>{SITE}/</link>
-  <description>Custom star maps of your exact night sky. Generated {date.today().isoformat()}.</description>
+  <description>Custom star maps and moon phase prints of your exact night. Generated {date.today().isoformat()}.</description>
 {body}
 </channel>
 </rss>
 """
     open(fname, "w").write(feed)
-    print(f"{fname}: {len(ITEMS)} items, {len(feed)} bytes")
+    print(f"{fname}: {len(ALL_ITEMS)} items ({len(ITEMS)} star + {len(MOON_ITEMS)} moon), {len(feed)} bytes")

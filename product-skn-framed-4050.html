@@ -266,6 +266,40 @@
 "hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy",
 "applicableCountry":"GB","returnPolicyCategory":"https://schema.org/MerchantReturnNotPermitted",
 "merchantReturnLink":"https://www.skythatnight.com/delivery.html"}}}</script>
+<!-- SKN_GTAG_HEAD:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ.
+     Consent Mode v2: до согласия куки не пишутся (UK PECR reg.6). -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    'ad_storage': 'denied', 'ad_user_data': 'denied', 'ad_personalization': 'denied',
+    'analytics_storage': 'denied', 'wait_for_update': 500
+  });
+  try {
+    if (localStorage.getItem('skn_consent') === 'granted') {
+      gtag('consent', 'update', {
+        'ad_storage': 'granted', 'ad_user_data': 'granted',
+        'ad_personalization': 'granted', 'analytics_storage': 'granted'
+      });
+    }
+  } catch (e) {}
+  gtag('js', new Date());
+  gtag('config', 'AW-18367610518');
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18367610518"></script>
+<style>
+  .skn-consent { position:fixed; left:0; right:0; bottom:0; z-index:9999; display:none;
+    gap:1rem; align-items:center; justify-content:center; flex-wrap:wrap;
+    padding:.85rem 1.2rem; background:rgba(8,12,26,.96); border-top:1px solid rgba(201,169,97,.28);
+    font-family:'Hanken Grotesk',system-ui,sans-serif; font-size:.82rem; color:#c9d3e8; }
+  .skn-consent.on { display:flex; }
+  .skn-consent p { margin:0; max-width:46rem; line-height:1.5; }
+  .skn-consent a { color:#c9a961; }
+  .skn-consent button { font-family:inherit; font-size:.8rem; letter-spacing:.04em; cursor:pointer;
+    padding:.5rem 1.1rem; border-radius:2px; border:1px solid rgba(201,169,97,.5); background:none; color:#c9a961; }
+  .skn-consent button.yes { background:#c9a961; border-color:#c9a961; color:#0b1020; font-weight:500; }
+</style>
+<!-- SKN_GTAG_HEAD:END -->
 </head>
 <body class="sm-night">
 <header>
@@ -429,5 +463,33 @@
 <script>window.SM_PRESET = {"frameType":"framed","size":"4050"};</script>
 <script src="assets/starmap.js?v=19" defer></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
+<!-- SKN_GTAG_BAR:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ. -->
+<div class="skn-consent" id="skn-consent" role="region" aria-label="Cookie choice">
+  <p>We use cookies only to measure whether our ads work. Nothing is stored until you choose.
+     See our <a href="privacy.html">Privacy Policy</a>.</p>
+  <span>
+    <button class="yes" id="skn-consent-yes">Accept</button>
+    <button id="skn-consent-no">Decline</button>
+  </span>
+</div>
+<script>
+  (function () {
+    var bar = document.getElementById('skn-consent');
+    var saved = null;
+    try { saved = localStorage.getItem('skn_consent'); } catch (e) {}
+    if (!saved) bar.classList.add('on');
+    function decide(ok) {
+      try { localStorage.setItem('skn_consent', ok ? 'granted' : 'denied'); } catch (e) {}
+      if (ok) gtag('consent', 'update', {
+        'ad_storage': 'granted', 'ad_user_data': 'granted',
+        'ad_personalization': 'granted', 'analytics_storage': 'granted'
+      });
+      bar.classList.remove('on');
+    }
+    document.getElementById('skn-consent-yes').onclick = function () { decide(true); };
+    document.getElementById('skn-consent-no').onclick = function () { decide(false); };
+  })();
+</script>
+<!-- SKN_GTAG_BAR:END -->
 </body>
 </html>
