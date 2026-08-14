@@ -118,6 +118,9 @@
   background:var(--night-deep); border:1px solid rgba(201,169,97,.3); border-radius:3px; max-height:210px; overflow:auto; }
 #sm-place-results li { padding:.6rem .85rem; font-family:var(--sans); font-size:.9rem; color:var(--moon-sub); cursor:pointer; }
 #sm-place-results li:hover { background:var(--night-hi); color:var(--moon); }
+.sm-place-echo { font-family:var(--sans); font-size:.74rem; letter-spacing:.02em; margin-top:.3rem;
+  color:var(--moon-faint); min-height:1.1em; }
+.sm-place-echo.warn { color:#e0a94a; }
 
 .sm-swatches { display:flex; flex-wrap:wrap; gap:.55rem; }
 .sm-theme { width:44px; height:44px; border-radius:50%; border:2px solid transparent; cursor:pointer; position:relative; }
@@ -221,6 +224,16 @@
   border:1px solid rgba(201,169,97,.5); border-radius:2rem; padding:.5rem 1rem; cursor:pointer;
   display:inline-flex; align-items:center; gap:.4rem; transition:background .2s, border-color .2s, color .2s; }
 .sm-film-sound:hover { background:rgba(11,23,51,.85); border-color:var(--gold); color:var(--gold); }
+/* сетка цен (#prices) — разметка генерится, см. маркеры SM_PRICE_GRID */
+.sm-pricegrid { display:grid; grid-template-columns:repeat(3,1fr); gap:.9rem; margin-top:2rem; }
+@media (max-width:820px){ .sm-pricegrid { grid-template-columns:1fr; } }
+.sm-pg-cell { display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap;
+  padding:1.1rem 1.25rem; border:1px solid rgba(201,169,97,.25); border-radius:3px;
+  text-decoration:none; transition:border-color .2s, background .2s; }
+.sm-pg-cell:hover { border-color:var(--gold); background:rgba(201,169,97,.05); }
+.sm-pg-fmt { font-family:var(--serif); font-size:1.05rem; color:var(--moon); }
+.sm-pg-size { font-family:var(--sans); font-weight:300; font-size:.85rem; color:var(--moon-sub); }
+.sm-pg-price { font-family:var(--serif); font-size:1.15rem; color:var(--gold); margin-left:auto; }
 </style>
 <!-- SKN_GTAG_HEAD:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ.
      Consent Mode v2: до согласия куки не пишутся (UK PECR reg.6). -->
@@ -327,6 +340,10 @@
       <div class="sm-field">
         <label for="sm-place">Place</label>
         <input type="text" id="sm-place" placeholder="City, country" autocomplete="off">
+        <!-- ⚠ 14.08.2026: строка показывает, какое место РЕАЛЬНО применено к карте.
+             Без неё расхождение «в поле одно, в расчёте другое» было невидимым и
+             уехало в живой заказ. Генерится starmap.js/moon.js, руками не править. -->
+        <div class="sm-place-echo" id="sm-place-echo"></div>
         <ul id="sm-place-results" hidden></ul>
       </div>
       <div class="sm-field">
@@ -404,6 +421,29 @@
 
 
 
+
+<section class="sm-section" id="prices">
+  <div class="container">
+    <div class="section-kicker sm-kicker">Sizes &amp; prices</div>
+    <h2>Nine ways to hang your night.</h2>
+    <!-- SM_PRICE_GRID:START — генерится gen_product_pages.py из ITEMS фида, РУКАМИ НЕ ПРАВИТЬ.
+         Цена здесь обязана совпадать с фидом и страницей товара: за расхождение
+         Merchant Center выдал Misrepresentation 05.08.2026. -->
+    <div class="sm-pricegrid">
+      <a class="sm-pg-cell" href="product-skn-print-3040.html"><span class="sm-pg-fmt">Print</span><span class="sm-pg-size">30×40 cm</span><span class="sm-pg-price">£26.99</span></a>
+      <a class="sm-pg-cell" href="product-skn-print-4050.html"><span class="sm-pg-fmt">Print</span><span class="sm-pg-size">40×50 cm</span><span class="sm-pg-price">£29.99</span></a>
+      <a class="sm-pg-cell" href="product-skn-print-5070.html"><span class="sm-pg-fmt">Print</span><span class="sm-pg-size">50×70 cm</span><span class="sm-pg-price">£32.99</span></a>
+      <a class="sm-pg-cell" href="product-skn-framed-3040.html"><span class="sm-pg-fmt">Framed</span><span class="sm-pg-size">30×40 cm</span><span class="sm-pg-price">£44.99</span></a>
+      <a class="sm-pg-cell" href="product-skn-framed-4050.html"><span class="sm-pg-fmt">Framed</span><span class="sm-pg-size">40×50 cm</span><span class="sm-pg-price">£52.99</span></a>
+      <a class="sm-pg-cell" href="product-skn-framed-5070.html"><span class="sm-pg-fmt">Framed</span><span class="sm-pg-size">50×70 cm</span><span class="sm-pg-price">£59.99</span></a>
+      <a class="sm-pg-cell" href="product-skn-classic-3040.html"><span class="sm-pg-fmt">Classic Frame</span><span class="sm-pg-size">30×40 cm</span><span class="sm-pg-price">£59.99</span></a>
+      <a class="sm-pg-cell" href="product-skn-classic-4050.html"><span class="sm-pg-fmt">Classic Frame</span><span class="sm-pg-size">40×50 cm</span><span class="sm-pg-price">£69.99</span></a>
+      <a class="sm-pg-cell" href="product-skn-classic-5070.html"><span class="sm-pg-fmt">Classic Frame</span><span class="sm-pg-size">50×70 cm</span><span class="sm-pg-price">£79.99</span></a>
+    </div>
+    <!-- SM_PRICE_GRID:END -->
+    <p class="sm-occ-more">Every price includes free UK delivery. Made to order in the UK and dispatched in 2–4 working days.</p>
+  </div>
+</section>
 
 
 
@@ -530,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 </script>
-<script src="assets/moon.js?v=1" defer></script>
+<script src="assets/moon.js?v=2" defer></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
 <!-- SKN_GTAG_BAR:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ. -->
 <div class="skn-consent" id="skn-consent" role="region" aria-label="Cookie choice">

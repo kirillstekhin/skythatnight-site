@@ -116,6 +116,9 @@
   background:var(--night-deep); border:1px solid rgba(201,169,97,.3); border-radius:3px; max-height:210px; overflow:auto; }
 #sm-place-results li { padding:.6rem .85rem; font-family:var(--sans); font-size:.9rem; color:var(--moon-sub); cursor:pointer; }
 #sm-place-results li:hover { background:var(--night-hi); color:var(--moon); }
+.sm-place-echo { font-family:var(--sans); font-size:.74rem; letter-spacing:.02em; margin-top:.3rem;
+  color:var(--moon-faint); min-height:1.1em; }
+.sm-place-echo.warn { color:#e0a94a; }
 
 .sm-swatches { display:flex; flex-wrap:wrap; gap:.55rem; }
 .sm-theme { width:44px; height:44px; border-radius:50%; border:2px solid transparent; cursor:pointer; position:relative; }
@@ -368,6 +371,10 @@
       <div class="sm-field">
         <label for="sm-place">Place</label>
         <input type="text" id="sm-place" placeholder="City, country" autocomplete="off">
+        <!-- ⚠ 14.08.2026: строка показывает, какое место РЕАЛЬНО применено к карте.
+             Без неё расхождение «в поле одно, в расчёте другое» было невидимым и
+             уехало в живой заказ. Генерится starmap.js/moon.js, руками не править. -->
+        <div class="sm-place-echo" id="sm-place-echo"></div>
         <ul id="sm-place-results" hidden></ul>
       </div>
       <div class="sm-field">
@@ -461,7 +468,7 @@
   </div>
 </footer>
 <script>window.MN_PRESET = {"frameType":"print","size":"3040"};</script>
-<script src="assets/moon.js?v=1" defer></script>
+<script src="assets/moon.js?v=2" defer></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
 <!-- SKN_GTAG_BAR:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ. -->
 <div class="skn-consent" id="skn-consent" role="region" aria-label="Cookie choice">

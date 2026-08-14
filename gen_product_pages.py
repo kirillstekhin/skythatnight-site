@@ -28,7 +28,7 @@ idx = open(os.path.join(HERE, "index.html")).read()
 
 STYLE = re.search(r"<style>(.*?)</style>", idx, re.S).group(1)
 CONFIG = re.search(r'(<section class="sm-config" id="design">.*?</section>)', idx, re.S).group(1)
-CACHE = "v=19"
+CACHE = "v=20"
 
 _spec = importlib.util.spec_from_file_location("feed", os.path.join(HERE, "gen_product_feed.py"))
 _feed = importlib.util.module_from_spec(_spec)
@@ -56,7 +56,10 @@ PRODUCTS = {
     "moon": dict(
         items=_feed.MOON_ITEMS,
         config=re.search(r'(<section class="sm-config" id="design">.*?</section>)', _moon_html, re.S).group(1),
-        script="moon.js", preset_var="MN_PRESET", cache="v=1",
+        # ⚠ версию кэша НЕ хардкодим: она живёт в moon.html (его пишет gen_moon_page.py).
+        # Разъедется — лунные лендинги отдадут СТАРЫЙ moon.js, и фикс до них не доедет.
+        script="moon.js", preset_var="MN_PRESET",
+        cache=re.search(r"moon\.js\?(v=\d+)", _moon_html).group(1),
         kind="Moon Phase Print",
         h1=lambda size: f"The Moon of your night, {size.replace(' cm', ' centimetres')}",
         blurb="The real Moon in the true phase of your date — rendered from NASA lunar "

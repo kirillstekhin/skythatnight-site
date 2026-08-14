@@ -427,37 +427,126 @@ function renderFrameColors() {
 }
 
 function attachGeocode() {
+  /* ⚠ БАГ, ПОЙМАННЫЙ НА ЖИВОМ ЗАКАЗЕ 14.08.2026 (David Simmons, £26.99).
+     Раньше координаты применялись ТОЛЬКО по клику на подсказку. Человек набирал
+     «Berwick», подсказку не нажимал и уходил дальше — в поле стоял Berwick, а state
+     хранил координаты предыдущего места (у него — Санторини, оставшийся от игры с
+     интерфейсом). В дизайн-код уходили СТАРЫЕ координаты, и на постере под словом
+     BERWICK печаталось «36.3932°N 25.4615°E». Заказ спасло только окно тишины.
+     Лечение из трёх частей:
+       1. под полем ВСЕГДА видно, какое место реально применено (с координатами);
+       2. Enter и уход из поля применяют первую подсказку сами — «набрал и ушёл»
+          больше не оставляет расхождения;
+       3. если текст так и не удалось привязать к точке, поле возвращается к
+          подтверждённому месту, а не притворяется, что выбор состоялся. */
   const input = document.getElementById('sm-place');
   const list  = document.getElementById('sm-place-results');
-  let timer = null;
+  const echo  = document.getElementById('sm-place-echo');
+  let timer = null, lastResults = [], appliedAt = 0;
+
+  function showEcho(warn) {
+    if (!echo) return;
+    echo.textContent = (warn ? '⚠ ' : '✦ ') + state.place +
+      '  ·  ' + Math.abs(state.lat).toFixed(4) + (state.lat >= 0 ? '°N ' : '°S ') +
+      Math.abs(state.lon).toFixed(4) + (state.lon >= 0 ? '°E' : '°W');
+    echo.className = warn ? 'sm-place-echo warn' : 'sm-place-echo';
+  }
+
+  function apply(res) {
+    state.place = [res.name, res.country].filter(Boolean).join(', ');
+    state.lat = res.latitude; state.lon = res.longitude;
+    state.iana = res.timezone || 'UTC';
+    input.value = state.place;
+    list.hidden = true;
+    appliedAt = Date.now();
+    showEcho(false);
+    refresh();
+  }
+
+  /* ⚠ Автовыбор БЕЗ клика обязан быть консервативным. Проверка фикса 14.08: на запрос
+     «Berwick» геокодер первым отдаёт Berwick в Пенсильвании, а покупатель почти наверняка
+     имел в виду Berwick-upon-Tweed — доставка у нас бесплатная только по UK, и все заказы
+     до сих пор были британские. Поэтому при АВТОприменении предпочитаем UK-результат,
+     если он есть в выдаче. Явный клик по подсказке этим правилом не трогается: человек
+     выбрал сам, и спорить с ним нельзя. */
+  function preferred(results) {
+    return results.find(r => r.country_code === 'GB') || results[0];
+  }
+
+  /* ⚠ БРИТАНСКИЕ МЕСТА ПЕРВЫМИ (14.08.2026). Геокодер на запрос «Berwick» отдаёт ТОЛЬКО
+     американские города — Berwick-upon-Tweed в общей выдаче не появляется вообще, и
+     покупатель физически не может его выбрать. При этом тот же запрос с countryCode=GB
+     находит его сразу. Поэтому спрашиваем дважды и склеиваем: сначала UK, затем мир.
+     Для не-британских запросов UK-выдача пустая (проверено на «Santorini» — 0), так что
+     ничего не ломается. Все заказы до сих пор были британские, доставка бесплатна по UK. */
+  async function search(q) {
+    const url = extra => `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=en&format=json${extra}`;
+    const get = async u => { try { const r = await fetch(u); return (await r.json()).results || []; } catch (e) { return []; } };
+    const [uk, world] = await Promise.all([get(url('&countryCode=GB')), get(url(''))]);
+    const seen = new Set(), out = [];
+    for (const r of uk.concat(world)) {
+      const k = r.latitude.toFixed(3) + ',' + r.longitude.toFixed(3);
+      if (seen.has(k)) continue;
+      seen.add(k); out.push(r);
+    }
+    return out.slice(0, 6);
+  }
+
   input.addEventListener('input', () => {
     clearTimeout(timer);
     const q = input.value.trim();
     if (q.length < 2) { list.hidden = true; return; }
+    /* пока текст не привязан к точке — честно говорим, что применено ещё старое место */
+    if (q !== state.place) showEcho(true);
     timer = setTimeout(async () => {
-      try {
-        const r = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=en&format=json`);
-        const j = await r.json();
-        list.innerHTML = '';
-        (j.results || []).forEach(res => {
-          const label = [res.name, res.admin1, res.country].filter(Boolean).join(', ');
-          const li = document.createElement('li');
-          li.textContent = label;
-          li.addEventListener('click', () => {
-            state.place = [res.name, res.country].filter(Boolean).join(', ');
-            state.lat = res.latitude; state.lon = res.longitude;
-            state.iana = res.timezone || 'UTC';
-            input.value = state.place;
-            list.hidden = true;
-            refresh();
-          });
-          list.appendChild(li);
-        });
-        list.hidden = (j.results || []).length === 0;
-      } catch (e) { list.hidden = true; }
+      lastResults = await search(q);
+      list.innerHTML = '';
+      lastResults.forEach(res => {
+        const li = document.createElement('li');
+        li.textContent = [res.name, res.admin1, res.country].filter(Boolean).join(', ');
+        li.addEventListener('click', () => apply(res));
+        list.appendChild(li);
+      });
+      list.hidden = lastResults.length === 0;
     }, 250);
   });
-  document.addEventListener('click', e => { if (!list.contains(e.target) && e.target !== input) list.hidden = true; });
+
+  /* Enter — выбрать первое совпадение, не заставляя целиться мышью */
+  input.addEventListener('keydown', async e => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const q = input.value.trim();
+    if (!q || q === state.place) { list.hidden = true; return; }
+    const res = lastResults.length ? lastResults : await search(q);
+    if (res.length) apply(preferred(res)); else revert();
+  });
+
+  /* Ушёл из поля, ничего не выбрав — применяем сами или откатываем.
+     ⚠ Нельзя выходить по `list.hidden`: при клике МЫШЬЮ по подсказке blur срабатывает
+     РАНЬШЕ click, и список ещё открыт — проверка «список открыт → выйти» глушила
+     автоприменение вообще (поймано при проверке фикса 14.08). Поэтому ждём 250 мс и
+     смотрим на флаг: успел ли клик применить место за это время. */
+  input.addEventListener('blur', () => {
+    const left = Date.now();
+    setTimeout(async () => {
+      if (appliedAt > left) return;           // клик по подсказке уже всё сделал
+      const q = input.value.trim();
+      if (!q || q === state.place) return;
+      const res = lastResults.length ? lastResults : await search(q);
+      if (res.length) apply(preferred(res)); else revert();
+    }, 250);
+  });
+
+  function revert() {
+    input.value = state.place;
+    list.hidden = true;
+    showEcho(false);
+  }
+
+  document.addEventListener('click', e => {
+    if (!list.contains(e.target) && e.target !== input) list.hidden = true;
+  });
+  showEcho(false);
 }
 
 function attachControls() {
