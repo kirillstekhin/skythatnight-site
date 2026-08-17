@@ -296,6 +296,11 @@ def update_index():
     lo, hi = min(x[3] for x in ITEMS), max(x[3] for x in ITEMS)
     s, n = re.subn(r'("lowPrice":")[\d.]+(","highPrice":")[\d.]+(")',
                    lambda m: f"{m.group(1)}{lo:.2f}{m.group(2)}{hi:.2f}{m.group(3)}", s)
+    # ⚠ 17.08.2026: Search Console просит offerCount в AggregateOffer (non-critical
+    # «Missing field offerCount»). Число оферов = 9 вариантов матрицы этой страницы.
+    if '"offerCount"' not in s:
+        s = s.replace('"@type":"AggregateOffer",',
+                      f'"@type":"AggregateOffer","offerCount":"{len(ITEMS)}",', 1)
     if n != 1:
         raise SystemExit(f"⛔ AggregateOffer на главной не найден (совпадений {n})")
     open(p, "w").write(s)
