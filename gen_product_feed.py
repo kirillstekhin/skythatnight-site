@@ -74,6 +74,9 @@ def additional_images(fmt, moon=False):
         names.insert(1, "frames.jpg")
     urls = [f"{SITE}/assets/starmap/gallery/{n}" for n in names]
     urls.append(f"{SITE}/assets/starmap/occ-met.jpg")
+    # 18.08: props-сцены поводов (кольца/торт; рамы = референсы Prodigi) — Merchant крутит их
+    # каруселью в карточке. Только звёздным позициям: на сценах звёздная карта, луне нельзя.
+    urls += [f"{SITE}/assets/starmap/props-wedding.jpg", f"{SITE}/assets/starmap/props-birthday.jpg"]
     return "\n".join(f"    <g:additional_image_link>{u}</g:additional_image_link>" for u in urls)
 
 
