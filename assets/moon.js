@@ -190,6 +190,48 @@ function tzOffsetHours(iana, dateStr, timeStr) {
   } catch (e) { return Math.round(state.lon / 15); }
 }
 
+/* ── ГЕЙТ МЕСТА ПЕРЕД ЧЕКАУТОМ (25.08.2026, кейс Emily) — зеркало starmap.js:
+   generic-дефолт (Лондон) не уезжает в оплату молча; подробный разбор в starmap.js. */
+let placeConfirmed = false;
+let placeGateBox = null, placeGateGo = null;
+
+function hidePlaceGate() { if (placeGateBox) placeGateBox.hidden = true; }
+
+function askPlaceConfirm(onKeep) {
+  const echo = document.getElementById('sm-place-echo');
+  const input = document.getElementById('sm-place');
+  const anchor = echo || input;
+  if (!anchor) { placeConfirmed = true; onKeep(); return; }   // разметки нет — покупку не запираем
+  placeGateGo = onKeep;
+  if (!placeGateBox) {
+    placeGateBox = document.createElement('div');
+    placeGateBox.className = 'sm-place-gate';
+    placeGateBox.style.cssText =
+      'margin:.55rem 0;padding:.7rem .9rem;border:1px solid #c9a961;border-radius:6px;' +
+      'font-size:.9rem;line-height:1.5;';
+    placeGateBox.innerHTML =
+      'One check before payment — the moon is calculated for <strong></strong>. Is that your place?' +
+      '<div style="margin-top:.55rem;display:flex;gap:.6rem;flex-wrap:wrap">' +
+      '<button type="button" class="sm-gate-keep" style="background:#c9a961;color:#111;border:0;' +
+      'padding:.45rem .95rem;border-radius:4px;cursor:pointer;font:inherit">Yes — that’s right</button>' +
+      '<button type="button" class="sm-gate-change" style="background:transparent;color:inherit;' +
+      'border:1px solid currentColor;padding:.45rem .95rem;border-radius:4px;cursor:pointer;' +
+      'font:inherit;opacity:.85">No — let me type it</button></div>';
+    anchor.insertAdjacentElement('afterend', placeGateBox);
+    placeGateBox.querySelector('.sm-gate-keep').addEventListener('click', () => {
+      placeConfirmed = true; hidePlaceGate();
+      if (placeGateGo) placeGateGo();
+    });
+    placeGateBox.querySelector('.sm-gate-change').addEventListener('click', () => {
+      hidePlaceGate();
+      if (input) { input.focus(); input.select(); }
+    });
+  }
+  placeGateBox.querySelector('strong').textContent = state.place;
+  placeGateBox.hidden = false;
+  placeGateBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 /* MN2 = лунный продукт; остальная грамматика идентична SM2 — их парсит один fulfil.parse_code. */
 function designCode() {
   const d = state.dateStr.replace(/-/g, '');
@@ -360,6 +402,8 @@ function attachGeocode() {
     input.value = state.place;
     list.hidden = true;
     appliedAt = Date.now();
+    placeConfirmed = true;      // место привязано человеком — гейт перед оплатой пройден
+    hidePlaceGate();
     showEcho(false);
     refresh();
   }
@@ -473,20 +517,28 @@ function attachControls() {
     refresh();
   }));
   document.getElementById('sm-buy').addEventListener('click', () => {
-    const link = PAYMENT_LINKS[formatToken()];
-    const code = designCode();
-    if (link) {
-      window.location.href = `${link}?client_reference_id=${encodeURIComponent(code)}`;
-    } else {
-      const box = document.getElementById('sm-checkout-note');
-      box.hidden = false;
-      box.querySelector('code').textContent = code;
-    }
+    const go = () => {
+      const link = PAYMENT_LINKS[formatToken()];
+      const code = designCode();
+      if (link) {
+        window.location.href = `${link}?client_reference_id=${encodeURIComponent(code)}`;
+      } else {
+        const box = document.getElementById('sm-checkout-note');
+        box.hidden = false;
+        box.querySelector('code').textContent = code;
+      }
+    };
+    /* 300 мс — даём blur-автоприменению поля места успеть (см. starmap.js) */
+    setTimeout(() => { placeConfirmed ? go() : askPlaceConfirm(go); }, 300);
   });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  if (window.MN_PRESET) Object.assign(state, window.MN_PRESET);
+  if (window.MN_PRESET) {
+    Object.assign(state, window.MN_PRESET);
+    /* пресет места страницей = осознанный выбор, гейт не нужен */
+    if ('place' in window.MN_PRESET || 'lat' in window.MN_PRESET) placeConfirmed = true;
+  }
   document.getElementById('sm-date').value = state.dateStr;
   document.getElementById('sm-time').value = state.timeStr;
   document.getElementById('sm-place').value = state.place;
