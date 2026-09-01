@@ -632,6 +632,17 @@ function attachControls() {
     refresh();                                    // якорь #design сам доскроллит
   }));
   // свотчи цвета рамы динамические — обработчики вешает renderFrameColors()
+  
+  // CRO 01.09.2026: сильнейший наш процесс — превью до печати — теперь виден у кнопки
+  (() => {
+    const btn = document.getElementById('sm-buy');
+    if (btn && !document.querySelector('.sm-preview-note')) {
+      const n = document.createElement('div');
+      n.className = 'sm-preview-note';
+      n.textContent = "\u2713\u00a0 Free preview by email before we print \u2014 we'll fix anything";
+      btn.insertAdjacentElement('afterend', n);
+    }
+  })();
   document.getElementById('sm-buy').addEventListener('click', () => {
     const go = () => {
       const link = PAYMENT_LINKS[formatToken()];

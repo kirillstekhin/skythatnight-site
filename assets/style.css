@@ -2080,3 +2080,22 @@ html:has(.sm-night) { background: #081124; }
 .sm-night .info-content .info-highlight { background: var(--night-hi); border: 1px solid rgba(201,169,97,.2); }
 .sm-night .info-content .info-highlight p { color: var(--moon-sub); }
 .sm-night .info-content .info-highlight strong { color: var(--moon); }
+
+/* ═══ CRO 01.09.2026: превью-бейдж у Buy · night-хедер на мобиле · компактный cookie-бар ·
+   якорь #design не ныряет под sticky-хедер · блок отзыва ═══ */
+.sm-preview-note { margin-top:.65rem; font-size:.8rem; letter-spacing:.02em;
+  color:var(--gold,#c9a961); text-align:center; }
+#design { scroll-margin-top: 140px; }
+@media (max-width: 760px) {
+  #design { scroll-margin-top: 96px; }
+  body.sm-night header, .sm-night header { background: var(--night-deep, #081124); }
+  body .skn-consent { padding: .55rem .9rem; gap: .5rem; }
+  body .skn-consent p { font-size: .78rem; line-height: 1.35; }
+  body .skn-consent button { padding: .45rem .85rem; }
+}
+.sm-review { margin: 0 auto; max-width: 660px; text-align: center; }
+.sm-review .stars { color: var(--gold,#c9a961); letter-spacing: .3em; font-size: 1.05rem; }
+.sm-review blockquote { font-family: var(--serif); font-size: 1.3rem; line-height: 1.55;
+  font-style: italic; margin: .85rem 0 .6rem; }
+.sm-review .who { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--moon-sub, #8fb0e6); }
