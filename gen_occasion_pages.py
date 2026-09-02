@@ -288,6 +288,7 @@ def product_jsonld(o, url, ogimg):
             "name": o["metatitle"], "description": o["metadesc"], "image": ogimg,
             "brand": {"@type": "Brand", "name": "Sky, That Night"},
             "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": "26.99",
+                       "validFrom": "2026-08-01",
                        "availability": "https://schema.org/InStock", "url": url,
                        "shippingDetails": {"@type": "OfferShippingDetails",
                            "shippingRate": {"@type": "MonetaryAmount", "value": "0", "currency": "GBP"},

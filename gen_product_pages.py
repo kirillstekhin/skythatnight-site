@@ -152,7 +152,7 @@ def jsonld(prod, pid, fmt, size, price, url, img):
 "description":"{esc(P['jsonld_desc'])} {esc(FMT[fmt]['what'])}",
 "offers":{{"@type":"Offer","price":"{price:.2f}","priceCurrency":"GBP",
 "availability":"https://schema.org/InStock","itemCondition":"https://schema.org/NewCondition",
-"url":"{url}","priceValidUntil":"2027-12-31",
+"url":"{url}","validFrom":"2026-08-01","priceValidUntil":"2027-12-31",
 "seller":{{"@type":"Organization","name":"Shopcienty Limited"}},
 "shippingDetails":{{"@type":"OfferShippingDetails",
 "shippingRate":{{"@type":"MonetaryAmount","value":"0","currency":"GBP"}},

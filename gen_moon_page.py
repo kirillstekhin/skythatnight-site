@@ -65,7 +65,7 @@ def main():
          '"image":"https://www.skythatnight.com/assets/starmap/hero-moon.jpg","sku":"moon-print",'
          '"brand":{"@type":"Brand","name":"Sky, That Night"},'
          '"offers":{"@type":"AggregateOffer","lowPrice":"26.99","highPrice":"79.99",'
-         '"priceCurrency":"GBP","availability":"https://schema.org/InStock",'
+         '"priceCurrency":"GBP","availability":"https://schema.org/InStock","validFrom":"2026-08-01",'
          '"url":"https://www.skythatnight.com/moon.html"}}\n</script>'),
         h, count=1, flags=re.S)
 
