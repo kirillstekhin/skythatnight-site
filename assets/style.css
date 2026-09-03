@@ -2099,3 +2099,10 @@ html:has(.sm-night) { background: #081124; }
   font-style: italic; margin: .85rem 0 .6rem; }
 .sm-review .who { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase;
   color: var(--moon-sub, #8fb0e6); }
+.sm-reviews-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2.4rem;
+  max-width: 1020px; margin: 0 auto; align-items: start; }
+.sm-reviews-row .sm-review { max-width: none; }
+.sm-reviews-row .sm-review blockquote { font-size: 1.12rem; }
+@media (max-width: 720px) {
+  .sm-reviews-row { grid-template-columns: 1fr; gap: 2.4rem; }
+}
