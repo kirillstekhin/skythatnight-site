@@ -222,7 +222,7 @@ def night_page(p):
       <p class="fn-story">{esc(p["pin_desc"])}</p>
       <p class="fn-facts"><b>{esc(n["place"])}</b> · {date_h} · {n["time"]} local · {coords(n["lat"], n["lon"])}</p>
       <a class="sm-cta" href="#design">Now map your own night — from £26.99</a>
-      <span class="sm-cta-sub">The configurator below is already set to this sky. Change the date to yours.</span>
+      <span class="sm-cta-sub">Set to this famous sky below — or map your own date and place in two taps.</span>
     </div>
     <div>
       <img src="{img}" alt="{esc(p["pin_title"])} — star map art print">
@@ -239,6 +239,27 @@ def night_page(p):
     from astronomical data for {date_h}, {n["time"]} local time.</p>
   </div>
 </section>
+
+<section class="sm-section" id="make-it-yours" style="padding-bottom:0">
+  <div class="container" style="text-align:center;max-width:720px">
+    <div class="section-kicker sm-kicker">Your turn</div>
+    <h2>Make it your night.</h2>
+    <p style="opacity:.85;margin:.4rem auto 1.2rem;max-width:56ch">Below, the map is set to this famous sky. Start fresh with your own date and place — the night you met, a birthday, a wedding — from £26.99. Or keep this historic sky as a print.</p>
+    <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap">
+      <a class="sm-cta" href="#design" id="mk-own">Map my own night — from £26.99</a>
+      <a href="#design" style="align-self:center;color:var(--gold,#c9a961);text-decoration:none;border-bottom:1px solid;font-size:.95rem">Keep this historic sky →</a>
+    </div>
+  </div>
+</section>
+<script>
+/* Night-страницы приходят с пресетом ИСТОРИЧЕСКОЙ ночи (и рамой Classic) — зритель Shorts
+   видел чужое небо за £59.99 и уходил с чекаута (разбор 07.09: 6 брошенных сессий).
+   Кнопка сбрасывает конфигуратор на «своё небо»: сегодня, без места (гейт места спросит),
+   Print 30×40 £26.99, тема midnight. Пресет остаётся вторым путём. */
+document.getElementById('mk-own').addEventListener('click', function () {{
+  if (window.SM_RESET_OWN) window.SM_RESET_OWN();   // хук живёт в starmap.js (IIFE)
+}});
+</script>
 
 {CONFIG}
 

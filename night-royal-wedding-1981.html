@@ -320,7 +320,7 @@
       <p class="fn-story">29 July 1981. 750 million people watched the wedding; that evening London danced under this sky — street parties, fireworks over Hyde Park, and a waning crescent rising late. Every star in its true position. What's your night?</p>
       <p class="fn-facts"><b>London, United Kingdom</b> · 29 July 1981 · 22:00 local · 51.5074° N · 0.1278° W</p>
       <a class="sm-cta" href="#design">Now map your own night — from £26.99</a>
-      <span class="sm-cta-sub">The configurator below is already set to this sky. Change the date to yours.</span>
+      <span class="sm-cta-sub">Set to this famous sky below — or map your own date and place in two taps.</span>
     </div>
     <div>
       <img src="assets/social/royal-wedding-morph.png" alt="The sky over London the night of the royal wedding, 1981 — star map art print">
@@ -337,6 +337,27 @@
     from astronomical data for 29 July 1981, 22:00 local time.</p>
   </div>
 </section>
+
+<section class="sm-section" id="make-it-yours" style="padding-bottom:0">
+  <div class="container" style="text-align:center;max-width:720px">
+    <div class="section-kicker sm-kicker">Your turn</div>
+    <h2>Make it your night.</h2>
+    <p style="opacity:.85;margin:.4rem auto 1.2rem;max-width:56ch">Below, the map is set to this famous sky. Start fresh with your own date and place — the night you met, a birthday, a wedding — from £26.99. Or keep this historic sky as a print.</p>
+    <div style="display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap">
+      <a class="sm-cta" href="#design" id="mk-own">Map my own night — from £26.99</a>
+      <a href="#design" style="align-self:center;color:var(--gold,#c9a961);text-decoration:none;border-bottom:1px solid;font-size:.95rem">Keep this historic sky →</a>
+    </div>
+  </div>
+</section>
+<script>
+/* Night-страницы приходят с пресетом ИСТОРИЧЕСКОЙ ночи (и рамой Classic) — зритель Shorts
+   видел чужое небо за £59.99 и уходил с чекаута (разбор 07.09: 6 брошенных сессий).
+   Кнопка сбрасывает конфигуратор на «своё небо»: сегодня, без места (гейт места спросит),
+   Print 30×40 £26.99, тема midnight. Пресет остаётся вторым путём. */
+document.getElementById('mk-own').addEventListener('click', function () {
+  if (window.SM_RESET_OWN) window.SM_RESET_OWN();   // хук живёт в starmap.js (IIFE)
+});
+</script>
 
 <section class="sm-config" id="design">
   <div class="container">
@@ -503,7 +524,7 @@
   v.addEventListener('seeking', function () { v.dataset.userTouched = 1; });
 })();
 </script>
-<script src="assets/starmap.js?v=22" defer></script>
+<script src="assets/starmap.js?v=23" defer></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
 <!-- SKN_GTAG_BAR:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ. -->
 <div class="skn-consent" id="skn-consent" role="region" aria-label="Cookie choice">

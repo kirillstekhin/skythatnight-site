@@ -691,4 +691,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   attachControls();
   refresh();
 });
+
+/* «Map my own night» (07.09.2026): night-страницы приходят с пресетом исторической ночи и рамой
+   Classic — зритель Shorts видел чужое небо за £59.99 и уходил с чекаута (6 брошенных сессий/нед).
+   Публичный сброс на «своё небо»: сегодня, без места (гейт места спросит сам), Print 30×40,
+   midnight. Живёт ВНУТРИ IIFE — снаружи state/refresh/placeConfirmed недоступны. */
+window.SM_RESET_OWN = function () {
+  var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); };
+  state.dateStr = d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+  state.timeStr = '21:00';
+  state.place = ''; state.dedication = 'Sky That Night';
+  state.theme = 'midnight'; state.frameType = 'print'; state.size = '3040'; state.frameColor = 'white';
+  placeConfirmed = false;
+  var set = function (id, v) { var el = document.getElementById(id); if (el) el.value = v; };
+  set('sm-date', state.dateStr); set('sm-time', state.timeStr); set('sm-place', ''); set('sm-dedication', '');
+  var echo = document.getElementById('sm-place-echo'); if (echo) echo.textContent = '';
+  document.querySelectorAll('.sm-theme').forEach(function (b) { b.classList.toggle('active', b.dataset.theme === 'midnight'); });
+  document.querySelectorAll('.sm-format').forEach(function (b) { b.classList.toggle('active', b.dataset.frametype === 'print'); });
+  document.querySelectorAll('.sm-size').forEach(function (b) { b.classList.toggle('active', b.dataset.size === '3040'); });
+  refresh();
+  setTimeout(function () { var pl = document.getElementById('sm-place'); if (pl) pl.focus(); }, 600);
+};
 })();
