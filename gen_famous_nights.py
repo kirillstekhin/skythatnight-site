@@ -322,9 +322,12 @@ def hub_page():
     schema = ('<script type="application/ld+json">' + json.dumps({
         "@context": "https://schema.org", "@type": "ItemList",
         "name": "Famous Nights",
+        # ⚠️фильтр как у видимой сетки: occ-* постам страниц НЕТ — без него ItemList
+        # вёл Google на 9 фантомных night-occ-*.html (GSC 404-алерт 06.09.2026)
         "itemListElement": [{"@type": "ListItem", "position": i + 1,
                              "url": f'{BASE}/night-{p["slug"]}.html'}
-                            for i, p in enumerate(plan["posts"])],
+                            for i, p in enumerate(
+                                [p for p in plan["posts"] if p["slug"] in nights])],
     }) + "</script>")
     return head(title, desc, "famous-nights.html", ogimg, schema) + f"""
 {HEADER}
