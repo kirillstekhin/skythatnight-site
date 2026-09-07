@@ -234,6 +234,16 @@
 .sm-pg-fmt { font-family:var(--serif); font-size:1.05rem; color:var(--moon); }
 .sm-pg-size { font-family:var(--sans); font-weight:300; font-size:.85rem; color:var(--moon-sub); }
 .sm-pg-price { font-family:var(--serif); font-size:1.15rem; color:var(--gold); margin-left:auto; }
+
+/* ── сестринская студия Ortus (07.09.2026): деликатный перекрёстный блок ── */
+.sister-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.4rem; max-width:620px; margin:0 auto; }
+.sister-grid a { text-decoration:none; color:inherit; display:block; }
+.sister-grid img { width:100%; height:auto; display:block; border-radius:3px;
+  box-shadow:0 18px 44px rgba(0,0,0,.5), 0 0 0 1px rgba(201,169,97,.14); transition:transform .25s; }
+.sister-grid a:hover img { transform:translateY(-4px); }
+.sister-grid span { display:block; margin-top:.7rem; font-family:var(--sans); font-size:.82rem;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--gold,#c9a961); }
+@media (max-width:640px){ .sister-grid { grid-template-columns:1fr; max-width:320px; } }
 </style>
 <!-- SKN_GTAG_HEAD:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ.
      Consent Mode v2: до согласия куки не пишутся (UK PECR reg.6). -->
@@ -281,6 +291,7 @@
       <a href="#design">Design yours</a>
       <a href="#craft">How it works</a>
       <a href="famous-nights.html">Famous Nights</a>
+      <a href="https://ortusatelier.com/" target="_blank" rel="noopener">Ortus Atelier ↗</a>
       <a href="#faq">FAQ</a>
       <a href="contact.html">Contact</a>
     </nav>
@@ -530,6 +541,26 @@
         people about it.”</blockquote>
         <div class="who">Emily · Verified purchase · September 2026</div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="sm-section" id="sister">
+  <div class="container" style="text-align:center;max-width:760px">
+    <div class="section-kicker sm-kicker">From the same workshop</div>
+    <h2 style="margin-bottom:.6rem">Ortus Atelier</h2>
+    <p style="opacity:.85;max-width:56ch;margin:0 auto 1.6rem">Our sister studio, for the sky of the
+    minute you were born: birth charts drawn on real astronomy, and family constellations — everyone
+    you love as their true zodiac figure on one night sky.</p>
+    <div class="sister-grid">
+      <a href="https://ortusatelier.com/" target="_blank" rel="noopener">
+        <img src="assets/social/sister-natal.jpg" alt="Ortus Atelier birth chart print — copper bloom" loading="lazy">
+        <span>Birth charts →</span>
+      </a>
+      <a href="https://ortusatelier.com/family" target="_blank" rel="noopener">
+        <img src="assets/social/sister-family.jpg" alt="Ortus Atelier family constellations print" loading="lazy">
+        <span>Family constellations →</span>
+      </a>
     </div>
   </div>
 </section>
