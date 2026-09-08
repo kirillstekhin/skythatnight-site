@@ -529,7 +529,7 @@ function attachGeocode() {
      находит его сразу. Поэтому спрашиваем дважды и склеиваем: сначала UK, затем мир.
      Для не-британских запросов UK-выдача пустая (проверено на «Santorini» — 0), так что
      ничего не ломается. Все заказы до сих пор были британские, доставка бесплатна по UK. */
-  async function search(q) {
+  async function lookup(q) {
     const url = extra => `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=en&format=json${extra}`;
     const get = async u => { try { const r = await fetch(u); return (await r.json()).results || []; } catch (e) { return []; } };
     const [uk, world] = await Promise.all([get(url('&countryCode=GB')), get(url(''))]);
@@ -540,6 +540,17 @@ function attachGeocode() {
       seen.add(k); out.push(r);
     }
     return out.slice(0, 6);
+  }
+
+  /* ⚠ «CITY, UK» ЛОМАЛ ПРИВЯЗКУ (08.09.2026). open-meteo ищет по имени места: «Harrogate, UK»,
+     «Bristol, UK» → ПУСТО (при этом «London, England» находит). А плейсхолдер сам подсказывает
+     «City, country» — то есть самый естественный британский ввод молча оставлял место
+     непривязанным, и покупка упиралась в гейт места. Нет выдачи — повторяем по части до
+     запятой; UK-first в lookup сам поставит британский вариант первым. */
+  async function search(q) {
+    let out = await lookup(q);
+    if (!out.length && q.includes(',')) out = await lookup(q.split(',')[0].trim());
+    return out;
   }
 
   input.addEventListener('input', () => {

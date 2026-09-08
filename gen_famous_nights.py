@@ -318,7 +318,7 @@ document.getElementById('mk-own').addEventListener('click', function () {{
   v.addEventListener('seeking', function () {{ v.dataset.userTouched = 1; }});
 }})();
 </script>
-<script src="assets/starmap.js?v=14" defer></script>
+<script src="assets/starmap.js?v=24" defer></script>
 </body>
 </html>
 """
