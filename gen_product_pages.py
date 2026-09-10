@@ -28,7 +28,7 @@ idx = open(os.path.join(HERE, "index.html")).read()
 
 STYLE = re.search(r"<style>(.*?)</style>", idx, re.S).group(1)
 CONFIG = re.search(r'(<section class="sm-config" id="design">.*?</section>)', idx, re.S).group(1)
-CACHE = "v=20"
+CACHE = "v=27"
 
 _spec = importlib.util.spec_from_file_location("feed", os.path.join(HERE, "gen_product_feed.py"))
 _feed = importlib.util.module_from_spec(_spec)
@@ -226,7 +226,7 @@ def build(prod, pid, fmt, size, price, extra):
       <div class="pp-kicker">{esc(fmt)} · {esc(size)}</div>
       <h1 class="pp-h1">{esc(P['h1'](size))}</h1>
       <p class="pp-price">£{price:.2f}</p>
-      <p class="pp-avail">In stock · free UK delivery · made to order, dispatched in 2–4 working days</p>
+      <p class="pp-avail">In stock · free UK delivery, UK addresses only · made to order, dispatched in 2–4 working days</p>
       <p class="pp-what">{esc(info['what'])} {esc(P['blurb'])}</p>
       <ul class="pp-incl">
 {incl}

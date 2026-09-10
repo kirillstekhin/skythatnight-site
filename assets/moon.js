@@ -321,7 +321,7 @@ function refresh() {
   const ft = FRAME_TYPES[state.frameType];
   if (ft.colors && !(state.frameColor in ft.colors)) state.frameColor = Object.keys(ft.colors)[0];
   document.getElementById('sm-price').textContent = `£${PRICES[state.frameType][state.size].toFixed(2)}`;
-  document.getElementById('sm-price-note').textContent = ft.note + ' · free UK delivery included';
+  document.getElementById('sm-price-note').textContent = ft.note + ' · free UK delivery, UK addresses only';
   document.getElementById('sm-code').textContent = designCode();
   document.querySelectorAll('.sm-format').forEach(b => {
     b.querySelector('.f-price').textContent = `£${PRICES[b.dataset.frametype][state.size].toFixed(2)}`;

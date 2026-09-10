@@ -420,7 +420,7 @@ function refresh() {
   // отбракует уже ПОСЛЕ оплаты.
   if (ft.colors && !(state.frameColor in ft.colors)) state.frameColor = Object.keys(ft.colors)[0];
   document.getElementById('sm-price').textContent = `£${PRICES[state.frameType][state.size].toFixed(2)}`;
-  document.getElementById('sm-price-note').textContent = ft.note + ' · free UK delivery included';
+  document.getElementById('sm-price-note').textContent = ft.note + ' · free UK delivery, UK addresses only';
   document.getElementById('sm-code').textContent = designCode();
   // цены на кнопках формата — для выбранного размера
   document.querySelectorAll('.sm-format').forEach(b => {
