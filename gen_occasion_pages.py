@@ -292,8 +292,15 @@ def product_jsonld(o, url, ogimg):
                        "priceValidUntil": "2027-12-31",
                        "availability": "https://schema.org/InStock", "url": url,
                        "shippingDetails": {"@type": "OfferShippingDetails",
+                           "deliveryTime": {"@type": "ShippingDeliveryTime",
+                               "handlingTime": {"@type": "QuantitativeValue", "minValue": 2, "maxValue": 4, "unitCode": "DAY"},
+                               "transitTime": {"@type": "QuantitativeValue", "minValue": 1, "maxValue": 3, "unitCode": "DAY"}},
                            "shippingRate": {"@type": "MonetaryAmount", "value": "0", "currency": "GBP"},
-                           "shippingDestination": {"@type": "DefinedRegion", "addressCountry": "GB"}}}}
+                           "shippingDestination": {"@type": "DefinedRegion", "addressCountry": "GB"}},
+                       "hasMerchantReturnPolicy": {"@type": "MerchantReturnPolicy",
+                           "applicableCountry": "GB",
+                           "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted",
+                           "merchantReturnLink": "https://www.skythatnight.com/delivery.html"}}}
     return '<script type="application/ld+json">' + json.dumps(data, ensure_ascii=False) + '</script>'
 
 

@@ -155,6 +155,7 @@ def jsonld(prod, pid, fmt, size, price, url, img):
 "url":"{url}","validFrom":"2026-08-01","priceValidUntil":"2027-12-31",
 "seller":{{"@type":"Organization","name":"Shopcienty Limited"}},
 "shippingDetails":{{"@type":"OfferShippingDetails",
+"deliveryTime":{{"@type":"ShippingDeliveryTime","handlingTime":{{"@type":"QuantitativeValue","minValue":2,"maxValue":4,"unitCode":"DAY"}},"transitTime":{{"@type":"QuantitativeValue","minValue":1,"maxValue":3,"unitCode":"DAY"}}}},
 "shippingRate":{{"@type":"MonetaryAmount","value":"0","currency":"GBP"}},
 "shippingDestination":{{"@type":"DefinedRegion","addressCountry":"GB"}}}},
 "hasMerchantReturnPolicy":{{"@type":"MerchantReturnPolicy",

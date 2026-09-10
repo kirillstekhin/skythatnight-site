@@ -66,7 +66,7 @@ def main():
          '"brand":{"@type":"Brand","name":"Sky, That Night"},'
          '"offers":{"@type":"AggregateOffer","lowPrice":"26.99","highPrice":"79.99",'
          '"priceCurrency":"GBP","availability":"https://schema.org/InStock","validFrom":"2026-08-01","priceValidUntil":"2027-12-31",'
-         '"url":"https://www.skythatnight.com/moon.html"}}\n</script>'),
+         '"url":"https://www.skythatnight.com/moon.html","shippingDetails":{"@type":"OfferShippingDetails","shippingRate":{"@type":"MonetaryAmount","value":"0","currency":"GBP"},"shippingDestination":{"@type":"DefinedRegion","addressCountry":"GB"},"deliveryTime":{"@type":"ShippingDeliveryTime","handlingTime":{"@type":"QuantitativeValue","minValue":2,"maxValue":4,"unitCode":"DAY"},"transitTime":{"@type":"QuantitativeValue","minValue":1,"maxValue":3,"unitCode":"DAY"}}},"hasMerchantReturnPolicy":{"@type":"MerchantReturnPolicy","applicableCountry":"GB","returnPolicyCategory":"https://schema.org/MerchantReturnNotPermitted","merchantReturnLink":"https://www.skythatnight.com/delivery.html"}}}\n</script>'),
         h, count=1, flags=re.S)
 
     # ── hero ──
