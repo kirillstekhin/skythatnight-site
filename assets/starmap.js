@@ -253,7 +253,10 @@ const state = {
   dateStr: '2021-06-19', timeStr: '21:45',
   place: 'London, United Kingdom', lat: 51.5074, lon: -0.1278, tz: 1, iana: 'Europe/London',
   dedication: 'Sky That Night',
-  theme: 'midnight', frameType: 'framed', size: '3040', frameColor: 'white',
+  /* ⚠️10.09.2026 дефолт был framed = £44.99, а главная и реклама обещают «from £26.99»:
+     человек жал «Buy this sky» и видел цену на 67% выше обещанной (7 из 24 чекаут-сессий
+     за 3 недели — ровно £44.99, формат не трогали). Рама теперь апселл, а не старт. */
+  theme: 'midnight', frameType: 'print', size: '3040', frameColor: 'white',
 };
 
 /* Токен формата в design-коде: FRAMED3040 / CLASSIC5070 … — его же ждёт fulfil.py CATALOG. */

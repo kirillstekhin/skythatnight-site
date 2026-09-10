@@ -172,7 +172,8 @@ const state = {
   dateStr: '2021-06-19', timeStr: '21:45',
   place: 'London, United Kingdom', lat: 51.5074, lon: -0.1278, tz: 1, iana: 'Europe/London',
   dedication: 'The Moon That Night',
-  theme: 'midnight', frameType: 'framed', size: '3040', frameColor: 'white',
+  /* дефолт print, а не framed — цена совпадает с обещанием «from £26.99» (см. starmap.js 10.09) */
+  theme: 'midnight', frameType: 'print', size: '3040', frameColor: 'white',
 };
 
 function formatToken() { return state.frameType.toUpperCase() + state.size; }
