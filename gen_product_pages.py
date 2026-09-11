@@ -232,7 +232,7 @@ def build(prod, pid, fmt, size, price, extra):
 {incl}
       </ul>
       <a class="sm-cta" href="#design">{esc(P['cta'])} — £{price:.2f}</a>
-      <span class="sm-cta-sub">Free UK delivery included · personalised, so no change-of-mind returns — damaged or not as approved, we reprint or refund in full · <a href="delivery.html">Delivery &amp; returns</a></span>
+      <span class="sm-cta-sub">Free UK delivery included · personalised, so no change-of-mind returns — damaged or not as previewed, we reprint or refund in full · <a href="delivery.html">Delivery &amp; returns</a></span>
     </div>
     <div>
       <img src="assets/starmap/feed/{pid}.jpg" alt="{esc(fmt)} {esc(size)} personalised {esc(P['kind'].lower())}, £{price:.2f}">
