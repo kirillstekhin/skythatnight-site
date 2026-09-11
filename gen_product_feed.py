@@ -29,12 +29,9 @@ def item_link(pid, utm):
 # генерится `tools/make_feed_images.py` → assets/starmap/feed/<id>.jpg (см. его шапку про
 # «почему квадрат» и «почему у каждой позиции свой кадр»).
 ITEMS = [
-    ("SKN-PRINT-3040",   "Print",         "30×40 cm", 26.99, "museum-grade giclée print, shipped rolled"),
-    ("SKN-PRINT-4050",   "Print",         "40×50 cm", 29.99, "museum-grade giclée print, shipped rolled"),
-    ("SKN-PRINT-5070",   "Print",         "50×70 cm", 32.99, "museum-grade giclée print, shipped rolled"),
-    ("SKN-FRAMED-3040",  "Framed",        "30×40 cm", 44.99, "handmade wood frame (white or natural), ready to hang"),
-    ("SKN-FRAMED-4050",  "Framed",        "40×50 cm", 52.99, "handmade wood frame (white or natural), ready to hang"),
-    ("SKN-FRAMED-5070",  "Framed",        "50×70 cm", 59.99, "handmade wood frame (white or natural), ready to hang"),
+    ("SKN-PRINT-3040",   "Print",         "30×40 cm", 34.99, "museum-grade giclée print, shipped rolled"),
+    ("SKN-PRINT-4050",   "Print",         "40×50 cm", 39.99, "museum-grade giclée print, shipped rolled"),
+    ("SKN-PRINT-5070",   "Print",         "50×70 cm", 44.99, "museum-grade giclée print, shipped rolled"),
     ("SKN-CLASSIC-3040", "Classic Frame", "30×40 cm", 59.99, "gallery classic frame in black, antique gold or antique silver"),
     ("SKN-CLASSIC-4050", "Classic Frame", "40×50 cm", 69.99, "gallery classic frame in black, antique gold or antique silver"),
     ("SKN-CLASSIC-5070", "Classic Frame", "50×70 cm", 79.99, "gallery classic frame in black, antique gold or antique silver"),

@@ -17,7 +17,7 @@ HERE = Path(__file__).resolve().parent
 SRC = HERE / "index.html"
 DST = HERE / "moon.html"
 
-MOON_JS_V = "v=6"
+MOON_JS_V = "v=7"
 
 
 def cut_section(html, marker):

@@ -28,7 +28,7 @@ idx = open(os.path.join(HERE, "index.html")).read()
 
 STYLE = re.search(r"<style>(.*?)</style>", idx, re.S).group(1)
 CONFIG = re.search(r'(<section class="sm-config" id="design">.*?</section>)', idx, re.S).group(1)
-CACHE = "v=27"
+CACHE = "v=28"
 
 _spec = importlib.util.spec_from_file_location("feed", os.path.join(HERE, "gen_product_feed.py"))
 _feed = importlib.util.module_from_spec(_spec)
@@ -75,10 +75,6 @@ FMT = {
                           incl=["Giclée print on 200 gsm archival matte paper",
                                 "Rolled in tissue inside a rigid tube",
                                 "No frame — ready for your own"]),
-    "Framed":        dict(key="framed",  what="Handmade wood frame in white or natural oak, ready to hang.",
-                          incl=["Giclée print on 200 gsm archival matte paper",
-                                "Handmade wood frame, white or natural oak",
-                                "Shatterproof glazing, hanging hardware fitted"]),
     "Classic Frame": dict(key="classic", what="Gallery frame in black, antique gold or antique silver.",
                           incl=["Giclée print on 200 gsm archival matte paper",
                                 "Gallery frame: black, antique gold or antique silver",

@@ -231,12 +231,10 @@ function renderSvg(o) {
 const SIZES = { '3040': '30×40 cm', '4050': '40×50 cm', '5070': '50×70 cm' };
 const FRAME_TYPES = {
   print:   { label: 'Print only',    note: 'Museum-grade giclée, shipped rolled',  colors: null },
-  framed:  { label: 'Framed',        note: 'Handmade wood frame, ready to hang',   colors: { white: 'White', natural: 'Natural wood' } },
   classic: { label: 'Classic frame', note: 'Gallery classic frame, ready to hang', colors: { black: 'Black', gold: 'Gold', silver: 'Silver' } },
 };
 const PRICES = {
-  print:   { '3040': 26.99, '4050': 29.99, '5070': 32.99 },
-  framed:  { '3040': 44.99, '4050': 52.99, '5070': 59.99 },
+  print:   { '3040': 34.99, '4050': 39.99, '5070': 44.99 },
   classic: { '3040': 59.99, '4050': 69.99, '5070': 79.99 },
 };
 
@@ -244,8 +242,7 @@ const PRICES = {
    и вписать сюда. Каждой ссылке добавляется ?client_reference_id=<design code> автоматически.
    Пустой линк → показываем design-код + email (fallback-блок), деньги не теряем. */
 const PAYMENT_LINKS = {
-  PRINT3040: 'https://buy.stripe.com/6oU5kE0kueuF0MrcRW7g409', PRINT4050: 'https://buy.stripe.com/28EbJ2aZ85Y9an1dW07g40a', PRINT5070: 'https://buy.stripe.com/aFa7sM3wG1HT52H2di7g40b',
-  FRAMED3040: 'https://buy.stripe.com/5kQdRa0ku1HT7aPdW07g40c', FRAMED4050: 'https://buy.stripe.com/9B6bJ27MWgCN7aP6ty7g40d', FRAMED5070: 'https://buy.stripe.com/7sY6oI0ku3Q13YD4lq7g40e',
+  PRINT3040: 'https://buy.stripe.com/6oUfZiebk4U566LbNS7g40u', PRINT4050: 'https://buy.stripe.com/14A9AU0ku0DP8eT5pu7g40v', PRINT5070: 'https://buy.stripe.com/cNi4gAd7gbit3YDdW07g40w',
   CLASSIC3040: 'https://buy.stripe.com/eVqaEY7MWaep52H8BG7g40f', CLASSIC4050: 'https://buy.stripe.com/14A14o3wGfyJan119e7g40g', CLASSIC5070: 'https://buy.stripe.com/7sY3cw3wG0DP2Uz05a7g40h',
 };
 
