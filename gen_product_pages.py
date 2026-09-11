@@ -28,7 +28,7 @@ idx = open(os.path.join(HERE, "index.html")).read()
 
 STYLE = re.search(r"<style>(.*?)</style>", idx, re.S).group(1)
 CONFIG = re.search(r'(<section class="sm-config" id="design">.*?</section>)', idx, re.S).group(1)
-CACHE = "v=28"
+CACHE = "v=29"
 
 _spec = importlib.util.spec_from_file_location("feed", os.path.join(HERE, "gen_product_feed.py"))
 _feed = importlib.util.module_from_spec(_spec)

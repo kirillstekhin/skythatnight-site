@@ -250,9 +250,11 @@ const state = {
   dateStr: '2021-06-19', timeStr: '21:45',
   place: 'London, United Kingdom', lat: 51.5074, lon: -0.1278, tz: 1, iana: 'Europe/London',
   dedication: 'Sky That Night',
-  /* ⚠️10.09.2026 дефолт был framed = £44.99, а главная и реклама обещают «from £26.99»:
+  /* ⚠️10.09.2026 дефолт был framed = £44.99, а главная и реклама обещали «from £26.99»:
      человек жал «Buy this sky» и видел цену на 67% выше обещанной (7 из 24 чекаут-сессий
-     за 3 недели — ровно £44.99, формат не трогали). Рама теперь апселл, а не старт. */
+     за 3 недели — ровно £44.99, формат не трогали). Дефолт переведён на print.
+     ⚠️11.09.2026 ярус framed СНЯТ С ПРОДАЖИ целиком (Prodigi снимает Budget Frame
+     с производства), цены принтов подняты до 34.99/39.99/44.99 — сетка Ortus. */
   theme: 'midnight', frameType: 'print', size: '3040', frameColor: 'white',
 };
 
@@ -430,7 +432,6 @@ function refresh() {
 /* Живая рама на превью: реальные пиксели Prodigi-шевронов (border-image, прозрачная
    середина, slice 80 = ширина планки в ассете; углы-митры не масштабируются). */
 const FRAME_ASSETS = {
-  framed:  { white: 'frame-budget-white.png',  natural: 'frame-budget-natural.png' },
   classic: { black: 'frame-classic-black.png', gold: 'frame-classic-gold.png', silver: 'frame-classic-silver.png' },
 };
 function applyPreviewFrame() {

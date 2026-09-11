@@ -328,7 +328,6 @@ function refresh() {
 }
 
 const FRAME_ASSETS = {
-  framed:  { white: 'frame-budget-white.png',  natural: 'frame-budget-natural.png' },
   classic: { black: 'frame-classic-black.png', gold: 'frame-classic-gold.png', silver: 'frame-classic-silver.png' },
 };
 function applyPreviewFrame() {
