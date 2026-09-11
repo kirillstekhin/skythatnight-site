@@ -41,6 +41,27 @@ AW_ID = "AW-18367610518"                       # Google tag аккаунта 544
 CONV_LABEL = "IZrUCL3o398cEJb9rbZE"            # метка конверсии «Purchase»
 SEND_TO = f"{AW_ID}/{CONV_LABEL}"
 
+# Pinterest Tag (11.09.2026). Кабинет 549770712600 тратил ~£3/день с 18.08 ВСЛЕПУЮ:
+# 426 переходов на сайт за $63, а сколько из них купили — неизвестно, потому что тега
+# на сайте не было вообще. ID уже существовал у рекламодателя (создавать не пришлось,
+# токен остался read-only): ads.pinterest.com → Conversions → Tag manager.
+# ⚠️ Тег ставит куки (_pin_unauth, _epik) ⇒ под UK PECR reg.6 грузим ТОЛЬКО после
+# согласия, тем же ключом localStorage `skn_consent`, что и Google. <noscript>-пиксель
+# НЕ ставим намеренно: он выстрелил бы до согласия.
+PIN_ID = "2613990629892"
+PIN_LOADER = """
+  function sknPin() {
+    if (window.pintrk) return;
+    !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(
+      Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version="3.0";
+      var t=document.createElement("script");t.async=!0,t.src=e;
+      var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r)}}
+      ("https://s.pinimg.com/ct/core.js");
+    pintrk('load', '__PIN_ID__');
+    pintrk('page');
+  }
+""".replace("__PIN_ID__", PIN_ID)
+
 # ⚠ ДВА БЛОКА, А НЕ ОДИН (иначе не работает — проверено 11.08).
 # Первая версия вешала всё одним куском перед </body>, и на `thank-you.html` событие
 # покупки оказывалось ВЫШЕ определения gtag: `typeof gtag === 'function'` = false,
@@ -70,6 +91,8 @@ HEAD_BLOCK = f"""{HSTART} — генерится gen_gtag.py, РУКАМИ НЕ 
   }} catch (e) {{}}
   gtag('js', new Date());
   gtag('config', '{AW_ID}');
+{PIN_LOADER}
+  try {{ if (localStorage.getItem('skn_consent') === 'granted') sknPin(); }} catch (e) {{}}
 </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id={AW_ID}"></script>
 <style>
@@ -103,10 +126,13 @@ BAR_BLOCK = f"""{BSTART} — генерится gen_gtag.py, РУКАМИ НЕ �
     if (!saved) bar.classList.add('on');
     function decide(ok) {{
       try {{ localStorage.setItem('skn_consent', ok ? 'granted' : 'denied'); }} catch (e) {{}}
-      if (ok) gtag('consent', 'update', {{
-        'ad_storage': 'granted', 'ad_user_data': 'granted',
-        'ad_personalization': 'granted', 'analytics_storage': 'granted'
-      }});
+      if (ok) {{
+        gtag('consent', 'update', {{
+          'ad_storage': 'granted', 'ad_user_data': 'granted',
+          'ad_personalization': 'granted', 'analytics_storage': 'granted'
+        }});
+        try {{ sknPin(); }} catch (e) {{}}          /* Pinterest — тоже только после «да» */
+      }}
       bar.classList.remove('on');
     }}
     document.getElementById('skn-consent-yes').onclick = function () {{ decide(true); }};

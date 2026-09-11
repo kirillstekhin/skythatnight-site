@@ -38,6 +38,19 @@
   } catch (e) {}
   gtag('js', new Date());
   gtag('config', 'AW-18367610518');
+
+  function sknPin() {
+    if (window.pintrk) return;
+    !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(
+      Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version="3.0";
+      var t=document.createElement("script");t.async=!0,t.src=e;
+      var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r)}}
+      ("https://s.pinimg.com/ct/core.js");
+    pintrk('load', '2613990629892');
+    pintrk('page');
+  }
+
+  try { if (localStorage.getItem('skn_consent') === 'granted') sknPin(); } catch (e) {}
 </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18367610518"></script>
 <style>
@@ -116,6 +129,7 @@
         <li><strong>Payment processor</strong> (Stripe) — to take payment securely</li>
         <li><strong>Delivery partners</strong> (e.g. Royal Mail) — to deliver your order</li>
         <li><strong>Website hosting &amp; content delivery</strong> (GitHub Pages; Google Fonts for typography) — these receive your IP address when the page loads</li>
+        <li><strong>Advertising measurement</strong> (Google Ads; Pinterest) — <em>only if you accept cookies</em>: they receive your IP address and the fact that a page or an order happened, so we can tell which advert worked. Not loaded at all if you decline</li>
       </ul>
     </div>
 
@@ -125,13 +139,14 @@
       a small bar at the bottom of the page asks you to choose, and nothing is written to your
       device until you do.</p>
       <ul>
-        <li><strong>If you accept:</strong> Google Ads sets a measurement cookie
-        (<code>_gcl_au</code>, up to 90 days) so we can tell whether an advert we paid for led
-        to an order. We use it for that and nothing else &mdash; we do not build profiles and we
-        do not sell data.</li>
-        <li><strong>If you decline:</strong> the tag stays in a cookieless mode. It can still
-        count an anonymous page view, but nothing is stored on your device and you are not
-        identified.</li>
+        <li><strong>If you accept:</strong> two advertising measurement tags load. Google Ads
+        sets <code>_gcl_au</code> (up to 90 days) and the Pinterest Tag sets
+        <code>_pin_unauth</code> and <code>_epik</code> (up to a year), so we can tell whether
+        an advert we paid for led to an order. We use them for that and nothing else &mdash; we
+        do not build profiles and we do not sell data.</li>
+        <li><strong>If you decline:</strong> the Google tag stays in a cookieless mode &mdash; it
+        can still count an anonymous page view, but nothing is stored on your device and you are
+        not identified &mdash; and <strong>the Pinterest Tag is not loaded at all</strong>.</li>
         <li><strong>Always on, no consent needed:</strong> your design choices are kept in your
         browser's own local storage on your device (strictly necessary to remember your
         selection) and are never sent to us until you check out. Our visitor counter
@@ -217,10 +232,13 @@
     if (!saved) bar.classList.add('on');
     function decide(ok) {
       try { localStorage.setItem('skn_consent', ok ? 'granted' : 'denied'); } catch (e) {}
-      if (ok) gtag('consent', 'update', {
-        'ad_storage': 'granted', 'ad_user_data': 'granted',
-        'ad_personalization': 'granted', 'analytics_storage': 'granted'
-      });
+      if (ok) {
+        gtag('consent', 'update', {
+          'ad_storage': 'granted', 'ad_user_data': 'granted',
+          'ad_personalization': 'granted', 'analytics_storage': 'granted'
+        });
+        try { sknPin(); } catch (e) {}          /* Pinterest — тоже только после «да» */
+      }
       bar.classList.remove('on');
     }
     document.getElementById('skn-consent-yes').onclick = function () { decide(true); };

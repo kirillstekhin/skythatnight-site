@@ -38,6 +38,19 @@
   } catch (e) {}
   gtag('js', new Date());
   gtag('config', 'AW-18367610518');
+
+  function sknPin() {
+    if (window.pintrk) return;
+    !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(
+      Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version="3.0";
+      var t=document.createElement("script");t.async=!0,t.src=e;
+      var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r)}}
+      ("https://s.pinimg.com/ct/core.js");
+    pintrk('load', '2613990629892');
+    pintrk('page');
+  }
+
+  try { if (localStorage.getItem('skn_consent') === 'granted') sknPin(); } catch (e) {}
 </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18367610518"></script>
 <style>
@@ -192,10 +205,13 @@
     if (!saved) bar.classList.add('on');
     function decide(ok) {
       try { localStorage.setItem('skn_consent', ok ? 'granted' : 'denied'); } catch (e) {}
-      if (ok) gtag('consent', 'update', {
-        'ad_storage': 'granted', 'ad_user_data': 'granted',
-        'ad_personalization': 'granted', 'analytics_storage': 'granted'
-      });
+      if (ok) {
+        gtag('consent', 'update', {
+          'ad_storage': 'granted', 'ad_user_data': 'granted',
+          'ad_personalization': 'granted', 'analytics_storage': 'granted'
+        });
+        try { sknPin(); } catch (e) {}          /* Pinterest — тоже только после «да» */
+      }
       bar.classList.remove('on');
     }
     document.getElementById('skn-consent-yes').onclick = function () { decide(true); };

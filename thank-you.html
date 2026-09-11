@@ -267,6 +267,19 @@
   } catch (e) {}
   gtag('js', new Date());
   gtag('config', 'AW-18367610518');
+
+  function sknPin() {
+    if (window.pintrk) return;
+    !function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(
+      Array.prototype.slice.call(arguments))};var n=window.pintrk;n.queue=[],n.version="3.0";
+      var t=document.createElement("script");t.async=!0,t.src=e;
+      var r=document.getElementsByTagName("script")[0];r.parentNode.insertBefore(t,r)}}
+      ("https://s.pinimg.com/ct/core.js");
+    pintrk('load', '2613990629892');
+    pintrk('page');
+  }
+
+  try { if (localStorage.getItem('skn_consent') === 'granted') sknPin(); } catch (e) {}
 </script>
 <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18367610518"></script>
 <style>
@@ -390,6 +403,17 @@
     var payload = { 'send_to': 'AW-18367610518/IZrUCL3o398cEJb9rbZE', 'currency': 'GBP', 'transaction_id': sid };
     if (value !== null) payload.value = value;
     gtag('event', 'conversion', payload);
+
+    /* Pinterest (11.09.2026): кабинет тратил £3/день с 18.08 вслепую — 426 переходов
+       на сайт и ни одной измеренной покупки, потому что тега не было. pintrk появляется
+       ТОЛЬКО после согласия на куки (sknPin в SKN_GTAG_HEAD), поэтому проверяем наличие,
+       а не вызываем вслепую: при отказе конверсия просто не засчитается, как у Google. */
+    if (typeof pintrk === 'function') {
+      var pin = { currency: 'GBP', order_quantity: 1, order_id: sid };
+      if (value !== null) pin.value = value;
+      pintrk('track', 'checkout', pin);
+    }
+
     try { localStorage.setItem(key, '1'); } catch (e) {}
   }
 })();
@@ -412,10 +436,13 @@
     if (!saved) bar.classList.add('on');
     function decide(ok) {
       try { localStorage.setItem('skn_consent', ok ? 'granted' : 'denied'); } catch (e) {}
-      if (ok) gtag('consent', 'update', {
-        'ad_storage': 'granted', 'ad_user_data': 'granted',
-        'ad_personalization': 'granted', 'analytics_storage': 'granted'
-      });
+      if (ok) {
+        gtag('consent', 'update', {
+          'ad_storage': 'granted', 'ad_user_data': 'granted',
+          'ad_personalization': 'granted', 'analytics_storage': 'granted'
+        });
+        try { sknPin(); } catch (e) {}          /* Pinterest — тоже только после «да» */
+      }
       bar.classList.remove('on');
     }
     document.getElementById('skn-consent-yes').onclick = function () { decide(true); };
