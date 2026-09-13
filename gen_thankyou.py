@@ -105,36 +105,32 @@ BODY = f"""
 </section>
 """
 
-PRICES_JS = ", ".join(f'"{k}":{v:.2f}' for k, v in PRICE_BY_SKU.items())
+# ⛔СОБЫТИЕ ПОКУПКИ УБРАНО 13.09.2026 (решение юзера). Оно шлось при ПРОСТОМ ОТКРЫТИИ
+# страницы: session_id, sku и сумма брались из URL, оплата не проверялась вообще, а
+# защитой от повтора был localStorage одного браузера. Открыть thank-you.html с любым
+# session_id было достаточно, чтобы засчиталась покупка. Такое число нельзя считать
+# ни продажами, ни выручкой.
+# ⚠️Выбор «£1 вместо суммы» проблему не решал: в кабинете у конверсии Purchase стоит
+# «Use different values. If there's no value, use £1», то есть отсутствие суммы даёт
+# правдоподобное неверное число вместо пустого — хуже, чем ничего.
+# ⭐Экономика до появления подтверждённых конверсий считается по Stripe и Etsy:
+# `tools/price_check.py`, `tools/unit_economics.py`, `tools/snapshot_state.py`.
+# Следующий шаг (отдельная задача): слать подтверждённую конверсию из фулфилмента —
+# сохранить рекламный идентификатор с учётом согласия, связать с заказом, отправлять
+# ФАКТИЧЕСКУЮ сумму после подтверждения оплаты, с защитой от повторной загрузки.
+# ⛔Отправка не должна зависеть от успешной печати.
+# ⚠️Матрица цен по SKU удалена отсюда НАМЕРЕННО: это было седьмое место, где жила
+# цена, и оно протухало молча при каждом изменении прайса.
 
-SCRIPT = f"""<script>
-(function () {{
+SCRIPT = """<script>
+(function () {
+  /* Страница только подтверждает заказ покупателю. Никаких событий покупки:
+     оплату подтверждает Stripe, а не загрузка HTML. */
   var q = new URLSearchParams(location.search);
   var sid = q.get('session_id') || '';
-  var sku = (q.get('sku') || '').toUpperCase();
-  var PRICES = {{{PRICES_JS}}};
-
-  /* ссылка на заказ — покупателю, чтобы было что назвать в письме */
   var ref = sid ? sid.slice(-10).toUpperCase() : '';
   document.getElementById('ty-ref').textContent = ref ? 'Order reference ' + ref : '';
-
-  /* значение конверсии: URL проверяем по матрице цен, иначе берём цену SKU */
-  var v = parseFloat(q.get('v'));
-  var known = PRICES[sku];
-  var value = (known !== undefined && Math.abs(v - known) < 0.005) ? known
-            : (known !== undefined ? known : (isFinite(v) && v > 0 && v < 500 ? v : null));
-
-  /* один раз на session_id — F5 не должен рождать вторую покупку */
-  var key = 'skn_conv_' + (sid || 'nosid');
-  var fired = false;
-  try {{ fired = localStorage.getItem(key) === '1'; }} catch (e) {{}}
-  if (!fired && typeof gtag === 'function') {{
-    var payload = {{ 'send_to': '{SEND_TO}', 'currency': 'GBP', 'transaction_id': sid }};
-    if (value !== null) payload.value = value;
-    gtag('event', 'conversion', payload);
-    try {{ localStorage.setItem(key, '1'); }} catch (e) {{}}
-  }}
-}})();
+})();
 </script>"""
 
 PAGE = f"""<!DOCTYPE html>
@@ -157,7 +153,7 @@ PAGE = f"""<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css?v=2">
+<link rel="stylesheet" href="assets/style.css?v=3">   <!-- ⚠️дрейф: было v=2, живой сайт на v=3 с 01.09 -->
 <style>{STYLE}{EXTRA_CSS}</style>
 </head>
 <body class="sm-night">
@@ -189,5 +185,5 @@ def _reinject():
 if __name__ == "__main__":
     out = os.path.join(HERE, "thank-you.html")
     open(out, "w").write(PAGE)
-    print(f"✅ thank-you.html · {len(PAGE)} байт · матрица цен {len(PRICE_BY_SKU)} SKU · send_to {SEND_TO}")
+    print(f"✅ thank-you.html · {len(PAGE)} байт · событий покупки НЕТ (только подтверждение заказа)")
     _reinject()

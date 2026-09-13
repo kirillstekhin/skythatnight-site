@@ -382,40 +382,15 @@
 (function () {
   var q = new URLSearchParams(location.search);
   var sid = q.get('session_id') || '';
-  var sku = (q.get('sku') || '').toUpperCase();
-  var PRICES = {"SKN-PRINT-3040":34.99, "SKN-PRINT-4050":39.99, "SKN-PRINT-5070":44.99, "SKN-CLASSIC-3040":59.99, "SKN-CLASSIC-4050":69.99, "SKN-CLASSIC-5070":79.99, "SKN-MOON-PRINT-3040":34.99, "SKN-MOON-PRINT-4050":39.99, "SKN-MOON-PRINT-5070":44.99, "SKN-MOON-CLASSIC-3040":59.99, "SKN-MOON-CLASSIC-4050":69.99, "SKN-MOON-CLASSIC-5070":79.99};
+  /* ⛔СОБЫТИЕ ПОКУПКИ УБРАНО 13.09.2026 (решение юзера). Оно уходило в Google Ads и
+     Pinterest при ПРОСТОМ ОТКРЫТИИ страницы: session_id, sku и сумма брались из URL,
+     оплата не проверялась, защитой от повтора был localStorage одного браузера.
+     Такое число нельзя считать ни продажами, ни выручкой. Экономика считается по
+     Stripe и Etsy (tools/price_check.py, unit_economics.py, snapshot_state.py). */
 
   /* ссылка на заказ — покупателю, чтобы было что назвать в письме */
   var ref = sid ? sid.slice(-10).toUpperCase() : '';
   document.getElementById('ty-ref').textContent = ref ? 'Order reference ' + ref : '';
-
-  /* значение конверсии: URL проверяем по матрице цен, иначе берём цену SKU */
-  var v = parseFloat(q.get('v'));
-  var known = PRICES[sku];
-  var value = (known !== undefined && Math.abs(v - known) < 0.005) ? known
-            : (known !== undefined ? known : (isFinite(v) && v > 0 && v < 500 ? v : null));
-
-  /* один раз на session_id — F5 не должен рождать вторую покупку */
-  var key = 'skn_conv_' + (sid || 'nosid');
-  var fired = false;
-  try { fired = localStorage.getItem(key) === '1'; } catch (e) {}
-  if (!fired && typeof gtag === 'function') {
-    var payload = { 'send_to': 'AW-18367610518/IZrUCL3o398cEJb9rbZE', 'currency': 'GBP', 'transaction_id': sid };
-    if (value !== null) payload.value = value;
-    gtag('event', 'conversion', payload);
-
-    /* Pinterest (11.09.2026): кабинет тратил £3/день с 18.08 вслепую — 426 переходов
-       на сайт и ни одной измеренной покупки, потому что тега не было. pintrk появляется
-       ТОЛЬКО после согласия на куки (sknPin в SKN_GTAG_HEAD), поэтому проверяем наличие,
-       а не вызываем вслепую: при отказе конверсия просто не засчитается, как у Google. */
-    if (typeof pintrk === 'function') {
-      var pin = { currency: 'GBP', order_quantity: 1, order_id: sid };
-      if (value !== null) pin.value = value;
-      pintrk('track', 'checkout', pin);
-    }
-
-    try { localStorage.setItem(key, '1'); } catch (e) {}
-  }
 })();
 </script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
