@@ -158,11 +158,11 @@ const FRAME_TYPES = {
 };
 const PRICES = {
   print:   { '3040': 34.99, '4050': 39.99, '5070': 44.99 },
-  classic: { '3040': 59.99, '4050': 69.99, '5070': 79.99 },
+  classic: { '3040': 69.99, '4050': 79.99, '5070': 89.99 },
 };
 const PAYMENT_LINKS = {
   PRINT3040: 'https://buy.stripe.com/6oUfZiebk4U566LbNS7g40u', PRINT4050: 'https://buy.stripe.com/14A9AU0ku0DP8eT5pu7g40v', PRINT5070: 'https://buy.stripe.com/cNi4gAd7gbit3YDdW07g40w',
-  CLASSIC3040: 'https://buy.stripe.com/eVqaEY7MWaep52H8BG7g40f', CLASSIC4050: 'https://buy.stripe.com/14A14o3wGfyJan119e7g40g', CLASSIC5070: 'https://buy.stripe.com/7sY3cw3wG0DP2Uz05a7g40h',
+  CLASSIC3040: 'https://buy.stripe.com/00w6oI0ku9aldzd19e7g40x', CLASSIC4050: 'https://buy.stripe.com/8x200k2sC5Y9fHl3hm7g40y', CLASSIC5070: 'https://buy.stripe.com/dRm3cwaZ8euFcv99FK7g40z',
 };
 
 const state = {
