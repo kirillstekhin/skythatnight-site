@@ -172,6 +172,14 @@ def main():
         "<summary>Is it really the moon of my date?</summary>\n      <p>Yes. We compute the lunar phase for your exact date, time and timezone with the same\n      astronomical formulae used across our star maps, and render it over a NASA Lunar\n      Reconnaissance Orbiter photographic mosaic — the terminator falls exactly where it did.</p>")
 
     # ── скрипты ──
+    # ⛔СЕТКА ЦЕН НАСЛЕДУЕТСЯ ОТ index.html СО ЗВЁЗДНЫМИ ССЫЛКАМИ (баг найден 13.09.2026).
+    # Её вшивает gen_product_pages.update_index() — и ТОЛЬКО в index.html; сюда она
+    # приезжает копией шаблона. Покупатель на лунной странице выбирал размер и уходил
+    # на звёздный товар, то есть терял продукт ровно в момент выбора.
+    # Цены у Луны и звезды совпадают, поэтому сумма не врала — врал адрес, и молча.
+    h, _n_grid = re.subn(r'(class="sm-pg-cell" href="product-skn-)(print|classic)-',
+                         r'\g<1>moon-\g<2>-', h)
+
     h = re.sub(r'<script src="assets/starmap\.js\?v=\d+" defer></script>',
                f'<script src="assets/moon.js?{MOON_JS_V}" defer></script>', h)
 
