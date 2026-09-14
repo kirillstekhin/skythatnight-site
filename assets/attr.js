@@ -29,6 +29,7 @@
   var SESSION_ID_KEY = 'skn_attr_id';        /* идентификатор — ТОЛЬКО после согласия */
   var SESSION_TOKEN_KEY = 'skn_attr_token';
   var PENDING_KEY = 'skn_attr_pending_revoke';
+  var LINKED_KEY = 'skn_attr_linked';        /* токены, уже привязанные к оплате */
   var CONSENT_VER_KEY = 'skn_consent_ver';
   var CONSENT_KEY = 'skn_consent';
   var ID_PARAMS = [['gclid', 'gclid'], ['wbraid', 'wbraid'], ['gbraid', 'gbraid']];
@@ -133,6 +134,7 @@
     return post({ revoke: token }, REVOKE_TIMEOUT_MS).then(function (res) {
       if (res.ok || res.status === 404) {
         queueDrop(token);                    /* ⛔подтверждён — запись очереди удаляется */
+        unlink(token);                       /* и привязка снимается: записи больше нет */
         if (get(sessionStorage, SESSION_TOKEN_KEY) === token) set(sessionStorage, SESSION_TOKEN_KEY, null);
         return true;
       }
@@ -141,8 +143,30 @@
     });
   }
 
+  /* ⛔ПРИВЯЗАННЫЕ К ОПЛАТЕ ТОКЕНЫ АВТОМАТИЧЕСКОЙ ОЧИСТКОЙ НЕ ТРОГАЕМ (замечание юзера
+     14.09). Предварительная запись в очередь нужна на случай потерянного ответа — но если
+     токен всё-таки доехал до оплаты, автоповтор при следующем заходе стёр бы атрибуцию
+     НАСТОЯЩЕЙ покупки. Хранится только сам токен: ни идентификатора, ни заказа.
+     ⚠️При НАСТОЯЩЕМ отзыве согласия `revoke()` вызывается явно и работает всё равно —
+     привязка не делает запись неудаляемой, она лишь запрещает удалять её МОЛЧА. */
+  function linked() { var l = parse(get(localStorage, LINKED_KEY), []); return Array.isArray(l) ? l : []; }
+
+  function markLinked(token) {
+    if (!TOKEN_RE.test(token || '')) return;
+    var l = linked();
+    if (l.indexOf(token) === -1) l.push(token);
+    set(localStorage, LINKED_KEY, JSON.stringify(l.slice(-20)));
+    queueDrop(token);
+  }
+
+  function unlink(token) {
+    var l = linked().filter(function (t) { return t !== token; });
+    set(localStorage, LINKED_KEY, l.length ? JSON.stringify(l) : null);
+  }
+
   function flushPending() {
-    var l = queue().slice(0, 5);
+    var link = linked();
+    var l = queue().filter(function (e) { return link.indexOf(e.token) === -1; }).slice(0, 5);
     return l.reduce(function (p, e) { return p.then(function () { return revoke(e.token); }); },
                     Promise.resolve());
   }
@@ -224,7 +248,11 @@
     if (navigated) return Promise.resolve(false);
     navigated = true;
     return token().catch(function () { return null; }).then(function (tok) {
-      location.href = link + '?client_reference_id=' + encodeURIComponent(buildRef(code, tok));
+      var ref = buildRef(code, tok);
+      /* Привязываем ТОЛЬКО если токен реально уехал в ссылку: не влез по длине — значит
+         он никуда не привязан, и автоочистка вправе его убрать. */
+      if (tok && ref !== code) markLinked(tok);
+      location.href = link + '?client_reference_id=' + encodeURIComponent(ref);
       return true;
     });
   }
@@ -237,7 +265,7 @@
     boot: boot, capture: capture, token: token, buildRef: buildRef, revoke: revoke,
     navigateToPayment: navigateToPayment,
     consent: consent, bumpConsentVer: bumpConsentVer, queue: queue, flushPending: flushPending,
-    forget: forget, identifier: identifier, watch: watch,
+    forget: forget, identifier: identifier, watch: watch, linked: linked, markLinked: markLinked,
     _mem: mem, ENDPOINT: ENDPOINT, TIMEOUT_MS: TIMEOUT_MS, CLIENT_REF_MAX: CLIENT_REF_MAX,
   };
 })();

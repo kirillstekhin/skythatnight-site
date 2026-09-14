@@ -56,6 +56,20 @@ const TOKEN_RE = /^[a-z0-9]{12}$/;
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
 
+/** Отзыв существующей записи. ⛔Идентификатор СТИРАЕМ, метка остаётся — чтобы экспорт видел
+    отзыв, а не гадал по отсутствию записи. */
+async function revokeExisting(env, key, rec, token) {
+  try {
+    await env.ATTR.put(key, JSON.stringify({
+      schema_version: SCHEMA_VERSION, token, state: "revoked",
+      revoked_at: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
+      id_type: rec.id_type || null,
+    }), { httpMetadata: { contentType: "application/json" } });
+  } catch { return json({ error: "storage_unavailable" }, 503); }
+  console.log("attr revoked", token);
+  return json({ revoked: true });
+}
+
 /** t + 11 символов base32 = 12 знаков, подходит под `[A-Za-z0-9]{6,32}` в суффиксе. */
 function newToken() {
   const raw = crypto.getRandomValues(new Uint8Array(8));
@@ -117,7 +131,28 @@ export async function onRequestPost({ request, env }) {
       const o = await env.ATTR.get(key);
       rec = o ? await o.json() : null;
     } catch { return json({ error: "storage_unavailable" }, 503); }
-    if (!rec) return json({ error: "not_found" }, 404);
+    if (!rec) {
+      // ⛔ОТЗЫВ МОЖЕТ ПРИЙТИ РАНЬШЕ САМОГО СОХРАНЕНИЯ (замечание юзера 14.09): запрос на
+      //   запись оборвался у клиента, но летит к нам, а человек уже отозвал согласие.
+      //   Раньше мы отвечали 404 и не оставляли ничего — запоздавшее сохранение спокойно
+      //   записывало идентификатор. Теперь кладём МЕТКУ ОТЗЫВА заранее; запись создающая,
+      //   поэтому опоздавшее сохранение наткнётся на неё и идентификатор не запишет.
+      try {
+        const put = await env.ATTR.put(key, JSON.stringify({
+          schema_version: SCHEMA_VERSION, token, state: "revoked", preemptive: true,
+          revoked_at: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
+        }), { httpMetadata: { contentType: "application/json" }, onlyIf: { etagDoesNotMatch: "*" } });
+        if (!put) {
+          // Кто-то успел записать между нашим чтением и записью — перечитываем и решаем.
+          const o2 = await env.ATTR.get(key);
+          const now = o2 ? await o2.json() : null;
+          if (now && now.state === "active") return await revokeExisting(env, key, now, token);
+          return json({ revoked: true, already: true });
+        }
+      } catch { return json({ error: "storage_unavailable" }, 503); }
+      console.log("attr revoked preemptively", token);
+      return json({ revoked: true, preemptive: true });
+    }
     // ⛔ПОВТОРНЫЙ ОТЗЫВ — УСПЕХ, А НЕ ОШИБКА. Клиент, у которого отзыв не прошёл из-за
     //   недоступного сервера, обязан повторить его позже; вторая попытка должна
     //   завершаться так же спокойно, как первая.
@@ -125,17 +160,7 @@ export async function onRequestPost({ request, env }) {
       console.log("attr revoke repeated", token);
       return json({ revoked: true, already: true });
     }
-    try {
-      // ⛔ИДЕНТИФИКАТОР СТИРАЕМ, А НЕ ПРОСТО ПОМЕЧАЕМ. Отзыв согласия означает, что хранить
-      //   его больше не на чем — метка остаётся, чтобы экспорт видел отзыв и не гадал.
-      await env.ATTR.put(key, JSON.stringify({
-        schema_version: SCHEMA_VERSION, token, state: "revoked",
-        revoked_at: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
-        id_type: rec.id_type || null,
-      }), { httpMetadata: { contentType: "application/json" } });
-    } catch { return json({ error: "storage_unavailable" }, 503); }
-    console.log("attr revoked", token);
-    return json({ revoked: true });
+    return await revokeExisting(env, key, rec, token);
   }
 
   // ── СОХРАНЕНИЕ ──
@@ -188,8 +213,16 @@ export async function onRequestPost({ request, env }) {
         cur = o ? await o.json() : null;
       } catch { return json({ error: "storage_unavailable" }, 503); }
       if (!cur || cur.state !== "active") {
+        // Отозванная (в том числе заранее) запись не воскрешается и токена не даёт.
         console.log("attr token not reusable", token, cur && cur.state);
-        return json({ error: "storage_unavailable" }, 503);
+        return json({ error: "revoked_or_unusable" }, 409);
+      }
+      // ⛔ОДИН ТОКЕН — ОДНО СОДЕРЖИМОЕ. Совпал токен, но идентификатор другой — это НЕ наш
+      //   повтор. Отказываем; подменять уже сохранённый идентификатор нельзя ни при каких
+      //   обстоятельствах, и делать вид, что всё хорошо, — тоже.
+      if (cur.id_type !== idType || cur.id_value !== idValue) {
+        console.log("attr token conflict", token);
+        return json({ error: "token_conflict" }, 409);
       }
       console.log("attr repeat", token);
       return json({ token, repeat: true });
