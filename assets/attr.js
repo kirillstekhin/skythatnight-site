@@ -34,7 +34,11 @@
   var CONSENT_KEY = 'skn_consent';
   var ID_PARAMS = [['gclid', 'gclid'], ['wbraid', 'wbraid'], ['gbraid', 'gbraid']];
   var ID_RE = /^[A-Za-z0-9_.-]{10,200}$/;
-  var TOKEN_RE = /^[a-z0-9]{12}$/;
+  /* ⛔27 СИМВОЛОВ: `t` + 26 base32 = 128 бит (замечание юзера 14.09). Было 12 — я взял
+     8 байт и обрезал их до 11 символов, то есть выбрасывал 9 бит из 64 и писал в описании
+     несуществующие «8 байт → 11 символов». Токен даёт право ОТОЗВАТЬ запись, поэтому
+     случайность тут не место экономить. */
+  var TOKEN_RE = /^t[a-z2-7]{26}$/;
   var CLIENT_REF_MAX = 200;           /* предел Stripe — тот же, что в fulfil.py */
 
   var mem = { id_type: null, id_value: null };
@@ -173,14 +177,15 @@
 
   /* ── токен ────────────────────────────────────────────────────────────── */
   function newToken() {
-    var a = new Uint8Array(8);
+    var a = new Uint8Array(16);                 /* 128 бит, и все они доезжают до токена */
     crypto.getRandomValues(a);
     var A = 'abcdefghijklmnopqrstuvwxyz234567', bits = 0, acc = 0, out = '';
     for (var i = 0; i < a.length; i++) {
       acc = ((acc << 8) | a[i]) & 0xfff; bits += 8;
       while (bits >= 5) { out += A[(acc >>> (bits - 5)) & 31]; bits -= 5; }
     }
-    return 't' + out.slice(0, 11);
+    if (bits > 0) out += A[(acc << (5 - bits)) & 31];   /* хвост, а не отбрасывание */
+    return 't' + out;                                   /* 1 + 26 = 27 символов */
   }
 
   function token() {

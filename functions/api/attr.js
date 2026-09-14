@@ -51,7 +51,10 @@ const RATE_MAX = 20;
     выбранным путём загрузки, проверяется отдельно; здесь мы лишь не принимаем чужое. */
 export const ID_TYPES = ["gclid", "wbraid", "gbraid"];
 const ID_RE = /^[A-Za-z0-9_.-]{10,200}$/;
-const TOKEN_RE = /^[a-z0-9]{12}$/;
+/* ⛔27 СИМВОЛОВ: `t` + 26 base32 = 128 бит. Прежние 12 символов давали 55 бит, потому что
+   восемь случайных байт обрезались до одиннадцати знаков. Токен позволяет ОТОЗВАТЬ запись —
+   на его длине не экономим. */
+const TOKEN_RE = /^t[a-z2-7]{26}$/;
 
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { "Content-Type": "application/json" } });
@@ -70,16 +73,18 @@ async function revokeExisting(env, key, rec, token) {
   return json({ revoked: true });
 }
 
-/** t + 11 символов base32 = 12 знаков, подходит под `[A-Za-z0-9]{6,32}` в суффиксе. */
+/** `t` + 26 символов base32 = 27 знаков, 128 бит. Подходит под `[A-Za-z0-9]{6,32}` в
+    суффиксе `client_reference_id`. */
 function newToken() {
-  const raw = crypto.getRandomValues(new Uint8Array(8));
+  const raw = crypto.getRandomValues(new Uint8Array(16));
   const A = "abcdefghijklmnopqrstuvwxyz234567";
   let bits = 0, acc = 0, out = "";
   for (const b of raw) {
     acc = ((acc << 8) | b) & 0xfff; bits += 8;
     while (bits >= 5) { out += A[(acc >>> (bits - 5)) & 31]; bits -= 5; }
   }
-  return "t" + out.slice(0, 11);
+  if (bits > 0) out += A[(acc << (5 - bits)) & 31];
+  return "t" + out;
 }
 
 /* ⚠️Ограничитель — первая линия, а не гарантия: Cache API живёт в пределах одного
