@@ -524,11 +524,21 @@ function attachControls() {
       btn.insertAdjacentElement('afterend', n);
     }
   })();
+  /* ⛔ЗАПУСК АТРИБУЦИИ — НА ЗАГРУЗКЕ. Модуль общий со звёздной витриной. */
+  try { window.SknAttr && window.SknAttr.boot(); } catch (e) {}
+
   document.getElementById('sm-buy').addEventListener('click', () => {
-    const go = () => {
+    const go = async () => {
       const link = PAYMENT_LINKS[formatToken()];
       const code = designCode();
       if (link) {
+        /* ⛔ЛУННАЯ ВИТРИНА ИДЁТ ТЕМ ЖЕ ПУТЁМ, что и звёздная: один модуль атрибуции на обе.
+           Один переход и только один — флаг ставится ДО ожидания токена, поэтому поздний
+           ответ не уводит покупателя второй раз. Любая осечка → чистый design-код. */
+        /* ⛔ОДИН ПЕРЕХОД И ТОЛЬКО ОДИН, и он живёт в общем модуле: обе витрины зовут одну
+           функцию, поэтому правило проверяется один раз и работает в обеих. Нет модуля —
+           идём как раньше, с чистым design-кодом. */
+        if (window.SknAttr) { window.SknAttr.navigateToPayment(link, code); return; }
         window.location.href = `${link}?client_reference_id=${encodeURIComponent(code)}`;
       } else {
         const box = document.getElementById('sm-checkout-note');

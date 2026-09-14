@@ -656,175 +656,10 @@ function attachControls() {
     }
   })();
 
-/* ═══════════════ РЕКЛАМНАЯ АТРИБУЦИЯ (14.09.2026) ═══════════════
-   Схема: platform/ATTRIBUTION_SPEC.md · сервер: functions/api/attr.js
-
-   ⛔РЕКЛАМА — УЧЁТ, А НЕ ГЕЙТ. Ни одна ветка ниже не имеет права помешать оплате: не
-   ответил сервер, вышел таймаут, отказано в согласии, не влез токен — покупатель уходит
-   платить по ПРЕЖНЕЙ ссылке с чистым design-кодом. Потерять измерение можно, заказ нельзя.
-
-   ⛔ДО СОГЛАСИЯ ИДЕНТИФИКАТОР НЕ СОХРАНЯЕТСЯ НИГДЕ: ни в localStorage, ни в cookies, ни в
-   sessionStorage, ни на сервере. Он живёт в переменной этой страницы и исчезает вместе с
-   ней. После согласия (ОБА флага) — кладём рядом с сессией, чтобы пережить переход по
-   страницам, и только тогда отправляем на сервер.
-
-   ⛔ОТЗЫВ ПЕРЕЖИВАЕТ СЕТЕВОЙ СБОЙ И ПЕРЕЗАГРУЗКУ. Токен, который не удалось отозвать,
-   остаётся в очереди `ATTR_PENDING` и повторяется при следующей загрузке страницы. Иначе
-   «сервер был недоступен» означало бы «отзыв потерян».
-
-   ⛔СОГЛАСИЕ МОГЛИ ОТОЗВАТЬ, ПОКА ЗАПРОС ЛЕТЕЛ. Ответ проверяется на актуальное согласие:
-   если его уже нет — полученный токен немедленно отзывается и к оплате НЕ добавляется. */
-
-const ATTR_ENDPOINT = '/api/attr';
-const ATTR_TIMEOUT_MS = 1200;        /* ⚠верхняя граница задержки перед оплатой */
-const ATTR_MEM = { id_type: null, id_value: null };   /* до согласия — только здесь */
-const ATTR_SESSION_KEY = 'skn_attr_id';
-const ATTR_TOKEN_KEY = 'skn_attr_token';
-const ATTR_PENDING_KEY = 'skn_attr_pending_revoke';
-const ATTR_ID_PARAMS = [['gclid', 'gclid'], ['wbraid', 'wbraid'], ['gbraid', 'gbraid']];
-const ATTR_ID_RE = /^[A-Za-z0-9_.-]{10,200}$/;
-const CLIENT_REF_MAX = 200;          /* предел Stripe — тот же, что в fulfil.py */
-
-function attrConsent() {
-  /* ⛔ОБА ФЛАГА. `ad_storage` разрешает хранить, `ad_user_data` — передавать Google.
-     Баннер пишет одно общее решение; расходиться они у нас не могут, но проверяем оба
-     явно, чтобы при появлении раздельного баннера ничего не переехало молча. */
-  let v = null;
-  try { v = localStorage.getItem('skn_consent'); } catch (e) {}
-  const granted = v === 'granted';
-  return { ad_storage: granted ? 'granted' : 'denied',
-           ad_user_data: granted ? 'granted' : 'denied', granted };
-}
-
-function attrRead(store, key) { try { return store.getItem(key); } catch (e) { return null; } }
-function attrWrite(store, key, val) {
-  try { val === null ? store.removeItem(key) : store.setItem(key, val); } catch (e) {}
-}
-
-function attrCapture() {
-  const q = new URLSearchParams(location.search);
-  for (const [param, type] of ATTR_ID_PARAMS) {
-    const v = q.get(param);
-    if (v && ATTR_ID_RE.test(v)) { ATTR_MEM.id_type = type; ATTR_MEM.id_value = v; break; }
-  }
-  if (attrConsent().granted) attrPersist();
-}
-
-function attrPersist() {
-  /* Только после согласия. Идентификатор переживает переход по страницам сайта. */
-  if (!ATTR_MEM.id_value) return;
-  attrWrite(sessionStorage, ATTR_SESSION_KEY, JSON.stringify(ATTR_MEM));
-}
-
-function attrIdentifier() {
-  if (ATTR_MEM.id_value) return ATTR_MEM;
-  try {
-    const d = JSON.parse(attrRead(sessionStorage, ATTR_SESSION_KEY) || 'null');
-    if (d && d.id_value && ATTR_ID_RE.test(d.id_value)) return d;
-  } catch (e) {}
-  return null;
-}
-
-function attrForget() {
-  /* Отказ или отзыв: стираем всё своё в браузере. Серверную запись отзывает attrRevoke. */
-  ATTR_MEM.id_type = ATTR_MEM.id_value = null;
-  attrWrite(sessionStorage, ATTR_SESSION_KEY, null);
-}
-
-async function attrPost(body, timeoutMs) {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-  try {
-    const r = await fetch(ATTR_ENDPOINT, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body), signal: ctrl.signal, keepalive: true,
-    });
-    return { ok: r.ok, status: r.status, data: await r.json().catch(() => ({})) };
-  } catch (e) {
-    return { ok: false, status: 0, data: {} };
-  } finally { clearTimeout(timer); }
-}
-
-function attrQueueRevoke(token) {
-  if (!token) return;
-  let list = [];
-  try { list = JSON.parse(attrRead(localStorage, ATTR_PENDING_KEY) || '[]'); } catch (e) {}
-  if (!list.includes(token)) list.push(token);
-  attrWrite(localStorage, ATTR_PENDING_KEY, JSON.stringify(list.slice(-20)));
-}
-
-async function attrRevoke(token) {
-  /* ⛔НЕ УДАЛОСЬ — В ОЧЕРЕДЬ, а не «ну и ладно». Очередь в localStorage, поэтому переживает
-     и сетевой сбой, и перезагрузку, и закрытие вкладки. */
-  if (!token) return false;
-  const res = await attrPost({ revoke: token }, 4000);
-  if (res.ok || res.status === 404) {
-    let list = [];
-    try { list = JSON.parse(attrRead(localStorage, ATTR_PENDING_KEY) || '[]'); } catch (e) {}
-    attrWrite(localStorage, ATTR_PENDING_KEY, JSON.stringify(list.filter((t) => t !== token)));
-    if (attrRead(sessionStorage, ATTR_TOKEN_KEY) === token) attrWrite(sessionStorage, ATTR_TOKEN_KEY, null);
-    return true;
-  }
-  attrQueueRevoke(token);
-  return false;
-}
-
-async function attrFlushPending() {
-  let list = [];
-  try { list = JSON.parse(attrRead(localStorage, ATTR_PENDING_KEY) || '[]'); } catch (e) {}
-  for (const t of list.slice(0, 5)) await attrRevoke(t);
-}
-
-function attrWatchConsent() {
-  /* Человек пришёл по объявлению и согласился ПОЗЖЕ — идентификатор обязан дожить до
-     согласия и попасть в хранилище. Баннер живёт в HTML страницы, поэтому следим за его
-     следом в localStorage, а не лезем в его код. */
-  let last = attrConsent().granted;
-  const tick = async () => {
-    const now = attrConsent().granted;
-    if (now === last) return;
-    last = now;
-    if (now) { attrPersist(); return; }
-    attrForget();                                   /* отозвали — стираем своё */
-    const tok = attrRead(sessionStorage, ATTR_TOKEN_KEY);
-    if (tok) await attrRevoke(tok);                 /* и отзываем серверную запись */
-  };
-  window.addEventListener('storage', tick);
-  const iv = setInterval(tick, 500);
-  setTimeout(() => clearInterval(iv), 120000);
-}
-
-async function attrToken() {
-  /* → токен или null. ⛔Любая осечка — null, и оплата идёт с чистым кодом. */
-  const c = attrConsent();
-  if (!c.granted) return null;                      /* отказ: на сервер НЕ ходим вовсе */
-  const id = attrIdentifier();
-  if (!id) return null;
-  const existing = attrRead(sessionStorage, ATTR_TOKEN_KEY);
-  if (existing) return existing;
-  const res = await attrPost({ id_type: id.id_type, id_value: id.id_value, consent: {
-    ad_storage: c.ad_storage, ad_user_data: c.ad_user_data } }, ATTR_TIMEOUT_MS);
-  const token = res.ok && res.data && res.data.token;
-  if (!token) return null;
-  /* ⛔СОГЛАСИЕ МОГЛИ ОТОЗВАТЬ, ПОКА ЗАПРОС ЛЕТЕЛ. Тогда токен, который мы только что
-     получили, к оплате не добавляем и немедленно отзываем. */
-  if (!attrConsent().granted) { attrQueueRevoke(token); attrRevoke(token); return null; }
-  attrWrite(sessionStorage, ATTR_TOKEN_KEY, token);
-  return token;
-}
-
-function attrBuildRef(code, token) {
-  /* Тот же формат и тот же предел, что у fulfil.build_client_reference. Не влезает —
-     выбрасываем ТОКЕН, а не заказ. */
-  if (!token) return code;
-  const candidate = code + '_a1_' + token;
-  return candidate.length > CLIENT_REF_MAX ? code : candidate;
-}
-
   /* ⛔ЗАПУСК АТРИБУЦИИ — НА ЗАГРУЗКЕ, а не при клике: идентификатор приходит в URL и
-     исчезнет при первом же переходе, а согласие человек может дать позже. Всё три вызова
-     молчаливы: ни один не имеет права помешать странице работать. */
-  try { attrCapture(); attrWatchConsent(); attrFlushPending(); } catch (e) {}
+     исчезнет при первом же переходе, а согласие человек может дать позже. Модуль общий с
+     лунной витриной (assets/attr.js) и молчалив: помешать странице он не может. */
+  try { window.SknAttr && window.SknAttr.boot(); } catch (e) {}
 
   document.getElementById('sm-buy').addEventListener('click', () => {
     const go = async () => {
@@ -833,12 +668,11 @@ function attrBuildRef(code, token) {
       if (link) {
         /* ⛔ОДИН ПЕРЕХОД И ТОЛЬКО ОДИН. Поздний ответ сервера не имеет права увести
            покупателя второй раз — флаг ставится ДО ожидания токена. */
-        if (window.__smNavigated) return;
-        window.__smNavigated = true;
-        let token = null;
-        try { token = await attrToken(); } catch (e) { token = null; }
-        const ref = attrBuildRef(code, token);
-        window.location.href = `${link}?client_reference_id=${encodeURIComponent(ref)}`;
+        /* ⛔ОДИН ПЕРЕХОД И ТОЛЬКО ОДИН, и он живёт в общем модуле: обе витрины зовут одну
+           функцию, поэтому правило проверяется один раз и работает в обеих. Нет модуля —
+           идём как раньше, с чистым design-кодом. */
+        if (window.SknAttr) { window.SknAttr.navigateToPayment(link, code); return; }
+        window.location.href = `${link}?client_reference_id=${encodeURIComponent(code)}`;
       } else {
         const box = document.getElementById('sm-checkout-note');
         box.hidden = false;

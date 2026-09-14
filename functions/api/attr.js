@@ -33,6 +33,12 @@
  *   условие, а отложенное. Поэтому режим `live` требует объявленного `ATTR_RETENTION_DAYS`,
  *   а без него разрешён только режим `test` с ВЫМЫШЛЕННЫМИ данными, и такие записи экспорт
  *   не отправляет никогда.
+ * ⛔ТОКЕН ПРИСЫЛАЕТ КЛИЕНТ (правка по замечанию юзера 14.09). Раньше его придумывал
+ *   сервер — и тогда оборванный запрос оставлял НАС с сохранённым идентификатором, а
+ *   КЛИЕНТА без токена, которым его отзывать: `abort` отменяет ожидание ответа, но не
+ *   запись. Теперь попытка известна клиенту заранее, поэтому отозвать можно и то, ответа
+ *   по чему он не получил. Подделать чужую запись нельзя: запись СОЗДАЮЩАЯ, существующий
+ *   объект ею не перезаписывается.
  * ⛔В ЛОГИ НЕ ПИСАТЬ САМ ИДЕНТИФИКАТОР. Только тип, токен и код ошибки.
  */
 
@@ -144,7 +150,9 @@ export async function onRequestPost({ request, env }) {
   if (consent.ad_storage !== "granted" || consent.ad_user_data !== "granted")
     return json({ error: "consent_required" }, 403);
 
-  const token = newToken();
+  // ⛔ТОКЕН — ОТ КЛИЕНТА. Свой генерируем только если клиент его не прислал (старый путь).
+  const token = (body && typeof body.attempt === "string") ? body.attempt : newToken();
+  if (!TOKEN_RE.test(token)) return json({ error: "bad_token" }, 400);
   const rec = {
     schema_version: SCHEMA_VERSION,
     token,
@@ -171,8 +179,20 @@ export async function onRequestPost({ request, env }) {
     });
     // ⛔R2 при невыполненном onlyIf возвращает null, а не бросает (урок 13.09).
     if (!put) {
-      console.log("attr token collision", token);
-      return json({ error: "storage_unavailable" }, 503);
+      // ⛔ОБЪЕКТ УЖЕ ЕСТЬ. Это либо повтор той же попытки (ответ потерялся, клиент пришёл
+      //   снова), либо — при отозванной записи — попытка её воскресить. Отозванную не
+      //   трогаем и токена не выдаём; активную считаем своим же повтором.
+      let cur = null;
+      try {
+        const o = await env.ATTR.get(`attr/${token}.json`);
+        cur = o ? await o.json() : null;
+      } catch { return json({ error: "storage_unavailable" }, 503); }
+      if (!cur || cur.state !== "active") {
+        console.log("attr token not reusable", token, cur && cur.state);
+        return json({ error: "storage_unavailable" }, 503);
+      }
+      console.log("attr repeat", token);
+      return json({ token, repeat: true });
     }
   } catch (e) {
     console.log("attr write failed", token, e && e.name);
