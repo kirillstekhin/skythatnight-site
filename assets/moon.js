@@ -529,7 +529,12 @@ function attachControls() {
 
   document.getElementById('sm-buy').addEventListener('click', () => {
     const go = async () => {
-      const link = PAYMENT_LINKS[formatToken()];
+      /* ⛔ТЕСТОВАЯ ВИТРИНА ОБЯЗАНА ВЕСТИ НА ТЕСТОВЫЕ ССЫЛКИ. Локальная копия сайта сама по
+         себе Stripe в тестовый режим не переводит — таблица здесь боевая. Поэтому тестовая
+         сборка подменяет её целиком через `window.SKN_PAYMENT_LINKS`; в бою переопределения
+         нет и берётся таблица из файла. */
+      const links = (typeof window !== 'undefined' && window.SKN_PAYMENT_LINKS) || PAYMENT_LINKS;
+      const link = links[formatToken()];
       const code = designCode();
       if (link) {
         /* ⛔ЛУННАЯ ВИТРИНА ИДЁТ ТЕМ ЖЕ ПУТЁМ, что и звёздная: один модуль атрибуции на обе.
