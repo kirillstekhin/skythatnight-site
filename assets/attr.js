@@ -71,6 +71,17 @@
 
   /* ── идентификатор ────────────────────────────────────────────────────── */
   function capture(search) {
+    /* ⛔ТЕСТОВАЯ ВИТРИНА НЕ БЕРЁТ ИДЕНТИФИКАТОРЫ ИЗ URL (замечание юзера 14.09). Префикс
+       `TEST` на сервере — фильтр, а не доказательство вымышленности: реальный gclid можно
+       подставить в адрес и случайно прогнать по тестовому пути. Поэтому когда задана
+       фикстура, URL не читается ВООБЩЕ — источник данных ровно один и он заранее известен. */
+    var fx = (typeof window !== 'undefined') && window.SKN_ATTR_FIXTURE;
+    if (fx && fx.id_value && ID_RE.test(fx.id_value) && ID_PARAMS.some(function (p) { return p[1] === fx.id_type; })) {
+      mem.id_type = fx.id_type; mem.id_value = fx.id_value;
+      if (consent().granted) persist();
+      return;
+    }
+    if (fx) return;                      /* фикстура задана, но негодная — молчим, URL не читаем */
     var q = new URLSearchParams(search === undefined ? location.search : search);
     for (var i = 0; i < ID_PARAMS.length; i++) {
       var v = q.get(ID_PARAMS[i][0]);
