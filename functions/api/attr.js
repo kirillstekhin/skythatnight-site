@@ -21,9 +21,18 @@
  *   окном импорта и корректировок. Пока окно не подтверждено — `expires_at` не
  *   проставляется, и уборка атрибуции не запускается (см. attribution_store).
  *
- * ⛔СОГЛАСИЕ. Запись делается ТОЛЬКО при `ad_user_data: granted`. При отказе идентификатор
- *   не сохраняется НИГДЕ — ни здесь, ни в браузере: клиент в этом случае сюда не ходит,
- *   а если всё же пришёл — получаем отказ и ничего не пишем.
+ * ⛔СОГЛАСИЕ — ОБА ФЛАГА (исправлено 14.09 по замечанию юзера; до этого запись требовала
+ *   только `ad_user_data`, и это была подмена согласованной схемы). Для консервативного
+ *   варианта, который мы выбрали:
+ *     `ad_storage`   — разрешение ХРАНИТЬ идентификатор;
+ *     `ad_user_data` — разрешение ПЕРЕДАВАТЬ данные Google для рекламы.
+ *   Запись требует **обоих** `granted`; экспорт дополнительно проверяет отсутствие отзыва.
+ *   При отказе идентификатор не сохраняется НИГДЕ — ни здесь, ни в браузере.
+ * ⛔СБОР РЕАЛЬНЫХ ДАННЫХ ЗАПЕРТ, ПОКА НЕ ВЫБРАН СРОК ХРАНЕНИЯ. Запрет уборки предотвращает
+ *   случайное удаление, но сам по себе оставляет данные бессрочно — это не выполненное
+ *   условие, а отложенное. Поэтому режим `live` требует объявленного `ATTR_RETENTION_DAYS`,
+ *   а без него разрешён только режим `test` с ВЫМЫШЛЕННЫМИ данными, и такие записи экспорт
+ *   не отправляет никогда.
  * ⛔В ЛОГИ НЕ ПИСАТЬ САМ ИДЕНТИФИКАТОР. Только тип, токен и код ошибки.
  */
 
@@ -74,7 +83,16 @@ export async function onRequestPost({ request, env }) {
   if (await rateLimited(ip)) return json({ error: "too_many_requests" }, 429);
   if (Number(request.headers.get("Content-Length") || 0) > MAX_BODY)
     return json({ error: "too_large" }, 413);
-  if (!env.ATTR) return json({ error: "not_configured" }, 503);
+  // ⛔ОТДЕЛЬНЫЙ ПРИВАТНЫЙ BUCKET (замечание юзера 14.09). Префикс разделяет ИМЕНА, но не
+  //   доступ: binding на bucket дизайнов дал бы этой Function доступ и к персонализации
+  //   заказов. У рекламной атрибуции нет ни одной причины её видеть.
+  if (!env.ATTR) return json({ error: "not_configured", detail: "attr_bucket_unbound" }, 503);
+  const mode = env.ATTR_MODE;
+  if (mode !== "test" && mode !== "live")
+    return json({ error: "not_configured", detail: "attr_mode_unset" }, 503);
+  const retention = Number(env.ATTR_RETENTION_DAYS || 0);
+  if (mode === "live" && !(retention > 0))
+    return json({ error: "not_configured", detail: "retention_undefined" }, 503);
 
   let body;
   try {
@@ -94,6 +112,13 @@ export async function onRequestPost({ request, env }) {
       rec = o ? await o.json() : null;
     } catch { return json({ error: "storage_unavailable" }, 503); }
     if (!rec) return json({ error: "not_found" }, 404);
+    // ⛔ПОВТОРНЫЙ ОТЗЫВ — УСПЕХ, А НЕ ОШИБКА. Клиент, у которого отзыв не прошёл из-за
+    //   недоступного сервера, обязан повторить его позже; вторая попытка должна
+    //   завершаться так же спокойно, как первая.
+    if (rec.state === "revoked") {
+      console.log("attr revoke repeated", token);
+      return json({ revoked: true, already: true });
+    }
     try {
       // ⛔ИДЕНТИФИКАТОР СТИРАЕМ, А НЕ ПРОСТО ПОМЕЧАЕМ. Отзыв согласия означает, что хранить
       //   его больше не на чем — метка остаётся, чтобы экспорт видел отзыв и не гадал.
@@ -113,9 +138,10 @@ export async function onRequestPost({ request, env }) {
   const consent = (body && body.consent) || {};
   if (!ID_TYPES.includes(idType) || typeof idValue !== "string" || !ID_RE.test(idValue))
     return json({ error: "bad_identifier" }, 400);
-  // ⛔РЕШЕНИЕ ПРИНИМАЕТ `ad_user_data`, а не `ad_storage`: первое разрешает передавать
-  //   данные Google для рекламы, второе — лишь хранить в браузере. Без него не пишем.
-  if (consent.ad_user_data !== "granted")
+  // ⛔НУЖНЫ ОБА. `ad_storage` разрешает хранить, `ad_user_data` — передавать Google.
+  //   Хранить то, что нельзя передать, бессмысленно; передавать без права хранить —
+  //   нельзя. Поэтому запись только при обоих `granted`.
+  if (consent.ad_storage !== "granted" || consent.ad_user_data !== "granted")
     return json({ error: "consent_required" }, 403);
 
   const token = newToken();
@@ -130,9 +156,12 @@ export async function onRequestPost({ request, env }) {
       ad_personalization: consent.ad_personalization || null,
     },
     created: new Date().toISOString().replace(/\.\d+Z$/, "Z"),
-    // ④СРОК НЕ ПРОСТАВЛЯЕМ, пока не подтверждено окно импорта и корректировок. Пустое
-    //   поле честнее выдуманного: уборка атрибуции по нему откажется работать.
-    expires_at: null,
+    // ④СРОК: в режиме `live` он обязателен и проставляется; в `test` может отсутствовать.
+    expires_at: retention > 0
+      ? new Date(Date.now() + retention * 86400000).toISOString().replace(/\.\d+Z$/, "Z")
+      : null,
+    // ⛔РЕЖИМ ДАННЫХ. `test` = вымышленные, экспорт их не отправляет НИКОГДА.
+    mode,
     state: "active",
   };
   try {
