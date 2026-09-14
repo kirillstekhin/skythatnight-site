@@ -23,7 +23,10 @@
 (function () {
   'use strict';
 
-  var ENDPOINT = '/api/attr';
+  /* ⛔ПО УМОЛЧАНИЮ — ОТНОСИТЕЛЬНЫЙ АДРЕС, то есть тот же хост, где находится покупатель
+     (`www.skythatnight.com`). Переопределяется ТОЛЬКО в тестовом окружении, где витрина и
+     Worker живут на разных адресах; в бою переопределения нет и CORS не нужен. */
+  var ENDPOINT = (typeof window !== 'undefined' && window.SKN_ATTR_ENDPOINT) || '/api/attr';
   var TIMEOUT_MS = 1200;              /* верхняя граница задержки перед оплатой */
   var REVOKE_TIMEOUT_MS = 4000;
   var SESSION_ID_KEY = 'skn_attr_id';        /* идентификатор — ТОЛЬКО после согласия */
