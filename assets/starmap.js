@@ -663,12 +663,18 @@ function attachControls() {
 
   document.getElementById('sm-buy').addEventListener('click', () => {
     const go = async () => {
-      /* ⛔ТЕСТОВАЯ ВИТРИНА ОБЯЗАНА ВЕСТИ НА ТЕСТОВЫЕ ССЫЛКИ. Локальная копия сайта сама по
-         себе Stripe в тестовый режим не переводит — таблица здесь боевая. Поэтому тестовая
-         сборка подменяет её целиком через `window.SKN_PAYMENT_LINKS`; в бою переопределения
-         нет и берётся таблица из файла. */
-      const links = (typeof window !== 'undefined' && window.SKN_PAYMENT_LINKS) || PAYMENT_LINKS;
+      /* ⛔ТЕСТОВАЯ СБОРКА НИКОГДА НЕ ПАДАЕТ ОБРАТНО НА БОЕВЫЕ ССЫЛКИ. Локальная копия сайта
+         сама по себе Stripe в тестовый режим не переводит — таблица в этом файле боевая.
+         Поэтому при `SKN_TEST_BUILD` берётся ТОЛЬКО подменённая таблица, и если её нет или
+         в ней не хватает нужного формата, оплата БЛОКИРУЕТСЯ: покупатель тестовой сборки
+         уходит на путь «заказ письмом», а не на живую ссылку. Отката к `PAYMENT_LINKS`
+         здесь нет ни при каких условиях — иначе проверка однажды заплатит по-настоящему. */
+      const testBuild = typeof window !== 'undefined' && window.SKN_TEST_BUILD === true;
+      const links = testBuild ? (window.SKN_PAYMENT_LINKS || {}) : PAYMENT_LINKS;
       const link = links[formatToken()];
+      if (testBuild && !link) {
+        console.warn('[skn] тестовая сборка: ссылки для', formatToken(), 'нет — оплата заблокирована');
+      }
       const code = designCode();
       if (link) {
         /* ⛔ОДИН ПЕРЕХОД И ТОЛЬКО ОДИН. Поздний ответ сервера не имеет права увести
