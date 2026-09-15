@@ -527,7 +527,32 @@ function attachControls() {
   /* ⛔ЗАПУСК АТРИБУЦИИ — НА ЗАГРУЗКЕ. Модуль общий со звёздной витриной. */
   try { window.SknAttr && window.SknAttr.boot(); } catch (e) {}
 
-  document.getElementById('sm-buy').addEventListener('click', () => {
+  /* ⛔КНОПКА ОБЯЗАНА ОТВЕЧАТЬ СРАЗУ (15.09.2026). Между кликом и уходом на Stripe проходит
+     до 1.5 с: 300 мс паузы на автопривязку места плюс до 1200 мс ожидания токена атрибуции
+     (замер на витрине: холодный клик 546 мс, следующие 191–242 мс). Всё это время кнопка
+     выглядела нетронутой. На телефоне это читается как «сломано»: человек жмёт второй раз,
+     а второй клик не делает НИЧЕГО — `navigateToPayment` уже помечен сработавшим.
+     ⚠️Задержка достаётся ровно тем, кто пришёл ПО ОБЪЯВЛЕНИЮ и дал согласие: без согласия
+     или без рекламного идентификатора токен не запрашивается вовсе, и клик мгновенный.
+     То есть молчала кнопка именно на самом дорогом трафике.
+     ⛔ШИРИНА ЗАКРЕПЛЯЕТСЯ ПЕРЕД СМЕНОЙ ТЕКСТА. Кнопка `inline-block` и ширину берёт от
+     содержимого; без этого подпись дёргала бы раскладку в момент нажатия. Подпись подобрана
+     короче исходной, чтобы поместиться в ту же ширину. */
+  const buyBtn = document.getElementById('sm-buy');
+  const BUY_LABEL = buyBtn.textContent;
+  let buyPending = false;
+  const setBuyPending = on => {
+    if (on && !buyBtn.style.width) buyBtn.style.width = buyBtn.offsetWidth + 'px';
+    buyPending = on;
+    buyBtn.setAttribute('aria-busy', on ? 'true' : 'false');
+    buyBtn.style.opacity = on ? '0.72' : '';
+    buyBtn.style.cursor = on ? 'progress' : '';
+    buyBtn.textContent = on ? 'One moment\u2026' : BUY_LABEL;
+  };
+
+  buyBtn.addEventListener('click', () => {
+    if (buyPending) return;
+    setBuyPending(true);
     const go = async () => {
       /* ⛔ТЕСТОВАЯ СБОРКА НИКОГДА НЕ ПАДАЕТ ОБРАТНО НА БОЕВЫЕ ССЫЛКИ. Локальная копия сайта
          сама по себе Stripe в тестовый режим не переводит — таблица в этом файле боевая.
@@ -546,16 +571,27 @@ function attachControls() {
         /* ⛔ЛУННАЯ ВИТРИНА ИДЁТ ТЕМ ЖЕ ПУТЁМ, что и звёздная: один модуль атрибуции на обе.
            Один переход и только один — флаг ставится ДО ожидания токена, поэтому поздний
            ответ не уводит покупателя второй раз. Любая осечка → чистый design-код. */
-        if (window.SknAttr) { window.SknAttr.navigateToPayment(link, code); return; }
+        if (window.SknAttr) {
+          /* ⚠️`false` значит «переход уже был» — тогда эта кнопка ничего не ждёт и обязана ожить */
+          window.SknAttr.navigateToPayment(link, code).then(ok => { if (!ok) setBuyPending(false); });
+          return;
+        }
         window.location.href = `${link}?client_reference_id=${encodeURIComponent(code)}`;
       } else {
         const box = document.getElementById('sm-checkout-note');
         box.hidden = false;
         box.querySelector('code').textContent = code;
+        setBuyPending(false);              // перехода не будет — кнопка оживает
       }
     };
     /* 300 мс — даём blur-автоприменению поля места успеть (см. starmap.js) */
-    setTimeout(() => { placeConfirmed ? go() : askPlaceConfirm(go); }, 300);
+    setTimeout(() => {
+      /* ⛔ГЕЙТ МЕСТА ЖДЁТ ЧЕЛОВЕКА, А НЕ СЕРВЕР. Пока он открыт, кнопка обязана быть живой:
+         иначе «One moment…» висит над вопросом, на который ответить должен покупатель. */
+      if (placeConfirmed) { go(); return; }
+      setBuyPending(false);
+      askPlaceConfirm(() => { setBuyPending(true); go(); });
+    }, 300);
   });
 }
 
