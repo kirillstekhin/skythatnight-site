@@ -679,9 +679,6 @@ function attachControls() {
       if (link) {
         /* ⛔ОДИН ПЕРЕХОД И ТОЛЬКО ОДИН. Поздний ответ сервера не имеет права увести
            покупателя второй раз — флаг ставится ДО ожидания токена. */
-        /* ⛔ОДИН ПЕРЕХОД И ТОЛЬКО ОДИН, и он живёт в общем модуле: обе витрины зовут одну
-           функцию, поэтому правило проверяется один раз и работает в обеих. Нет модуля —
-           идём как раньше, с чистым design-кодом. */
         if (window.SknAttr) { window.SknAttr.navigateToPayment(link, code); return; }
         window.location.href = `${link}?client_reference_id=${encodeURIComponent(code)}`;
       } else {

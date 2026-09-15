@@ -1,5 +1,5 @@
 /* SKN — рекламная атрибуция на стороне браузера (14.09.2026).
-   Схема: platform/ATTRIBUTION_SPEC.md · сервер: functions/api/attr.js
+   Схема: platform/ATTRIBUTION_SPEC.md · сервер: Worker `skn-attr-prod` на /api/attr
    Общий модуль: подключается ДО starmap.js и moon.js, обоим нужен один и тот же путь.
 
    ⛔РЕКЛАМА — УЧЁТ, А НЕ ГЕЙТ. Ни одна ветка не имеет права помешать оплате: не ответил
