@@ -51,19 +51,23 @@ function moonName(p) {
 const THEMES = {
   midnight: { page:'#0b1733', sky:'#0a1430', ink:'#eaf0ff', sub:'#8fb0e6', faint:'#6f8bc0',
               star:'#ffffff', ring:'#3a5a9a', grid:'#20345f', lines:'#4f6fa8', lineOp:0.34,
-              accent:'#8fb0e6', lineW:0.7, label:'Midnight' },
+              accent:'#8fb0e6', lineW:0.7, mw:'#a8c4f0', mwOp:0.05, label:'Midnight' },
   luxegold: { page:'#0b1733', sky:'#0a1430', ink:'#eaf0ff', sub:'#8fb0e6', faint:'#6f8bc0',
               star:'#ffffff', ring:'#c9a961', grid:'#20345f', lines:'#4f6fa8', lineOp:0.34,
-              accent:'#c9a961', lineW:0.7, label:'Luxe · Gold' },
+              accent:'#c9a961', lineW:0.7, mw:'#a8c4f0', mwOp:0.05, label:'Luxe · Gold' },
   luxesilver:{ page:'#0b1733', sky:'#0a1430', ink:'#eaf0ff', sub:'#8fb0e6', faint:'#6f8bc0',
               star:'#ffffff', ring:'#c3ccd8', grid:'#20345f', lines:'#4f6fa8', lineOp:0.34,
-              accent:'#c3ccd8', lineW:0.7, label:'Luxe · Silver' },
+              accent:'#c3ccd8', lineW:0.7, mw:'#a8c4f0', mwOp:0.05, label:'Luxe · Silver' },
   porcelain:{ page:'#f5f2ea', sky:'#f5f2ea', ink:'#0d1830', sub:'#33496e', faint:'#5f7396',
               star:'#0d1830', ring:'#0f1b33', grid:'#ccd3e0', lines:'#2c4269', lineOp:0.82,
-              accent:'#243a63', lineW:1.6, dotScale:1.8, opMin:0.78, opBase:0.68, label:'Porcelain' },
+              accent:'#243a63', lineW:1.6, dotScale:1.8, opMin:0.78, opBase:0.68,
+              /* ⛔У Porcelain Млечного Пути НЕТ — так же в печати (`milkyway=False`): на светлой
+                 бумаге полоса читается грязью, а не небом. Ноль, а не флаг, чтобы переход между
+                 темами гасил её плавно, а не обрывом на первом же кадре. */
+              mw:'#1c2a4a', mwOp:0, label:'Porcelain' },
   noir:     { page:'#060608', sky:'#060608', ink:'#e8dcc0', sub:'#c9a961', faint:'#8a7845',
               star:'#f5efe0', ring:'#c9a961', grid:'#1d1a12', lines:'#8a7845', lineOp:0.32,
-              accent:'#c9a961', lineW:0.7, label:'Noir' },
+              accent:'#c9a961', lineW:0.7, mw:'#cfc4a4', mwOp:0.035, label:'Noir' },
 };
 
 // Промежуточная палитра для анимации смены темы: hex-цвета и числовые
@@ -71,11 +75,11 @@ const THEMES = {
 function mixThemes(A, B, p) {
   const out = Object.assign({}, B);
   const ch = (h, i) => parseInt(h.slice(i, i + 2), 16);
-  for (const k of ['page','sky','ink','sub','faint','star','ring','grid','lines','accent']) {
+  for (const k of ['page','sky','ink','sub','faint','star','ring','grid','lines','accent','mw']) {
     out[k] = '#' + [1, 3, 5].map(i =>
       Math.round(ch(A[k], i) + (ch(B[k], i) - ch(A[k], i)) * p).toString(16).padStart(2, '0')).join('');
   }
-  const D = { lineOp: 0.34, lineW: 0.7, dotScale: 1, opMin: 0.25, opBase: 0.30 };
+  const D = { lineOp: 0.34, lineW: 0.7, dotScale: 1, opMin: 0.25, opBase: 0.30, mwOp: 0.05 };
   for (const k in D) {
     const a = A[k] !== undefined ? A[k] : D[k], b = B[k] !== undefined ? B[k] : D[k];
     out[k] = a + (b - a) * p;
@@ -138,12 +142,46 @@ function renderSvg(o) {
   const LAT = o._lat !== undefined ? o._lat : o.lat;
   if (o._themeMix) t = o._themeMix;
   const s = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">`];
-  s.push(`<defs><clipPath id="skyclip"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath></defs>`);
+  s.push(`<defs><clipPath id="skyclip"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>`
+    /* ⛔ТЕ ЖЕ ЧИСЛА, ЧТО В ПЕЧАТИ (`starmap_v3.py`, фильтр `mwb`). Размытие здесь не украшение:
+       полоса — это пять вложенных силуэтов, и без него видны их края, как у топографии. */
+    + `<filter id="mwblur" x="-15%" y="-15%" width="130%" height="130%"><feGaussianBlur stdDeviation="9"/></filter></defs>`);
   s.push(`<rect width="${W}" height="${H}" fill="${t.page}"/>`);
   // passe-partout border
   s.push(`<rect x="34" y="34" width="${W-68}" height="${H-68}" fill="none" stroke="${t.accent}" stroke-width="1.4" opacity="0.9"/>`);
   s.push(`<rect x="44" y="44" width="${W-88}" height="${H-88}" fill="none" stroke="${t.accent}" stroke-width="0.6" opacity="0.7"/>`);
   s.push(`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${t.sky}"/>`);
+
+  /* ── Млечный Путь ───────────────────────────────────────────────────────────────────
+     ⛔ПРЕВЬЮ ОБЯЗАНО ПОКАЗЫВАТЬ ТО, ЧТО НАПЕЧАТАЕТСЯ. Печатный движок рисует полосу с
+     14.09, витрина — не рисовала: покупатель платил за небо, которого не видел на экране,
+     и получал больше обещанного. Лишнее в подарок — всё равно расхождение.
+     Геометрия и порядок слоёв повторяют `starmap_v3.render`: полоса ложится на диск неба
+     и ПОД линии созвездий, иначе линии тонут в ней.
+     ⚠️Данные — упрощённая копия `starmap/milkyway.json` (8.4% точек), её делает
+     `tools/make_milkyway_preview.py`; долготы там уже развёрнуты. */
+  if (CATALOG.milkyway && t.mwOp > 0.0005) {
+    s.push(`<g clip-path="url(#skyclip)" filter="url(#mwblur)">`);
+    for (const feat of CATALOG.milkyway) {
+      let d = '';
+      for (const ring of feat) {
+        let path = '', maxAlt = -9, minR = 9;
+        for (const [lon, lat] of ring) {
+          const [alt, az] = altAz(lon, lat, L, LAT);
+          if (alt > maxAlt) maxAlt = alt;
+          const rr = (Math.PI / 2 - alt) / (Math.PI / 2);
+          if (rr < minR) minR = rr;
+          const [x, y] = project(alt, az, cx, cy, R);
+          path += (path ? 'L' : 'M') + x.toFixed(1) + ',' + y.toFixed(1);
+        }
+        // те же отсечки, что в печати: кольцо глубоко под горизонтом или далеко за диском
+        if (maxAlt < -0.4363 || minR > 1.75) continue;
+        d += path + 'Z';
+      }
+      if (d) s.push(`<path d="${d}" fill="${t.mw}" fill-opacity="${t.mwOp.toFixed(3)}" fill-rule="evenodd"/>`);
+    }
+    s.push('</g>');
+  }
 
   // constellation lines
   s.push(`<g clip-path="url(#skyclip)" stroke="${t.lines}" stroke-opacity="${t.lineOp}" stroke-width="${t.lineW}" fill="none" stroke-linecap="round">`);
@@ -704,7 +742,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if ('place' in window.SM_PRESET || 'lat' in window.SM_PRESET) placeConfirmed = true;
   }
   try {
-    const r = await fetch('assets/starmap-data.json');
+    /* ⛔ВЕРСИЯ У ДАННЫХ ОБЯЗАТЕЛЬНА, как у скриптов (найдено 15.09.2026 на локальной витрине).
+       Скрипты подключаются как `starmap.js?v=NN` и обновляются у вернувшихся посетителей;
+       каталог запрашивался БЕЗ версии — и браузер отдавал страницу с новым кодом и старым
+       каталогом из кэша. Млечный Путь тогда просто не появлялся, молча: код есть, данных нет.
+       ⚠️Меняешь `starmap-data.json` — подними здесь число, иначе увидят изменение только те,
+       кто пришёл впервые. */
+    const r = await fetch('assets/starmap-data.json?v=2');
     CATALOG = await r.json();
   } catch (e) {
     document.getElementById('sm-preview').innerHTML =
