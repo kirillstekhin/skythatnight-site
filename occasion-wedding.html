@@ -99,7 +99,22 @@
 .sm-config .container { display:grid; grid-template-columns: minmax(0,1fr) 420px; gap:clamp(2rem,4vw,3.5rem); align-items:start; }
 @media (max-width: 980px){ .sm-config .container { grid-template-columns:1fr; } }
 .sm-preview-wrap { position:sticky; top:2rem; }
-@media (max-width: 980px){ .sm-preview-wrap { position:static; } }
+/* ⛔НА ТЕЛЕФОНЕ НЕБО ОБЯЗАНО БЫТЬ ВИДНО В МОМЕНТ ВЫБОРА (замер 15.09.2026, 375×812).
+   Превью заканчивалось на 1473 px, а «Тема» лежала на 2005, «Размер» 2093, «Формат» 2208:
+   человек менял тему и НЕ ВИДЕЛ, что изменилось. Главное обещание витрины — «смотри своё
+   небо до печати» — на мобильном не работало вовсе; кнопка оплаты была на 1034 px ниже
+   превью. На десктопе превью липкое с самого начала, и там этой беды нет.
+   ⚠️Просто включить `sticky` было нельзя — ровно поэтому здесь и стоял `static`: превью
+   447 px на экране 812 px съело бы больше половины, и выбирать стало бы негде. Поэтому
+   прилипшее превью СЖИМАЕТСЯ ПО ШИРИНЕ: высота идёт за ней сама, пропорция постера цела,
+   а планку рамы пересчитывает `applyPreviewFrame` (она считается от ширины превью). */
+@media (max-width: 980px){
+  .sm-preview-wrap { position:sticky; top:0; z-index:5; background:var(--night); padding:.5rem 0 .4rem; }
+  .sm-preview-wrap #sm-preview { margin:0 auto; transition:max-width .22s ease; }
+  .sm-preview-wrap.is-stuck #sm-preview { max-width:46vw; }
+  .sm-preview-wrap.is-stuck .sm-moon-chip { display:none; }
+}
+@media (prefers-reduced-motion: reduce){ .sm-preview-wrap #sm-preview { transition:none; } }
 #sm-preview svg { width:100%; height:auto; display:block; border-radius:3px;
   box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(201,169,97,.14); }
 .sm-moon-chip { margin-top:1rem; text-align:center; font-family:var(--serif); font-style:italic; font-size:1rem; color:var(--gold); }
@@ -614,7 +629,7 @@
 </script>
 
 <script src="assets/attr.js?v=3" defer></script>
-<script src="assets/starmap.js?v=32" defer></script>
+<script src="assets/starmap.js?v=35" defer></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
 <!-- SKN_GTAG_BAR:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ. -->
 <div class="skn-consent" id="skn-consent" role="region" aria-label="Cookie choice">

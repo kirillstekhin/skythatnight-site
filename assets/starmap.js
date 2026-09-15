@@ -649,6 +649,49 @@ function attachGeocode() {
   showEcho(false);
 }
 
+/* ⛔ПРИЛИПАНИЕ НАДО ЗАМЕТИТЬ, ЧТОБЫ СЖАТЬ. Чистым CSS состояние «прилипло» не выражается,
+   поэтому берём приём с наблюдателем: элемент с `top:0` при прилипании выходит на 1 px за
+   верх корня, и доля видимости падает ниже единицы. Нет `IntersectionObserver` — остаётся
+   прежнее поведение (превью просто липкое), ничего не ломается.
+   ⚠️Планку рамы пересчитываем ДВАЖДЫ: сразу и после перехода — `applyPreviewFrame` берёт
+   ширину превью, а в середине анимации она промежуточная. */
+function watchStickyPreview() {
+  const wrap = document.querySelector('.sm-preview-wrap');
+  if (!wrap || typeof IntersectionObserver === 'undefined') return;
+  /* ⛔ПРОВЕРЯЕМ ПО ПРОКРУТКЕ, А НЕ НАБЛЮДАТЕЛЕМ ПЕРЕСЕЧЕНИЙ. Сначала стояло два варианта
+     на `IntersectionObserver`, и оба врали. Первый решал по самой записи наблюдателя —
+     при мгновенной прокрутке записи приходят пачкой, и `entries[0]` описывает устаревшее
+     положение. Второй читал геометрию, но обратного вызова могло не быть ВОВСЕ: если
+     страница прыгает так, что блок уходит из-под экрана целиком, доля видимости остаётся
+     нулём до и после, порог не пересекается и наблюдатель молчит. На лунной витрине именно
+     это и случилось: превью прилипало, а сжатия не было.
+     Слушатель прокрутки с `rAF` грубее, но честнее: он смотрит на положение, а не на
+     событие, и работает одинаково при плавной прокрутке, прыжке и якоре. */
+  let last = null, ticking = false;
+  /* ⛔ЗОНА НЕЧУВСТВИТЕЛЬНОСТИ. Сжатие меняет высоту блока, страница становится короче, и
+     при той же прокрутке верх превью уезжает ВНИЗ — то есть само сжатие может отменить
+     условие, по которому оно произошло. На 375×812 замер дал ровно один переход, но на
+     экране другой высоты это превратилось бы в мигание. Поэтому порог включения и порог
+     выключения разные: сжимаем на 0.5 px, разжимаем только на 24 px. */
+  const evaluate = () => {
+    const top = wrap.getBoundingClientRect().top;
+    const stuck = window.innerWidth <= 980 && (last ? top <= 24 : top <= 0.5);
+    if (stuck === last) return;
+    last = stuck;
+    wrap.classList.toggle('is-stuck', stuck);
+    applyPreviewFrame();
+    setTimeout(applyPreviewFrame, 240);
+  };
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { ticking = false; evaluate(); });
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', evaluate);
+  evaluate();
+}
+
 function attachControls() {
   document.getElementById('sm-date').addEventListener('change', e => { if (e.target.value) { state.dateStr = e.target.value; refresh(); } });
   document.getElementById('sm-time').addEventListener('change', e => { if (e.target.value) { state.timeStr = e.target.value; refresh(); } });
@@ -698,6 +741,7 @@ function attachControls() {
      исчезнет при первом же переходе, а согласие человек может дать позже. Модуль общий с
      лунной витриной (assets/attr.js) и молчалив: помешать странице он не может. */
   try { window.SknAttr && window.SknAttr.boot(); } catch (e) {}
+  watchStickyPreview();
 
   /* ⛔КНОПКА ОБЯЗАНА ОТВЕЧАТЬ СРАЗУ (15.09.2026). Между кликом и уходом на Stripe проходит
      до 1.5 с: 300 мс паузы на автопривязку места плюс до 1200 мс ожидания токена атрибуции
