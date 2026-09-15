@@ -64,6 +64,14 @@ function canvasH(o, W) {
   const px = PRINT_PX[String(o.frameType || 'print').toUpperCase() + o.size];
   return px ? Math.round(W * px[1] / px[0]) : Math.round(W * PRINT_SIZES[SIZE_CM[o.size] || '30x40']);
 }
+
+/* ⛔ШРИФТ ПОСТЕРА — КАК В ПЕЧАТИ (15.09.2026, решение юзера). fulfil.py зовёт движок без
+   display_font/body_font, печатный SVG объявляет `Georgia,serif`, и rsvg-convert берёт
+   /System/Library/Fonts/Supplemental/Georgia.ttf. Превью объявляло EB Garamond: браузер его
+   загружал и рисовал им, а у печатного рендера этого шрифта нет вовсе. Покупатель утверждал
+   одну гарнитуру, получал другую — на 0–4% шире. Шрифт интерфейса сайта это не трогает,
+   только текст внутри постера. Печатный шрифт не менялся. */
+const POSTER_FONT = 'Georgia,serif';
 const SIZE_CM = { '3040': '30x40', '4050': '40x50', '5070': '50x70' };
 const TEX = 'assets/starmap/moon-texture.jpg';
 
@@ -140,10 +148,10 @@ function renderSvg(o) {
   /* типографика — грамматика звёздного постера */
   const esc = x => String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const ctext = (txt, yy, size, fill, ls) =>
-    s.push(`<text x="${cx}" y="${yy}" fill="${fill}" font-family="'EB Garamond',Georgia,serif" font-size="${size}" letter-spacing="${ls}" text-anchor="middle">${esc(txt)}</text>`);
+    s.push(`<text x="${cx}" y="${yy}" fill="${fill}" font-family="${POSTER_FONT}" font-size="${size}" letter-spacing="${ls}" text-anchor="middle">${esc(txt)}</text>`);
   const months = ['','JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
   const [Y, MO, D] = o.dateStr.split('-').map(Number);
-  const ded = (o.dedication || 'The Moon That Night').toUpperCase();
+  const ded = ((o.dedication || '').trim() ? o.dedication : 'The Moon That Night').toUpperCase();   // пробелы = пусто, как в fulfil.py
   // ⛔`floor`, а не `round`: печать усекает (`int` в starmap_v3), и на 33 символах округление
   //   давало 27px против 26px печатных. Мелочь, но это ровно то расхождение превью и печати,
   //   которое мы и вычищаем.

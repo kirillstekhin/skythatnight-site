@@ -132,6 +132,14 @@ function canvasH(o, W) {
   const px = PRINT_PX[String(o.frameType || 'print').toUpperCase() + o.size];
   return px ? Math.round(W * px[1] / px[0]) : Math.round(W * PRINT_SIZES[SIZE_CM[o.size] || '30x40']);
 }
+
+/* ⛔ШРИФТ ПОСТЕРА — КАК В ПЕЧАТИ (15.09.2026, решение юзера). fulfil.py зовёт движок без
+   display_font/body_font, печатный SVG объявляет `Georgia,serif`, и rsvg-convert берёт
+   /System/Library/Fonts/Supplemental/Georgia.ttf. Превью объявляло EB Garamond: браузер его
+   загружал и рисовал им, а у печатного рендера этого шрифта нет вовсе. Покупатель утверждал
+   одну гарнитуру, получал другую — на 0–4% шире. Шрифт интерфейса сайта это не трогает,
+   только текст внутри постера. Печатный шрифт не менялся. */
+const POSTER_FONT = 'Georgia,serif';
 const SIZE_CM = { '3040': '30x40', '4050': '40x50', '5070': '50x70' };
 
 function renderSvg(o) {
@@ -246,13 +254,13 @@ function renderSvg(o) {
     const [alt, az] = altAz(ra, dec, L, LAT);
     if (alt < 0.07) continue;
     const [x, y] = project(alt, az, cx, cy, R);
-    s.push(`<text x="${(x+7).toFixed(1)}" y="${(y+3).toFixed(1)}" fill="${t.sub}" fill-opacity="0.85" font-family="'EB Garamond',Georgia,serif" font-size="12">${name}</text>`);
+    s.push(`<text x="${(x+7).toFixed(1)}" y="${(y+3).toFixed(1)}" fill="${t.sub}" fill-opacity="0.85" font-family="${POSTER_FONT}" font-size="12">${name}</text>`);
   }
 
   // compass
   for (const [ang, lab] of [[0,'N'],[90,'E'],[180,'S'],[270,'W']]) {
     const a = ang * Math.PI / 180;
-    s.push(`<text x="${(cx+(R+28)*Math.sin(a)).toFixed(1)}" y="${(cy-(R+28)*Math.cos(a)+8).toFixed(1)}" fill="${t.accent}" font-family="'EB Garamond',Georgia,serif" font-size="24" text-anchor="middle">${lab}</text>`);
+    s.push(`<text x="${(cx+(R+28)*Math.sin(a)).toFixed(1)}" y="${(cy-(R+28)*Math.cos(a)+8).toFixed(1)}" fill="${t.accent}" font-family="${POSTER_FONT}" font-size="24" text-anchor="middle">${lab}</text>`);
   }
 
   // typography block
@@ -270,9 +278,9 @@ function renderSvg(o) {
      Утверждать «смотри своё небо до печати» и показывать другую вёрстку нельзя.
      ⚠️Числа скопированы из `starmap_v3.render` намеренно: меняешь там — меняй здесь. */
   const dedFont = (txt, y, size, fill, ls) =>
-    s.push(`<text x="${cx}" y="${y}" fill="${fill}" font-family="'EB Garamond',Georgia,serif" `
+    s.push(`<text x="${cx}" y="${y}" fill="${fill}" font-family="${POSTER_FONT}" `
          + `font-size="${size}" letter-spacing="${ls}" text-anchor="middle">${esc(txt)}</text>`);
-  const dedRaw = (o.dedication || 'Sky That Night');
+  const dedRaw = (o.dedication || '').trim() ? o.dedication : 'Sky That Night';   // пробелы = пусто, как в fulfil.py
   const dedLines = dedRaw.replace(' | ', '\n').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 2);
   let oy;
   if (dedLines.length === 2) {
@@ -291,13 +299,13 @@ function renderSvg(o) {
   s.push(`<line x1="${cx-130}" y1="${oy}" x2="${cx-14}" y2="${oy}" stroke="${t.accent}" stroke-width="0.8" opacity="0.7"/>`);
   s.push(`<line x1="${cx+14}" y1="${oy}" x2="${cx+130}" y2="${oy}" stroke="${t.accent}" stroke-width="0.8" opacity="0.7"/>`);
   s.push(`<path d="M ${cx} ${oy-5} L ${cx+4} ${oy} L ${cx} ${oy+5} L ${cx-4} ${oy} Z" fill="${t.accent}"/>`);
-  s.push(`<text x="${cx}" y="${oy+34}" fill="${t.sub}" font-family="'EB Garamond',Georgia,serif" font-size="21" letter-spacing="6" text-anchor="middle">${esc((o.place||'').toUpperCase())}</text>`);
+  s.push(`<text x="${cx}" y="${oy+34}" fill="${t.sub}" font-family="${POSTER_FONT}" font-size="21" letter-spacing="6" text-anchor="middle">${esc((o.place||'').toUpperCase())}</text>`);
   // ⛔цвет даты как в печати: у luxe и noir это `sub` — noir печатался золотом, превью показывало голубым
-  s.push(`<text x="${cx}" y="${oy+68}" fill="${o.theme==='porcelain' ? t.ink : o.theme==='midnight' ? '#c9d6f2' : t.sub}" font-family="'EB Garamond',Georgia,serif" font-size="19" letter-spacing="1" text-anchor="middle">${months[MO]} ${D}, ${Y}  ·  ${o.timeStr}</text>`);
+  s.push(`<text x="${cx}" y="${oy+68}" fill="${o.theme==='porcelain' ? t.ink : o.theme==='midnight' ? '#c9d6f2' : t.sub}" font-family="${POSTER_FONT}" font-size="19" letter-spacing="1" text-anchor="middle">${months[MO]} ${D}, ${Y}  ·  ${o.timeStr}</text>`);
   const latS = Math.abs(o.lat).toFixed(4) + '°' + (o.lat >= 0 ? 'N' : 'S');
   const lonS = Math.abs(o.lon).toFixed(4) + '°' + (o.lon >= 0 ? 'E' : 'W');
-  s.push(`<text x="${cx}" y="${oy+100}" fill="${t.faint}" font-family="'EB Garamond',Georgia,serif" font-size="16" letter-spacing="2" text-anchor="middle">${latS}   ${lonS}</text>`);
-  s.push(`<text x="${cx}" y="${H-58}" fill="${t.faint}" font-family="'EB Garamond',Georgia,serif" font-size="14" letter-spacing="3" text-anchor="middle">S K Y ,  T H A T  N I G H T</text>`);
+  s.push(`<text x="${cx}" y="${oy+100}" fill="${t.faint}" font-family="${POSTER_FONT}" font-size="16" letter-spacing="2" text-anchor="middle">${latS}   ${lonS}</text>`);
+  s.push(`<text x="${cx}" y="${H-58}" fill="${t.faint}" font-family="${POSTER_FONT}" font-size="14" letter-spacing="3" text-anchor="middle">S K Y ,  T H A T  N I G H T</text>`);
   s.push('</svg>');
   return { svg: s.join(''), phase, lst };
 }
