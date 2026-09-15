@@ -53,6 +53,17 @@ function mixThemes(A, B, p) {
 }
 
 const PRINT_SIZES = { '30x40': 4 / 3, '40x50': 5 / 4, '50x70': 7 / 5 };
+
+/* ⛔ПИКСЕЛИ АРТИКУЛОВ — ИЗ fulfil.CATALOG, И ВЫСОТА ХОЛСТА СЧИТАЕТСЯ ИЗ НИХ, КАК В ПЕЧАТИ.
+   fulfil.py зовёт движок с `H=round(1200*h/w)`, а не с пропорцией размера. Для пяти артикулов
+   это одно и то же, но у CLASSIC3040 файл 3614×4795 — не ровно 3:4: печатный холст 1592, а не
+   1600, и вся композиция сдвинута. Меняешь CATALOG в fulfil.py — меняй здесь. */
+const PRINT_PX = { PRINT3040: [3600, 4800], PRINT4050: [4800, 6000], PRINT5070: [6000, 8400],
+                   CLASSIC3040: [3614, 4795], CLASSIC4050: [4800, 6000], CLASSIC5070: [6000, 8400] };
+function canvasH(o, W) {
+  const px = PRINT_PX[String(o.frameType || 'print').toUpperCase() + o.size];
+  return px ? Math.round(W * px[1] / px[0]) : Math.round(W * PRINT_SIZES[SIZE_CM[o.size] || '30x40']);
+}
 const SIZE_CM = { '3040': '30x40', '4050': '40x50', '5070': '50x70' };
 const TEX = 'assets/starmap/moon-texture.jpg';
 
@@ -73,7 +84,7 @@ function renderSvg(o) {
   const t = o._themeMix || THEMES[o.theme] || THEMES.midnight;
   const age = o._age !== undefined ? o._age : moonAge(o.dateStr, o.timeStr, o.tz);
   const W = 1200;
-  const H = Math.round(W * PRINT_SIZES[SIZE_CM[o.size] || '30x40']);
+  const H = canvasH(o, W);                        // из пикселей артикула, как в fulfil.py
   const porcelain = o.theme === 'porcelain';
 
   const brandPad = 58, textBlock = 236, gap = 96;

@@ -121,14 +121,29 @@ function moonIconSvg(cx, cy, r, phase, fill, ring) {
 /* Аспект = print-area Prodigi (иначе печать обрежет постер):
    30x40 → 3:4 · 40x50 → 4:5 · 50x70 → 5:7. Превью ОБЯЗАНО совпадать с печатью. */
 const PRINT_SIZES = { '30x40': 4 / 3, '40x50': 5 / 4, '50x70': 7 / 5 };            // H/W
+
+/* ⛔ПИКСЕЛИ АРТИКУЛОВ — ИЗ fulfil.CATALOG, И ВЫСОТА ХОЛСТА СЧИТАЕТСЯ ИЗ НИХ, КАК В ПЕЧАТИ.
+   fulfil.py зовёт движок с `H=round(1200*h/w)`, а не с пропорцией размера. Для пяти артикулов
+   это одно и то же, но у CLASSIC3040 файл 3614×4795 — не ровно 3:4: печатный холст 1592, а не
+   1600, и вся композиция сдвинута. Меняешь CATALOG в fulfil.py — меняй здесь. */
+const PRINT_PX = { PRINT3040: [3600, 4800], PRINT4050: [4800, 6000], PRINT5070: [6000, 8400],
+                   CLASSIC3040: [3614, 4795], CLASSIC4050: [4800, 6000], CLASSIC5070: [6000, 8400] };
+function canvasH(o, W) {
+  const px = PRINT_PX[String(o.frameType || 'print').toUpperCase() + o.size];
+  return px ? Math.round(W * px[1] / px[0]) : Math.round(W * PRINT_SIZES[SIZE_CM[o.size] || '30x40']);
+}
 const SIZE_CM = { '3040': '30x40', '4050': '40x50', '5070': '50x70' };
 
 function renderSvg(o) {
   // o: {dateStr,timeStr,lat,lon,tz,place,dedication,theme,size}
   let t = THEMES[o.theme] || THEMES.midnight;
   const W = 1200;
-  const H = Math.round(W * PRINT_SIZES[SIZE_CM[o.size] || '30x40']);
-  const MOON_R = 16;
+  const H = canvasH(o, W);                        // из пикселей артикула, как в fulfil.py
+  /* ⛔РАДИУС ЛУНЫ НАД ПОДПИСЬЮ — 13, КАК В ПЕЧАТИ (сверка координат 15.09.2026). Здесь стояло 16,
+     а fulfil.py зовёт движок без `moon_r`, то есть с 13. Радиус входит в высоту типоблока: весь
+     диск в превью сидел на 3 px выше печатного, а посвящение, орнамент, место, дата и координаты —
+     на 3 px ниже. Кегль и интервал при этом совпадали, поэтому сверка по ним этого не видела. */
+  const MOON_R = 13;
   const TEXT_H = 108 + (2 * MOON_R + 9) + 136;   // круг → луна → посвящение/место/дата/координаты
   const region = H - 58;                          // полезная высота над строкой бренда
   const R = Math.min(0.4167 * W, (region - TEXT_H - 180) / 2);
@@ -245,8 +260,8 @@ function renderSvg(o) {
   const [Y, MO, D] = o.dateStr.split('-').map(Number);
   const phase = moonPhase(jd);
   let ty = cy + R + 108;
-  s.push(`<g>${moonIconSvg(cx, ty - 17, 16, phase, o.theme === 'porcelain' ? t.ink : t.star, t.accent)}</g>`);
-  ty += 41;
+  s.push(`<g>${moonIconSvg(cx, ty - MOON_R - 1, MOON_R, phase, o.theme === 'porcelain' ? t.ink : t.star, t.accent)}</g>`);
+  ty += 2 * MOON_R + 9;                            // как `ty += 2*moon_r + 9` в starmap_v3
   /* ⛔ПОСВЯЩЕНИЕ РИСУЕТСЯ ТЕМИ ЖЕ ПРАВИЛАМИ, ЧТО В ПЕЧАТИ (15.09.2026). Раньше превью всегда
      рисовало 34-й кегль с интервалом 4, а `starmap_v3` уменьшает длинный текст (34 → вплоть
      до 19) и сжимает интервал, а « | » превращает в ДВЕ строки разного размера и сдвигает
@@ -277,7 +292,8 @@ function renderSvg(o) {
   s.push(`<line x1="${cx+14}" y1="${oy}" x2="${cx+130}" y2="${oy}" stroke="${t.accent}" stroke-width="0.8" opacity="0.7"/>`);
   s.push(`<path d="M ${cx} ${oy-5} L ${cx+4} ${oy} L ${cx} ${oy+5} L ${cx-4} ${oy} Z" fill="${t.accent}"/>`);
   s.push(`<text x="${cx}" y="${oy+34}" fill="${t.sub}" font-family="'EB Garamond',Georgia,serif" font-size="21" letter-spacing="6" text-anchor="middle">${esc((o.place||'').toUpperCase())}</text>`);
-  s.push(`<text x="${cx}" y="${oy+68}" fill="${o.theme==='porcelain'?t.ink:'#c9d6f2'}" font-family="'EB Garamond',Georgia,serif" font-size="19" letter-spacing="1" text-anchor="middle">${months[MO]} ${D}, ${Y}  ·  ${o.timeStr}</text>`);
+  // ⛔цвет даты как в печати: у luxe и noir это `sub` — noir печатался золотом, превью показывало голубым
+  s.push(`<text x="${cx}" y="${oy+68}" fill="${o.theme==='porcelain' ? t.ink : o.theme==='midnight' ? '#c9d6f2' : t.sub}" font-family="'EB Garamond',Georgia,serif" font-size="19" letter-spacing="1" text-anchor="middle">${months[MO]} ${D}, ${Y}  ·  ${o.timeStr}</text>`);
   const latS = Math.abs(o.lat).toFixed(4) + '°' + (o.lat >= 0 ? 'N' : 'S');
   const lonS = Math.abs(o.lon).toFixed(4) + '°' + (o.lon >= 0 ? 'E' : 'W');
   s.push(`<text x="${cx}" y="${oy+100}" fill="${t.faint}" font-family="'EB Garamond',Georgia,serif" font-size="16" letter-spacing="2" text-anchor="middle">${latS}   ${lonS}</text>`);
