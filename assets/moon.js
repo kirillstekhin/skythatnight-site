@@ -133,7 +133,10 @@ function renderSvg(o) {
   const months = ['','JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
   const [Y, MO, D] = o.dateStr.split('-').map(Number);
   const ded = (o.dedication || 'The Moon That Night').toUpperCase();
-  const dsize = ded.length <= 26 ? 34 : Math.max(19, Math.round(34 * 26 / ded.length));
+  // ⛔`floor`, а не `round`: печать усекает (`int` в starmap_v3), и на 33 символах округление
+  //   давало 27px против 26px печатных. Мелочь, но это ровно то расхождение превью и печати,
+  //   которое мы и вычищаем.
+  const dsize = ded.length <= 26 ? 34 : Math.max(19, Math.floor(34 * 26 / ded.length));
   ctext(ded, ty0, dsize, t.ink, ded.length <= 26 ? '4' : '2');
   const oy = ty0 + 26;
   s.push(`<line x1="${cx-130}" y1="${oy}" x2="${cx-14}" y2="${oy}" stroke="${t.accent}" stroke-width="0.8" opacity="0.7"/>`);

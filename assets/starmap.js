@@ -247,9 +247,32 @@ function renderSvg(o) {
   let ty = cy + R + 108;
   s.push(`<g>${moonIconSvg(cx, ty - 17, 16, phase, o.theme === 'porcelain' ? t.ink : t.star, t.accent)}</g>`);
   ty += 41;
-  const ded = (o.dedication || 'Sky That Night').toUpperCase();
-  s.push(`<text x="${cx}" y="${ty}" fill="${t.ink}" font-family="'EB Garamond',Georgia,serif" font-size="34" letter-spacing="4" text-anchor="middle">${esc(ded)}</text>`);
-  const oy = ty + 26;
+  /* ⛔ПОСВЯЩЕНИЕ РИСУЕТСЯ ТЕМИ ЖЕ ПРАВИЛАМИ, ЧТО В ПЕЧАТИ (15.09.2026). Раньше превью всегда
+     рисовало 34-й кегль с интервалом 4, а `starmap_v3` уменьшает длинный текст (34 → вплоть
+     до 19) и сжимает интервал, а « | » превращает в ДВЕ строки разного размера и сдвигает
+     орнамент. Покупатель с длинным посвящением видел на экране текст крупнее печатного и
+     почти вплотную к рамке, а с « | » — одну строку с палкой посередине вместо двух строк.
+     Утверждать «смотри своё небо до печати» и показывать другую вёрстку нельзя.
+     ⚠️Числа скопированы из `starmap_v3.render` намеренно: меняешь там — меняй здесь. */
+  const dedFont = (txt, y, size, fill, ls) =>
+    s.push(`<text x="${cx}" y="${y}" fill="${fill}" font-family="'EB Garamond',Georgia,serif" `
+         + `font-size="${size}" letter-spacing="${ls}" text-anchor="middle">${esc(txt)}</text>`);
+  const dedRaw = (o.dedication || 'Sky That Night');
+  const dedLines = dedRaw.replace(' | ', '\n').split('\n').map(x => x.trim()).filter(Boolean).slice(0, 2);
+  let oy;
+  if (dedLines.length === 2) {
+    const [l1, l2] = dedLines;
+    const s1 = l1.length <= 26 ? 34 : Math.max(21, Math.floor(34 * 26 / l1.length));
+    const s2 = Math.max(17, Math.floor(s1 * 0.62));
+    dedFont(l1.toUpperCase(), ty, s1, t.ink, l1.length <= 26 ? 4 : 2);
+    dedFont(l2.toUpperCase(), ty + Math.floor(s1 * 0.95), s2, t.sub, 3);
+    oy = ty + Math.floor(s1 * 0.95) + 24;
+  } else {
+    const dlen = dedRaw.length;
+    const dsize = dlen <= 26 ? 34 : Math.max(19, Math.floor(34 * 26 / dlen));
+    dedFont(dedRaw.toUpperCase(), ty, dsize, t.ink, dlen <= 26 ? 4 : 2);
+    oy = ty + 26;
+  }
   s.push(`<line x1="${cx-130}" y1="${oy}" x2="${cx-14}" y2="${oy}" stroke="${t.accent}" stroke-width="0.8" opacity="0.7"/>`);
   s.push(`<line x1="${cx+14}" y1="${oy}" x2="${cx+130}" y2="${oy}" stroke="${t.accent}" stroke-width="0.8" opacity="0.7"/>`);
   s.push(`<path d="M ${cx} ${oy-5} L ${cx+4} ${oy} L ${cx} ${oy+5} L ${cx-4} ${oy} Z" fill="${t.accent}"/>`);
