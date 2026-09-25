@@ -182,9 +182,14 @@ const PRICES = {
   print:   { '3040': 34.99, '4050': 39.99, '5070': 44.99 },
   classic: { '3040': 69.99, '4050': 79.99, '5070': 89.99 },
 };
+/* ⛔СВОИ ССЫЛКИ ЛУНЫ (25.09.2026). До этого луна вела на ссылки звёздной карты: цена и
+   формат те же, но на странице оплаты стояло «Custom Star Map — Print 30×40 cm». Теперь у
+   каждого формата свой Product «Custom Moon Phase Print — …» с той же ценой; настройки
+   ссылок клонированы из звёздных (`tools/stripe_moon_links.py`, redirect на thank-you со
+   sku SKN-MOON-…). Фулфилмент сверяет оплату по формату из MN2-кода, ссылку не смотрит. */
 const PAYMENT_LINKS = {
-  PRINT3040: 'https://buy.stripe.com/6oUfZiebk4U566LbNS7g40u', PRINT4050: 'https://buy.stripe.com/14A9AU0ku0DP8eT5pu7g40v', PRINT5070: 'https://buy.stripe.com/cNi4gAd7gbit3YDdW07g40w',
-  CLASSIC3040: 'https://buy.stripe.com/00w6oI0ku9aldzd19e7g40x', CLASSIC4050: 'https://buy.stripe.com/8x200k2sC5Y9fHl3hm7g40y', CLASSIC5070: 'https://buy.stripe.com/dRm3cwaZ8euFcv99FK7g40z',
+  PRINT3040: 'https://buy.stripe.com/7sYaEY8R01HT1QvcRW7g40A', PRINT4050: 'https://buy.stripe.com/00w9AU5EOaep8eT6ty7g40B', PRINT5070: 'https://buy.stripe.com/6oU4gA5EOaep1QvbNS7g40C',
+  CLASSIC3040: 'https://buy.stripe.com/cNicN69V4cmxan1cRW7g40D', CLASSIC4050: 'https://buy.stripe.com/7sY00kffocmxcv93hm7g40E', CLASSIC5070: 'https://buy.stripe.com/bJe00kgjs0DPeDh4lq7g40F',
 };
 
 const state = {
