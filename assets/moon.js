@@ -345,7 +345,7 @@ function refresh() {
   const ft = FRAME_TYPES[state.frameType];
   if (ft.colors && !(state.frameColor in ft.colors)) state.frameColor = Object.keys(ft.colors)[0];
   document.getElementById('sm-price').textContent = `£${PRICES[state.frameType][state.size].toFixed(2)}`;
-  document.getElementById('sm-price-note').textContent = ft.note + ' · free UK delivery, UK addresses only';
+  document.getElementById('sm-price-note').textContent = ft.note + ' · free delivery to the UK and US';
   document.getElementById('sm-code').textContent = designCode();
   document.querySelectorAll('.sm-format').forEach(b => {
     b.querySelector('.f-price').textContent = `£${PRICES[b.dataset.frametype][state.size].toFixed(2)}`;
@@ -438,8 +438,13 @@ function attachGeocode() {
      до сих пор были британские. Поэтому при АВТОприменении предпочитаем UK-результат,
      если он есть в выдаче. Явный клик по подсказке этим правилом не трогается: человек
      выбрал сам, и спорить с ним нельзя. */
+  /* 25.09.2026: сайт открыт для США. Британцам — как было (UK first); посетителю с американским
+     часовым поясом первым предлагаем результат из US («Boston» → Massachusetts), остальным — UK.
+     Явный клик по подсказке по-прежнему не трогаем. */
+  const HOME = (() => { try { const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    return /^America\//.test(tz) ? 'US' : 'GB'; } catch (e) { return 'GB'; } })();
   function preferred(results) {
-    return results.find(r => r.country_code === 'GB') || results[0];
+    return results.find(r => r.country_code === HOME) || results[0];
   }
 
   /* ⚠ БРИТАНСКИЕ МЕСТА ПЕРВЫМИ (14.08.2026). Пример (вымышленный): на запрос «Boston» геокодер
@@ -451,7 +456,7 @@ function attachGeocode() {
   async function search(q) {
     const url = extra => `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=en&format=json${extra}`;
     const get = async u => { try { const r = await fetch(u); return (await r.json()).results || []; } catch (e) { return []; } };
-    const [uk, world] = await Promise.all([get(url('&countryCode=GB')), get(url(''))]);
+    const [uk, world] = await Promise.all([get(url('&countryCode=' + HOME)), get(url(''))]);
     const seen = new Set(), out = [];
     for (const r of uk.concat(world)) {
       const k = r.latitude.toFixed(3) + ',' + r.longitude.toFixed(3);
