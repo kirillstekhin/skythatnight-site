@@ -302,6 +302,25 @@
 .occ-faq[open] summary { color:var(--gold); }
 .occ-faq[open] summary::before { content:"− "; }
 .occ-faq p { font-family:var(--sans); font-weight:300; font-size:.98rem; line-height:1.7; color:var(--moon-sub); margin:0 0 1rem; max-width:40rem; }
+
+/* ── мобильный эксперимент 26.09.2026: постер первым, стиль свёрнут, отзыв у кнопки ── */
+@media (max-width:860px){
+  .occ-hero .container > div:first-child { order:2; }
+  .occ-hero .container > div:last-child { order:1; }
+  .occ-hero .container > div:last-child img { max-width:420px; margin:0 auto; }
+}
+.sm-more { margin:0 0 1.15rem; border:1px solid rgba(201,169,97,.22); border-radius:3px; padding:.15rem .85rem .2rem; }
+.sm-more summary { cursor:pointer; font-family:var(--sans); font-size:.74rem; letter-spacing:.16em; text-transform:uppercase; color:var(--moon-faint); padding:.65rem 0; list-style:none; }
+.sm-more summary::-webkit-details-marker { display:none; }
+.sm-more summary::after { content:"+"; float:right; color:var(--gold); font-size:1rem; line-height:1; }
+.sm-more[open] summary::after { content:"−"; }
+.sm-more[open] summary { color:var(--moon-sub); }
+.sm-more > .sm-field:first-of-type { margin-top:.5rem; }
+.sm-buy-proof { margin-top:1rem; padding-top:.9rem; border-top:1px solid rgba(201,169,97,.16); font-family:var(--sans); }
+.sm-buy-review { font-size:.86rem; line-height:1.5; color:var(--moon-sub); margin:0 0 .45rem; }
+.sm-buy-review .stars { color:var(--gold); letter-spacing:.08em; margin-right:.35rem; }
+.sm-buy-review span { color:var(--moon-faint); }
+.sm-buy-when { font-size:.8rem; color:var(--moon-faint); margin:0; }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Is a star map a good anniversary gift?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — it is one of the most personal gifts you can give: the exact night sky over the moment that matters, mapped down to the minute and framed to keep. It marks the date in a way a generic gift cannot."}}, {"@type": "Question", "name": "How accurate is the star map?", "acceptedAnswer": {"@type": "Answer", "text": "Every map is generated from real astronomical data for the exact date, time and place you choose — the true positions of the stars, planets and the Milky Way that night, not a decorative pattern."}}, {"@type": "Question", "name": "What date and time should I choose?", "acceptedAnswer": {"@type": "Answer", "text": "Use the moment that matters — most people pick the evening of the event. If you don't know the exact time, any time that night still shows the correct sky; the stars shift only slightly across a few hours."}}, {"@type": "Question", "name": "How long does delivery take?", "acceptedAnswer": {"@type": "Answer", "text": "Free UK and US delivery, dispatched in 2 to 4 working days. A tracking number is emailed the moment your parcel leaves us."}}, {"@type": "Question", "name": "Can I return it?", "acceptedAnswer": {"@type": "Answer", "text": "Because each map is made to order to your exact date, place and wording, it's exempt from the usual change-of-mind return — so please check every detail before you order. You're still fully protected if anything's wrong: if it arrives faulty, damaged or not as described, email us within 30 days for a full refund or free replacement, return postage on us."}}]}</script><script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "Anniversary Star Map — The Sky of Your Date", "description": "A silver star map of the exact sky on your anniversary. Real astronomy, handmade frame, from £34.99, free UK and US delivery.", "image": "https://www.skythatnight.com/assets/starmap/props-anniversary.jpg", "brand": {"@type": "Brand", "name": "Sky, That Night"}, "offers": {"@type": "Offer", "priceCurrency": "GBP", "price": "34.99", "validFrom": "2026-08-01", "priceValidUntil": "2027-12-31", "availability": "https://schema.org/InStock", "url": "https://www.skythatnight.com/occasion-anniversary.html", "shippingDetails": {"@type": "OfferShippingDetails", "shippingRate": {"@type": "MonetaryAmount", "value": "0", "currency": "GBP"}, "shippingDestination": [{"@type": "DefinedRegion", "addressCountry": "GB"}, {"@type": "DefinedRegion", "addressCountry": "US"}], "deliveryTime": {"@type": "ShippingDeliveryTime", "handlingTime": {"@type": "QuantitativeValue", "minValue": 2, "maxValue": 4, "unitCode": "DAY"}, "transitTime": {"@type": "QuantitativeValue", "minValue": 1, "maxValue": 3, "unitCode": "DAY"}}}, "hasMerchantReturnPolicy": {"@type": "MerchantReturnPolicy", "applicableCountry": "GB", "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted", "merchantReturnLink": "https://www.skythatnight.com/delivery.html"}}}</script>
 <!-- SKN_GTAG_HEAD:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ.
@@ -423,6 +442,8 @@
         <label for="sm-dedication">Name or a short message <span style="text-transform:none;letter-spacing:0;">(up to 40 characters)</span></label>
         <input type="text" id="sm-dedication" maxlength="40" placeholder="e.g. Eliana Grace · The night we met">
       </div>
+      <details class="sm-more">
+        <summary>Style, size and frame</summary>
       <div class="sm-field">
         <label>Theme</label>
         <div class="sm-swatches">
@@ -448,6 +469,7 @@
         <label>Frame</label>
         <span id="sm-frame-color-row"></span>
       </div>
+      </details>
       <div class="sm-buyrow">
         <div id="sm-price">£34.99</div>
         <div id="sm-price-note"></div>
@@ -457,6 +479,10 @@
           <code></code> — email it to
           <!--email_off--><a href="mailto:admin@shopcienty.com" style="color:var(--gold)">admin@shopcienty.com</a><!--/email_off-->
           and we'll send a secure payment link the same day.
+        </div>
+        <div class="sm-buy-proof">
+          <p class="sm-buy-review"><span class="stars" aria-label="Rated 5 out of 5 stars">★★★★★</span>“It is exactly how it looks online and I’m very happy with it.” <span>— Emily, verified purchase</span></p>
+          <p class="sm-buy-when">Preview by email before we print · dispatched in 2–4 working days · free UK &amp; US delivery, tracked</p>
         </div>
         <div class="sm-code-line">Design code: <code id="sm-code"></code></div>
       </div>
@@ -610,6 +636,7 @@
 })();
 </script>
 
+<script>(function(){var d=document.querySelector('.sm-more');if(d&&window.matchMedia('(min-width:981px)').matches){d.open=true;}})();</script>
 <script src="assets/attr.js?v=3" defer></script>
 <script src="assets/starmap.js?v=40" defer></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
