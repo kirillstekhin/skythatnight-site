@@ -280,6 +280,15 @@
 .sm-buy-review .stars { color:var(--gold); letter-spacing:.08em; margin-right:.35rem; }
 .sm-buy-review span { color:var(--moon-faint); }
 .sm-buy-when { font-size:.8rem; color:var(--moon-faint); margin:0; }
+/* ── 27.09: кнопка под ценой на телефоне; резерв места под фото ── */
+@media (max-width:900px){
+  .pp-hero .container > div:first-child { display:flex; flex-direction:column; }
+  .pp-hero .container > div:first-child > * { order:9; }
+  .pp-hero .pp-kicker { order:1; } .pp-hero .pp-h1 { order:2; } .pp-hero .pp-price { order:3; } .pp-hero .pp-avail { order:4; }
+  .pp-hero .sm-cta { order:5; margin-top:.35rem; } .pp-hero .sm-cta-sub { order:6; margin-bottom:1.1rem; }
+  .pp-hero .pp-what { order:7; } .pp-hero .pp-incl { order:8; }
+}
+.pp-hero img { aspect-ratio:1 / 1; }
 .pp-others { display:grid; grid-template-columns:repeat(3,1fr); gap:.9rem; margin-top:1.6rem; }
 @media (max-width:640px){ .pp-others { grid-template-columns:1fr; } }
 .pp-others a { display:block; padding:.9rem 1rem; border:1px solid rgba(201,169,97,.25); border-radius:3px;
@@ -373,7 +382,7 @@
       <span class="sm-cta-sub">Free UK and US delivery included · personalised, so no change-of-mind returns — damaged or not as previewed, we reprint or refund in full · <a href="delivery.html">Delivery &amp; returns</a></span>
     </div>
     <div>
-      <img src="assets/starmap/feed/SKN-MOON-CLASSIC-3040.jpg" alt="Classic Frame 30×40 cm personalised moon phase print, £69.99">
+      <img src="assets/starmap/feed/SKN-MOON-CLASSIC-3040.jpg" width="1600" height="1600" alt="Classic Frame 30×40 cm personalised moon phase print, £69.99">
     </div>
   </div>
 </section>
