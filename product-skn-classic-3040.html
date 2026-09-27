@@ -283,10 +283,14 @@
 /* ── 27.09: кнопка под ценой на телефоне; резерв места под фото ── */
 @media (max-width:900px){
   .pp-hero .container > div:first-child { display:flex; flex-direction:column; }
-  .pp-hero .container > div:first-child > * { order:9; }
-  .pp-hero .pp-kicker { order:1; } .pp-hero .pp-h1 { order:2; } .pp-hero .pp-price { order:3; } .pp-hero .pp-avail { order:4; }
-  .pp-hero .sm-cta { order:5; margin-top:.35rem; } .pp-hero .sm-cta-sub { order:6; margin-bottom:1.1rem; }
-  .pp-hero .pp-what { order:7; } .pp-hero .pp-incl { order:8; }
+  .pp-hero .container > div:first-child > .pp-kicker { order:1; }
+  .pp-hero .container > div:first-child > .pp-h1 { order:2; }
+  .pp-hero .container > div:first-child > .pp-price { order:3; }
+  .pp-hero .container > div:first-child > .pp-avail { order:4; }
+  .pp-hero .container > div:first-child > .sm-cta { order:5; margin-top:.35rem; }
+  .pp-hero .container > div:first-child > .sm-cta-sub { order:6; margin-bottom:1.1rem; }
+  .pp-hero .container > div:first-child > .pp-what { order:7; }
+  .pp-hero .container > div:first-child > .pp-incl { order:8; }
 }
 .pp-hero img { aspect-ratio:1 / 1; }
 .pp-others { display:grid; grid-template-columns:repeat(3,1fr); gap:.9rem; margin-top:1.6rem; }
