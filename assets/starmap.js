@@ -5,9 +5,15 @@
 
 /* ───────────────────────── astro engine ───────────────────────── */
 
+/* Meeus, гл. 7 — зеркало starmap_v3.julian_date: григорианский календарь с 15.10.1582, раньше —
+   юлианский (так записаны исторические даты и так считает JPL Horizons). Прежняя короткая
+   формула верна только для 03.1900–02.2100: ночи XIX века уезжали на сутки, 1492 — на 13. */
 function julianDate(y, mo, d, utHours) {
-  return 367 * y - Math.floor(7 * (y + Math.floor((mo + 9) / 12)) / 4)
-       + Math.floor(275 * mo / 9) + d + 1721013.5 + utHours / 24.0;
+  const greg = y > 1582 || (y === 1582 && (mo > 10 || (mo === 10 && d >= 15)));
+  if (mo <= 2) { y -= 1; mo += 12; }
+  const a = Math.floor(y / 100);
+  const b = greg ? 2 - a + Math.floor(a / 4) : 0;
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (mo + 1)) + d + b - 1524.5 + utHours / 24.0;
 }
 function lstDeg(dateStr, timeStr, lon, tzOffset) {
   const [y, mo, d] = dateStr.split('-').map(Number);
@@ -33,10 +39,35 @@ function project(alt, az, cx, cy, R) {
   const r = (Math.PI / 2 - alt) / (Math.PI / 2);
   return [cx + R * r * Math.sin(az), cy - R * r * Math.cos(az)];
 }
+/* Каталог J2000 → равноденствие даты (Meeus 21.2–21.4) — зеркало starmap_v3.precess_from_j2000.
+   Луна и звёздное время уже «даты»: без этого шага звёзды и Луна расходились (0.4° в 2026, 7° в 1492). */
+function precessFromJ2000(raDeg, decDeg, jd) {
+  const t = (jd - 2451545.0) / 36525.0, r = Math.PI / 180;
+  const zeta  = (2306.2181 * t + 0.30188 * t * t + 0.017998 * t * t * t) / 3600 * r;
+  const z     = (2306.2181 * t + 1.09468 * t * t + 0.018203 * t * t * t) / 3600 * r;
+  const theta = (2004.3109 * t - 0.42665 * t * t - 0.041833 * t * t * t) / 3600 * r;
+  const ra0 = raDeg * r + zeta, dec0 = decDeg * r;
+  const A = Math.cos(dec0) * Math.sin(ra0);
+  const B = Math.cos(theta) * Math.cos(dec0) * Math.cos(ra0) - Math.sin(theta) * Math.sin(dec0);
+  const C = Math.sin(theta) * Math.cos(dec0) * Math.cos(ra0) + Math.cos(theta) * Math.sin(dec0);
+  return [((Math.atan2(A, B) + z) / r % 360 + 360) % 360, Math.asin(Math.max(-1, Math.min(1, C))) / r];
+}
+/* Угол от новолуния по Meeus (48.4) — зеркало starmap_v3.moon_phase: средняя фаза ошибалась
+   до ~0.6 сут (у четвертей до 5–6 п.п. в подписи), эта сверена с JPL Horizons
+   (tools/sky_math_check.py). age — угол в сутках среднего месяца: им рисуется терминатор. */
+const SYNODIC = 29.530588853;
+function phaseAngle(jd) {
+  const T = (jd - 2451545.0) / 36525.0, r = Math.PI / 180;
+  const D  = 297.8501921 + 445267.1114034 * T - 0.0018819 * T * T + T * T * T / 545868 - T * T * T * T / 113065000;
+  const M  = 357.5291092 + 35999.0502909 * T - 0.0001536 * T * T + T * T * T / 24490000;
+  const Mp = 134.9633964 + 477198.8675055 * T + 0.0087414 * T * T + T * T * T / 69699 - T * T * T * T / 14712000;
+  const a = D + 6.289 * Math.sin(Mp * r) - 2.100 * Math.sin(M * r) + 1.274 * Math.sin((2 * D - Mp) * r)
+          + 0.658 * Math.sin(2 * D * r) + 0.214 * Math.sin(2 * Mp * r) + 0.110 * Math.sin(D * r);
+  return (a % 360 + 360) % 360;
+}
 function moonPhase(jd) {
-  const age  = ((jd - 2451550.1) % 29.530588853 + 29.530588853) % 29.530588853;
-  const lit  = (1 - Math.cos(2 * Math.PI * age / 29.530588853)) / 2;
-  return { age, lit, waxing: age < 14.765 };
+  const ang = phaseAngle(jd);
+  return { age: ang / 360 * SYNODIC, lit: (1 - Math.cos(ang * Math.PI / 180)) / 2, waxing: ang < 180 };
 }
 function moonName(p) {
   if (p.lit < 0.04)  return 'New moon';
@@ -98,6 +129,22 @@ const NAMED = [
 /* ───────────────────────── SVG renderer ───────────────────────── */
 
 let CATALOG = null; // {stars:[[ra,dec,mag]...], lines:[[[ra,dec],...],...]}
+/* Каталог на равноденствие даты: прецессия меняется на 0.14″ в сутки, поэтому пересчёт —
+   при смене даты, а не на каждом кадре анимации неба. */
+let SKY = null;
+function skyOfDate(jd) {
+  const key = Math.round(jd);
+  if (SKY && SKY.key === key && SKY.src === CATALOG) return SKY;
+  const p = (ra, dec) => precessFromJ2000(ra, dec, jd);
+  SKY = {
+    key, src: CATALOG,
+    stars: CATALOG.stars.map(([ra, dec, mag]) => [...p(ra, dec), mag]),
+    lines: CATALOG.lines.map(line => line.map(([ra, dec]) => p(ra, dec))),
+    milkyway: CATALOG.milkyway ? CATALOG.milkyway.map(feat => feat.map(ring => ring.map(([lon, lat]) => p(lon, lat)))) : null,
+    named: NAMED.map(([name, ra, dec, mag]) => [name, ...p(ra, dec), mag]),
+  };
+  return SKY;
+}
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -163,6 +210,7 @@ function renderSvg(o) {
   // (палитра перетекает между темами).
   const L = o._lst !== undefined ? o._lst : lst;
   const LAT = o._lat !== undefined ? o._lat : o.lat;
+  const sky = skyOfDate(jd);
   if (o._themeMix) t = o._themeMix;
   const s = [`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}">`];
   s.push(`<defs><clipPath id="skyclip"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>`
@@ -183,9 +231,9 @@ function renderSvg(o) {
      и ПОД линии созвездий, иначе линии тонут в ней.
      ⚠️Данные — упрощённая копия `starmap/milkyway.json` (8.4% точек), её делает
      `tools/make_milkyway_preview.py`; долготы там уже развёрнуты. */
-  if (CATALOG.milkyway && t.mwOp > 0.0005) {
+  if (sky.milkyway && t.mwOp > 0.0005) {
     s.push(`<g clip-path="url(#skyclip)" filter="url(#mwblur)">`);
-    for (const feat of CATALOG.milkyway) {
+    for (const feat of sky.milkyway) {
       let d = '';
       for (const ring of feat) {
         let path = '', maxAlt = -9, minR = 9;
@@ -208,7 +256,7 @@ function renderSvg(o) {
 
   // constellation lines
   s.push(`<g clip-path="url(#skyclip)" stroke="${t.lines}" stroke-opacity="${t.lineOp}" stroke-width="${t.lineW}" fill="none" stroke-linecap="round">`);
-  for (const line of CATALOG.lines) {
+  for (const line of sky.lines) {
     let path = '', pen = false, below = 0;
     for (const [ra, dec] of line) {
       const [alt, az] = altAz(ra, dec, L, LAT);
@@ -236,7 +284,7 @@ function renderSvg(o) {
 
   // stars
   s.push(`<g clip-path="url(#skyclip)">`);
-  for (const [ra, dec, mag] of CATALOG.stars) {
+  for (const [ra, dec, mag] of sky.stars) {
     const [alt, az] = altAz(ra, dec, L, LAT);
     if (alt <= 0.01) continue;
     const [x, y] = project(alt, az, cx, cy, R);
@@ -249,7 +297,7 @@ function renderSvg(o) {
   s.push('</g>');
 
   // labels
-  for (const [name, ra, dec, mag] of NAMED) {
+  for (const [name, ra, dec, mag] of sky.named) {
     if (mag > 1.05) continue;
     const [alt, az] = altAz(ra, dec, L, LAT);
     if (alt < 0.07) continue;
@@ -817,6 +865,9 @@ function attachControls() {
     buyBtn.style.cursor = on ? 'progress' : '';
     buyBtn.textContent = on ? 'One moment\u2026' : BUY_LABEL;
   };
+  /* «Назад» со Stripe восстанавливает страницу из bfcache с кнопкой в «One moment…» —
+     оживляем её (05.10.2026, C-2 аудита; парный сброс — в attr.js). */
+  window.addEventListener('pageshow', e => { if (e.persisted) setBuyPending(false); });
 
   buyBtn.addEventListener('click', () => {
     if (buyPending) return;

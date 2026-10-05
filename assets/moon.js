@@ -7,16 +7,31 @@
 'use strict';
 
 /* ── astronomy (mirror of starmap_v3) ── */
+/* Meeus, гл. 7 — как starmap_v3.julian_date: григорианский календарь с 15.10.1582, раньше — юлианский. */
 function julianDate(y, mo, d, utHours) {
-  return 367 * y - Math.floor(7 * (y + Math.floor((mo + 9) / 12)) / 4)
-       + Math.floor(275 * mo / 9) + d + 1721013.5 + utHours / 24.0;
+  const greg = y > 1582 || (y === 1582 && (mo > 10 || (mo === 10 && d >= 15)));
+  if (mo <= 2) { y -= 1; mo += 12; }
+  const a = Math.floor(y / 100);
+  const b = greg ? 2 - a + Math.floor(a / 4) : 0;
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (mo + 1)) + d + b - 1524.5 + utHours / 24.0;
 }
 const CYCLE = 29.530588853;
+/* Угол от новолуния по Meeus (48.4) — как starmap_v3.moon_phase (сверка с JPL Horizons:
+   tools/sky_math_check.py). Средняя фаза ошибалась до ~0.6 сут — до 5–6 п.п. в подписи. */
+function phaseAngle(jd) {
+  const T = (jd - 2451545.0) / 36525.0, r = Math.PI / 180;
+  const D  = 297.8501921 + 445267.1114034 * T - 0.0018819 * T * T + T * T * T / 545868 - T * T * T * T / 113065000;
+  const M  = 357.5291092 + 35999.0502909 * T - 0.0001536 * T * T + T * T * T / 24490000;
+  const Mp = 134.9633964 + 477198.8675055 * T + 0.0087414 * T * T + T * T * T / 69699 - T * T * T * T / 14712000;
+  const a = D + 6.289 * Math.sin(Mp * r) - 2.100 * Math.sin(M * r) + 1.274 * Math.sin((2 * D - Mp) * r)
+          + 0.658 * Math.sin(2 * D * r) + 0.214 * Math.sin(2 * Mp * r) + 0.110 * Math.sin(D * r);
+  return (a % 360 + 360) % 360;
+}
 function moonAge(dateStr, timeStr, tzOffset) {
   const [y, mo, d] = dateStr.split('-').map(Number);
   const [hh, mm]   = timeStr.split(':').map(Number);
   const jd = julianDate(y, mo, d, hh + mm / 60 - tzOffset);
-  return ((jd - 2451550.1) % CYCLE + CYCLE) % CYCLE;
+  return phaseAngle(jd) / 360 * CYCLE;           // «возраст» = угол в сутках: терминатор и подпись согласованы
 }
 function illumOf(age)  { return (1 - Math.cos(2 * Math.PI * age / CYCLE)) / 2; }
 function moonTitle(age) {
@@ -625,6 +640,9 @@ function attachControls() {
     buyBtn.style.cursor = on ? 'progress' : '';
     buyBtn.textContent = on ? 'One moment\u2026' : BUY_LABEL;
   };
+  /* «Назад» со Stripe восстанавливает страницу из bfcache с кнопкой в «One moment…» —
+     оживляем её (05.10.2026, C-2 аудита; парный сброс — в attr.js). */
+  window.addEventListener('pageshow', e => { if (e.persisted) setBuyPending(false); });
 
   buyBtn.addEventListener('click', () => {
     if (buyPending) return;

@@ -317,6 +317,12 @@
      функцию, поэтому «один переход и только один» проверяется один раз и работает в обеих.
      Флаг ставится ДО ожидания токена: поздний ответ не имеет права увести второй раз. */
   var navigated = false;
+  /* ⛔«НАЗАД» СО STRIPE (05.10.2026, C-2 аудита): браузер восстанавливает страницу из bfcache
+     вместе с `navigated = true`, и кнопка оплаты больше не уводила — покупатель, вернувшийся
+     сменить размер или раму, терялся. Восстановленная страница — новый визит к оплате. */
+  if (typeof window !== 'undefined' && window.addEventListener) {
+    window.addEventListener('pageshow', function (e) { if (e && e.persisted) navigated = false; });
+  }
   function navigateToPayment(link, code) {
     if (navigated) return Promise.resolve(false);
     navigated = true;
