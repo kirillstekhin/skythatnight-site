@@ -191,7 +191,7 @@
 
   /* ── канал визита (05.10.2026, R3 аудита AUDIT_2026-10-05) ──────────────
      С 13.09 ни один заказ не был связан с каналом. Канал — КАТЕГОРИЯ без идентификаторов:
-     gads (в адресе был gclid/gbraid/wbraid), gshop (бесплатные товарные листинги Google,
+     gads / gads-<utm_medium> (в адресе был gclid/gbraid/wbraid; gads-shopping — платный Shopping), gshop (бесплатные товарные листинги Google,
      srsltid), <utm_source>[-<utm_medium>], домен-реферер по списку (google, bing, pinterest,
      etsy, instagram, facebook, youtube, tiktok…), direct, int (переход внутри сайта), other.
      ⛔ДО СОГЛАСИЯ НЕ СОХРАНЯЕТСЯ НИГДЕ — считается из адреса и реферера этой страницы и
@@ -208,9 +208,11 @@
 
   function channelOf(search, referrer, host) {
     var q = new URLSearchParams(search || '');
-    if (q.get('gclid') || q.get('gbraid') || q.get('wbraid')) return 'gads';
     var clean = function (v, n) { return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, n); };
     var src = clean(q.get('utm_source'), 12), med = clean(q.get('utm_medium'), 10);
+    /* Платный клик Google (gclid/gbraid/wbraid) + utm из фида → gads-shopping; без utm (поиск) → gads.
+       Бесплатный товарный листинг несёт utm фида без gclid → google-shopping. */
+    if (q.get('gclid') || q.get('gbraid') || q.get('wbraid')) return med ? 'gads-' + med : 'gads';
     if (src) return med ? src + '-' + med : src;
     if (q.get('srsltid')) return 'gshop';
     if (!referrer) return 'direct';
