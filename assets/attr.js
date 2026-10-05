@@ -189,6 +189,54 @@
                     Promise.resolve());
   }
 
+  /* ── канал визита (05.10.2026, R3 аудита AUDIT_2026-10-05) ──────────────
+     С 13.09 ни один заказ не был связан с каналом. Канал — КАТЕГОРИЯ без идентификаторов:
+     gads (в адресе был gclid/gbraid/wbraid), gshop (бесплатные товарные листинги Google,
+     srsltid), <utm_source>[-<utm_medium>], домен-реферер по списку (google, bing, pinterest,
+     etsy, instagram, facebook, youtube, tiktok…), direct, int (переход внутри сайта), other.
+     ⛔ДО СОГЛАСИЯ НЕ СОХРАНЯЕТСЯ НИГДЕ — считается из адреса и реферера этой страницы и
+     живёт в переменной. После согласия — в sessionStorage, чтобы переход на другую страницу
+     сайта не превращал источник входа в «int». К оплате едет суффиксом `_c1_<канал>` ПЕРЕД
+     токеном; fulfil.split_client_reference отрезает его всегда — печати метка не мешает. */
+  var CHANNEL_KEY = 'skn_channel';
+  var CHANNEL_RE = /^[a-z0-9-]{1,24}$/;
+  var REF_HOSTS = [['google', 'google'], ['bing', 'bing'], ['pinterest', 'pinterest'],
+    ['etsy', 'etsy'], ['instagram', 'instagram'], ['facebook', 'facebook'], ['youtube', 'youtube'],
+    ['tiktok', 'tiktok'], ['duckduckgo', 'ddg'], ['ecosia', 'ecosia'], ['yahoo', 'yahoo'],
+    ['stripe', 'stripe']];
+  var chanMem = null;
+
+  function channelOf(search, referrer, host) {
+    var q = new URLSearchParams(search || '');
+    if (q.get('gclid') || q.get('gbraid') || q.get('wbraid')) return 'gads';
+    var clean = function (v, n) { return String(v || '').toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, n); };
+    var src = clean(q.get('utm_source'), 12), med = clean(q.get('utm_medium'), 10);
+    if (src) return med ? src + '-' + med : src;
+    if (q.get('srsltid')) return 'gshop';
+    if (!referrer) return 'direct';
+    var m = /^[a-z][a-z0-9+.-]*:\/\/([^\/?#:]+)/i.exec(String(referrer));
+    if (!m) return 'other';
+    var bare = function (h) { return String(h || '').toLowerCase().replace(/^www\./, ''); };
+    var rh = bare(m[1]);
+    if (host && rh === bare(host)) return 'int';
+    for (var i = 0; i < REF_HOSTS.length; i++) if (rh.indexOf(REF_HOSTS[i][0]) !== -1) return REF_HOSTS[i][1];
+    return 'other';
+  }
+
+  function captureChannel(search, referrer, host) {
+    var c = channelOf(search === undefined ? location.search : search,
+                      referrer === undefined ? (typeof document !== 'undefined' ? document.referrer : '') : referrer,
+                      host === undefined ? (location.hostname || '') : host);
+    if (!CHANNEL_RE.test(c)) c = 'other';
+    var stored = get(sessionStorage, CHANNEL_KEY);
+    if (c === 'int' && stored && CHANNEL_RE.test(stored)) c = stored;   /* источник входа, если было согласие */
+    chanMem = c;
+    if (consent().granted && c !== 'int') set(sessionStorage, CHANNEL_KEY, c);
+    return c;
+  }
+
+  function channel() { return chanMem; }
+
   /* ── токен ────────────────────────────────────────────────────────────── */
   function newToken() {
     var a = new Uint8Array(16);                 /* 128 бит, и все они доезжают до токена */
@@ -234,10 +282,13 @@
       });
   }
 
-  function buildRef(code, tok) {
-    if (!tok) return code;
-    var candidate = code + '_a1_' + tok;
-    return candidate.length > CLIENT_REF_MAX ? code : candidate;   /* не влез — теряем ТОКЕН */
+  function buildRef(code, tok, chan) {
+    /* Канал (05.10) — перед токеном и только годный; не влезает — теряем канал, а не заказ. */
+    var base = code;
+    if (chan && CHANNEL_RE.test(chan) && (code + '_c1_' + chan).length <= CLIENT_REF_MAX) base = code + '_c1_' + chan;
+    if (!tok) return base;
+    var candidate = base + '_a1_' + tok;
+    return candidate.length > CLIENT_REF_MAX ? base : candidate;   /* не влез — теряем ТОКЕН */
   }
 
   /* ── наблюдение за согласием ──────────────────────────────────────────── */
@@ -248,8 +299,9 @@
       if (now === last) return;
       last = now;
       bumpConsentVer();
-      if (now) { persist(); return; }
+      if (now) { persist(); if (chanMem && chanMem !== 'int') set(sessionStorage, CHANNEL_KEY, chanMem); return; }
       forget();
+      set(sessionStorage, CHANNEL_KEY, null);
       var tok = get(sessionStorage, SESSION_TOKEN_KEY);
       if (tok) revoke(tok);
     };
@@ -267,10 +319,11 @@
     if (navigated) return Promise.resolve(false);
     navigated = true;
     return token().catch(function () { return null; }).then(function (tok) {
-      var ref = buildRef(code, tok);
+      var ref = buildRef(code, tok, chanMem);
       /* Привязываем ТОЛЬКО если токен реально уехал в ссылку: не влез по длине — значит
-         он никуда не привязан, и автоочистка вправе его убрать. */
-      if (tok && ref !== code) markLinked(tok);
+         он никуда не привязан, и автоочистка вправе его убрать. (С каналом ref ≠ code и без
+         токена, поэтому проверяем сам суффикс токена.) */
+      if (tok && ref.indexOf('_a1_' + tok) !== -1) markLinked(tok);
       location.href = link + '?client_reference_id=' + encodeURIComponent(ref);
       return true;
     });
@@ -278,11 +331,12 @@
 
   function boot() {
     try { capture(); watch(); flushPending(); } catch (e) {}
+    try { captureChannel(); } catch (e) {}          /* канал — отдельно: его сбой не трогает атрибуцию */
   }
 
   window.SknAttr = {
     boot: boot, capture: capture, token: token, buildRef: buildRef, revoke: revoke,
-    navigateToPayment: navigateToPayment,
+    navigateToPayment: navigateToPayment, channelOf: channelOf, captureChannel: captureChannel, channel: channel,
     consent: consent, bumpConsentVer: bumpConsentVer, queue: queue, flushPending: flushPending,
     forget: forget, identifier: identifier, watch: watch, linked: linked, markLinked: markLinked,
     _mem: mem, ENDPOINT: ENDPOINT, TIMEOUT_MS: TIMEOUT_MS, CLIENT_REF_MAX: CLIENT_REF_MAX,
