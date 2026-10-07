@@ -404,6 +404,64 @@ function formatToken() { return state.frameType.toUpperCase() + state.size; }
    (коммит 3a75e68): этот гейт ловит ДО оплаты, тот — до печати. */
 let placeConfirmed = false;
 let placeGateBox = null, placeGateGo = null;
+/* ── ПОДТВЕРЖДЕНИЕ НОЧИ НА СТРАНИЦАХ ПОВОДОВ (07.10.2026, советчик) ──
+   Пресет страницы повода — ПРИМЕР (Santorini, «Ten years of us»), а не выбор покупателя. Раньше
+   он считался осознанным местом, и пример мог незаметно уйти в оплату. Теперь при SM_PRESET.sample
+   перед оплатой покупатель видит дату, время, место и подпись и подтверждает их явно; меняет что-то
+   после подтверждения — спрашиваем снова. Подпись в design-код не входит (печатается текст поля
+   «Dedication line» в Stripe) — окно говорит это прямо. */
+let samplePreset = false;
+let nightKey = null;
+let nightGateBox = null, nightGateGo = null;
+const currentNightKey = () => [state.dateStr, state.timeStr, state.place, state.dedication].join('|');
+
+function longDate(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  return isNaN(d) ? dateStr : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function hideNightGate() { if (nightGateBox) nightGateBox.hidden = true; }
+
+function askNightConfirm(onKeep) {
+  const anchor = document.getElementById('sm-buy');
+  if (!anchor) { nightKey = currentNightKey(); placeConfirmed = true; onKeep(); return; }
+  nightGateGo = onKeep;
+  if (!nightGateBox) {
+    nightGateBox = document.createElement('div');
+    nightGateBox.className = 'sm-night-gate';
+    nightGateBox.style.cssText =
+      'margin:.55rem 0;padding:.7rem .9rem;border:1px solid #c9a961;border-radius:6px;' +
+      'font-size:.9rem;line-height:1.5;';
+    nightGateBox.innerHTML =
+      '<div>One check before payment — your print will show the sky on <strong class="g-when"></strong> ' +
+      'over <strong class="g-place"></strong>. Is this your night?</div>' +
+      '<div class="g-ded" style="margin-top:.4rem"></div>' +
+      '<div style="margin-top:.55rem;display:flex;gap:.6rem;flex-wrap:wrap">' +
+      '<button type="button" class="sm-gate-keep" style="background:#c9a961;color:#111;border:0;' +
+      'padding:.45rem .95rem;border-radius:4px;cursor:pointer;font:inherit">Yes — that’s our night</button>' +
+      '<button type="button" class="sm-gate-change" style="background:transparent;color:inherit;' +
+      'border:1px solid currentColor;padding:.45rem .95rem;border-radius:4px;cursor:pointer;' +
+      'font:inherit;opacity:.85">No — let me change it</button></div>';
+    anchor.insertAdjacentElement('beforebegin', nightGateBox);
+    nightGateBox.querySelector('.sm-gate-keep').addEventListener('click', () => {
+      nightKey = currentNightKey(); placeConfirmed = true; hideNightGate();
+      if (nightGateGo) nightGateGo();
+    });
+    nightGateBox.querySelector('.sm-gate-change').addEventListener('click', () => {
+      hideNightGate();
+      const el = document.getElementById('sm-date');
+      if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+    });
+  }
+  nightGateBox.querySelector('.g-when').textContent = `${longDate(state.dateStr)}, ${state.timeStr}`;
+  nightGateBox.querySelector('.g-place').textContent = state.place || 'the place you chose';
+  const ded = (state.dedication || '').trim();
+  nightGateBox.querySelector('.g-ded').textContent = ded
+    ? `Your line: “${ded}”. On the next page, type it in “Dedication line” — that is the text we print.`
+    : 'Want a line on the print? Type it in “Dedication line” on the next page.';
+  nightGateBox.hidden = false;
+  nightGateBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
 
 function hidePlaceGate() { if (placeGateBox) placeGateBox.hidden = true; }
 
@@ -908,6 +966,11 @@ function attachControls() {
     setTimeout(() => {
       /* ⛔ГЕЙТ МЕСТА ЖДЁТ ЧЕЛОВЕКА, А НЕ СЕРВЕР. Пока он открыт, кнопка обязана быть живой:
          иначе «One moment…» висит над вопросом, на который ответить должен покупатель. */
+      if (samplePreset && nightKey !== currentNightKey()) {
+        setBuyPending(false);
+        askNightConfirm(() => { setBuyPending(true); go(); });
+        return;
+      }
       if (placeConfirmed) { go(); return; }
       setBuyPending(false);
       askPlaceConfirm(() => { setBuyPending(true); go(); });
@@ -919,10 +982,12 @@ function attachControls() {
 
 document.addEventListener('DOMContentLoaded', async () => {
   if (window.SM_PRESET) {
-    Object.assign(state, window.SM_PRESET);
-    /* страница пресетит место осознанно (night-страницы ставят место события) —
-       это выбор автора страницы, а не generic-дефолт; гейт не нужен */
-    if ('place' in window.SM_PRESET || 'lat' in window.SM_PRESET) placeConfirmed = true;
+    const { sample, ...preset } = window.SM_PRESET;
+    Object.assign(state, preset);
+    samplePreset = !!sample;
+    /* night-страницы пресетят место осознанно (место события) — это выбор автора страницы, гейт не
+       нужен. Страницы поводов ставят ПРИМЕР (sample: true) — его покупатель подтверждает сам. */
+    if (!samplePreset && ('place' in preset || 'lat' in preset)) placeConfirmed = true;
   }
   try {
     /* ⛔ВЕРСИЯ У ДАННЫХ ОБЯЗАТЕЛЬНА, как у скриптов (найдено 15.09.2026 на локальной витрине).
