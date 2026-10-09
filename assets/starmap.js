@@ -379,8 +379,16 @@ const PAYMENT_LINKS = {
   CLASSIC3040: 'https://buy.stripe.com/00w6oI0ku9aldzd19e7g40x', CLASSIC4050: 'https://buy.stripe.com/8x200k2sC5Y9fHl3hm7g40y', CLASSIC5070: 'https://buy.stripe.com/dRm3cwaZ8euFcv99FK7g40z',
 };
 
+/* ⛔НОЧЬ ПО УМОЛЧАНИЮ (09.10.2026). Конструктор открывается с этой ночью, и её можно оплатить, не
+   тронув дату: 08.10 так ушёл заказ Луны (место покупатель привязал, дату — нет; верную ночь прислал
+   потом четырьмя письмами). Пока ночь не менялась, перед оплатой — то же окно «Is this your night?»,
+   что и на страницах поводов. Значение — одно на сайт и конвейер: fulfil.DEFAULT_NIGHT держит заказ с
+   этой ночью до ответа покупателя, site_predeploy_check сверяет обе стороны. */
+const DEFAULT_NIGHT = ['2021-06-19', '21:45'];
+const isDefaultNight = () => state.dateStr === DEFAULT_NIGHT[0] && state.timeStr === DEFAULT_NIGHT[1];
+
 const state = {
-  dateStr: '2021-06-19', timeStr: '21:45',
+  dateStr: DEFAULT_NIGHT[0], timeStr: DEFAULT_NIGHT[1],
   place: 'London, United Kingdom', lat: 51.5074, lon: -0.1278, tz: 1, iana: 'Europe/London',
   dedication: 'Sky That Night',
   /* ⚠️10.09.2026 дефолт был framed = £44.99, а главная и реклама обещали «from £26.99»:
@@ -966,7 +974,7 @@ function attachControls() {
     setTimeout(() => {
       /* ⛔ГЕЙТ МЕСТА ЖДЁТ ЧЕЛОВЕКА, А НЕ СЕРВЕР. Пока он открыт, кнопка обязана быть живой:
          иначе «One moment…» висит над вопросом, на который ответить должен покупатель. */
-      if (samplePreset && nightKey !== currentNightKey()) {
+      if ((samplePreset || isDefaultNight()) && nightKey !== currentNightKey()) {
         setBuyPending(false);
         askNightConfirm(() => { setBuyPending(true); go(); });
         return;

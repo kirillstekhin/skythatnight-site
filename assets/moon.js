@@ -207,8 +207,14 @@ const PAYMENT_LINKS = {
   CLASSIC3040: 'https://buy.stripe.com/cNicN69V4cmxan1cRW7g40D', CLASSIC4050: 'https://buy.stripe.com/7sY00kffocmxcv93hm7g40E', CLASSIC5070: 'https://buy.stripe.com/bJe00kgjs0DPeDh4lq7g40F',
 };
 
+/* ⛔НОЧЬ ПО УМОЛЧАНИЮ (09.10.2026) — зеркало starmap.js. 08.10 заказ Луны оплатили с этой нетронутой
+   ночью: место покупатель привязал, дату — нет. Пока ночь не менялась, перед оплатой спрашиваем
+   «Is this your night?». Значение одно на сайт и конвейер (fulfil.DEFAULT_NIGHT, site_predeploy_check). */
+const DEFAULT_NIGHT = ['2021-06-19', '21:45'];
+const isDefaultNight = () => state.dateStr === DEFAULT_NIGHT[0] && state.timeStr === DEFAULT_NIGHT[1];
+
 const state = {
-  dateStr: '2021-06-19', timeStr: '21:45',
+  dateStr: DEFAULT_NIGHT[0], timeStr: DEFAULT_NIGHT[1],
   place: 'London, United Kingdom', lat: 51.5074, lon: -0.1278, tz: 1, iana: 'Europe/London',
   dedication: 'The Moon That Night',
   /* дефолт print, а не framed — цена совпадает с обещанием «from £26.99» (см. starmap.js 10.09) */
@@ -270,6 +276,55 @@ function askPlaceConfirm(onKeep) {
   placeGateBox.querySelector('strong').textContent = state.place;
   placeGateBox.hidden = false;
   placeGateBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* ── ПОДТВЕРЖДЕНИЕ НОЧИ (09.10.2026) — зеркало askNightConfirm из starmap.js: окно у кнопки, дата,
+   время и место словами; «да» запоминает ночь, поменяли что-то — спросим снова. */
+let nightKey = null;
+let nightGateBox = null, nightGateGo = null;
+const currentNightKey = () => [state.dateStr, state.timeStr, state.place].join('|');
+
+function longDate(dateStr) {
+  const d = new Date(dateStr + 'T12:00:00');
+  return isNaN(d) ? dateStr : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function hideNightGate() { if (nightGateBox) nightGateBox.hidden = true; }
+
+function askNightConfirm(onKeep) {
+  const anchor = document.getElementById('sm-buy');
+  if (!anchor) { nightKey = currentNightKey(); placeConfirmed = true; onKeep(); return; }
+  nightGateGo = onKeep;
+  if (!nightGateBox) {
+    nightGateBox = document.createElement('div');
+    nightGateBox.className = 'sm-night-gate';
+    nightGateBox.style.cssText =
+      'margin:.55rem 0;padding:.7rem .9rem;border:1px solid #c9a961;border-radius:6px;' +
+      'font-size:.9rem;line-height:1.5;';
+    nightGateBox.innerHTML =
+      '<div>One check before payment — your print will show the Moon on <strong class="g-when"></strong> ' +
+      'over <strong class="g-place"></strong>. Is this your night?</div>' +
+      '<div style="margin-top:.55rem;display:flex;gap:.6rem;flex-wrap:wrap">' +
+      '<button type="button" class="sm-gate-keep" style="background:#c9a961;color:#111;border:0;' +
+      'padding:.45rem .95rem;border-radius:4px;cursor:pointer;font:inherit">Yes — that’s our night</button>' +
+      '<button type="button" class="sm-gate-change" style="background:transparent;color:inherit;' +
+      'border:1px solid currentColor;padding:.45rem .95rem;border-radius:4px;cursor:pointer;' +
+      'font:inherit;opacity:.85">No — let me change it</button></div>';
+    anchor.insertAdjacentElement('beforebegin', nightGateBox);
+    nightGateBox.querySelector('.sm-gate-keep').addEventListener('click', () => {
+      nightKey = currentNightKey(); placeConfirmed = true; hideNightGate();
+      if (nightGateGo) nightGateGo();
+    });
+    nightGateBox.querySelector('.sm-gate-change').addEventListener('click', () => {
+      hideNightGate();
+      const el = document.getElementById('sm-date');
+      if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.focus(); }
+    });
+  }
+  nightGateBox.querySelector('.g-when').textContent = `${longDate(state.dateStr)}, ${state.timeStr}`;
+  nightGateBox.querySelector('.g-place').textContent = state.place || 'the place you chose';
+  nightGateBox.hidden = false;
+  nightGateBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 /* MN2 = лунный продукт; остальная грамматика идентична SM2 — их парсит один fulfil.parse_code. */
@@ -682,6 +737,11 @@ function attachControls() {
     setTimeout(() => {
       /* ⛔ГЕЙТ МЕСТА ЖДЁТ ЧЕЛОВЕКА, А НЕ СЕРВЕР. Пока он открыт, кнопка обязана быть живой:
          иначе «One moment…» висит над вопросом, на который ответить должен покупатель. */
+      if (isDefaultNight() && nightKey !== currentNightKey()) {
+        setBuyPending(false);
+        askNightConfirm(() => { setBuyPending(true); go(); });
+        return;
+      }
       if (placeConfirmed) { go(); return; }
       setBuyPending(false);
       askPlaceConfirm(() => { setBuyPending(true); go(); });
