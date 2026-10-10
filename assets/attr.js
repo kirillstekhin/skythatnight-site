@@ -200,7 +200,11 @@
      токеном; fulfil.split_client_reference отрезает его всегда — печати метка не мешает. */
   var CHANNEL_KEY = 'skn_channel';
   var CHANNEL_RE = /^[a-z0-9-]{1,24}$/;
-  var REF_HOSTS = [['google', 'google'], ['bing', 'bing'], ['pinterest', 'pinterest'],
+  /* ИИ-ассистенты (10.10.2026) — ПЕРВЫМИ: gemini.google.com иначе ушёл бы в «google», copilot — в «other».
+     ChatGPT по рефереру метится так же, как по своему utm_source=chatgpt.com («chatgptcom»): один канал. */
+  var REF_HOSTS = [['chatgpt', 'chatgptcom'], ['openai', 'chatgptcom'], ['perplexity', 'perplexity'],
+    ['claude.ai', 'claude'], ['gemini', 'gemini'], ['bard.google', 'gemini'], ['copilot', 'copilot'],
+    ['google', 'google'], ['bing', 'bing'], ['pinterest', 'pinterest'],
     ['etsy', 'etsy'], ['instagram', 'instagram'], ['facebook', 'facebook'], ['youtube', 'youtube'],
     ['tiktok', 'tiktok'], ['duckduckgo', 'ddg'], ['ecosia', 'ecosia'], ['yahoo', 'yahoo'],
     ['stripe', 'stripe']];
