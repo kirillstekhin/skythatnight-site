@@ -698,6 +698,21 @@ function attachControls() {
   /* «Назад» со Stripe восстанавливает страницу из bfcache с кнопкой в «One moment…» —
      оживляем её (05.10.2026, C-2 аудита; парный сброс — в attr.js). */
   window.addEventListener('pageshow', e => { if (e.persisted) setBuyPending(false); });
+  /* Сообщение под кнопкой, когда дизайн не сохранился (хранилище дизайна, 11.10.2026).
+     Создаётся на лету: в 40+ страницах разметку не трогаем. */
+  const showBuyProblem = msg => {
+    let p = document.getElementById('sm-buy-problem');
+    if (!p) {
+      p = document.createElement('p');
+      p.id = 'sm-buy-problem';
+      p.setAttribute('role', 'alert');
+      p.style.cssText = 'margin:.6rem 0 0;font-size:.92rem;line-height:1.45;color:var(--gold,#c9a961);';
+      buyBtn.insertAdjacentElement('afterend', p);
+    }
+    p.textContent = msg;
+    p.hidden = false;
+  };
+  const hideBuyProblem = () => { const p = document.getElementById('sm-buy-problem'); if (p) p.hidden = true; };
 
   buyBtn.addEventListener('click', () => {
     if (buyPending) return;
@@ -716,6 +731,21 @@ function attachControls() {
         console.warn('[skn] тестовая сборка: ссылки для', formatToken(), 'нет — оплата заблокирована');
       }
       const code = designCode();
+      /* ХРАНИЛИЩЕ ДИЗАЙНА (11.10.2026) — тем же путём, что звёздная карта; см. starmap.js. */
+      if (window.SknAttr && window.SknAttr.navigateViaDesign && (link || !testBuild)) {
+        hideBuyProblem();
+        window.SknAttr.navigateViaDesign({
+          product: 'moon', design_code: code, format: formatToken(),
+          place: { name: state.place, lat: state.lat, lon: state.lon },
+          dedication: state.dedication || '',
+          return_path: location.pathname,
+        }, link || null).then(r => {
+          if (r.ok) return;
+          setBuyPending(false);
+          if (!r.navigated && r.message) showBuyProblem(r.message);
+        });
+        return;
+      }
       if (link) {
         /* ⛔ЛУННАЯ ВИТРИНА ИДЁТ ТЕМ ЖЕ ПУТЁМ, что и звёздная: один модуль атрибуции на обе.
            Один переход и только один — флаг ставится ДО ожидания токена, поэтому поздний

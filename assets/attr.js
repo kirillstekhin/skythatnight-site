@@ -341,6 +341,104 @@
     });
   }
 
+  /* ── ХРАНИЛИЩЕ ДИЗАЙНА (11.10.2026, решение владельца) ─────────────────────────
+     Место и подпись сохраняются ОДИН раз — ровно те, что в превью, — и печать берёт их из
+     записи, а не из необязательных полей Stripe (6 из 12 оплат сайта на 10.10 пришли с
+     пустой подписью → печаталось «Sky That Night»). Переход живёт здесь, рядом с
+     navigateToPayment: «один переход и только один» проверяется в одном месте на обеих витринах.
+     ⛔ОТКАТ НА СТАРЫЙ ПУТЬ только когда Function НЕДОСТУПНА или НЕ НАСТРОЕНА (сеть, 5xx,
+       404/405/501 — её нет на сервере). Тогда покупатель уходит по Payment Link с design-кодом,
+       и поля Stripe работают как раньше. Отказы по СОДЕРЖИМОМУ (400/409/410/429) — не откат:
+       показываем, что поправить, кнопка оживает, данные целы.
+     ⚠️ПОПЫТКА ПРИВЯЗАНА К СОДЕРЖИМОМУ и живёт в sessionStorage: повтор того же дизайна после
+       потерянного ответа или F5 идёт с той же попыткой — сервер вернёт ТУ ЖЕ сессию, а не
+       создаст вторую. Изменился дизайн — попытка новая. */
+  var DESIGN_ENDPOINT = '/api/design';
+  var DESIGN_TIMEOUT_MS = 15000;
+  var DESIGN_ATTEMPT_KEY = 'skn_design_attempt';
+  var DESIGN_ATTEMPT_TTL_MS = 7 * 24 * 3600 * 1000;      /* = срок попытки на сервере */
+  var DESIGN_MSG = {
+    design_expired: 'Your checkout window has closed. Everything you chose is still here — press the button again and we will open a fresh checkout.',
+    attempt_expired: 'Your checkout window has closed. Everything you chose is still here — press the button again and we will open a fresh checkout.',
+    checkout_expired: 'Your checkout window has closed. Everything you chose is still here — press the button again and we will open a fresh checkout.',
+    already_paid: 'This order has already been paid. Check your inbox for the confirmation — if it is not there, email admin@shopcienty.com and we will sort it out.',
+    attempt_content_changed: 'Something changed while we were saving your design. Check the details and press the button again.',
+    too_many_requests: 'Too many attempts in a row — please wait a minute and press the button again.',
+    invalid: 'We could not save your design. Please check the place and your dedication line, then press the button again.',
+    _default: 'We could not save your design, so we have not sent you to payment. Please press the button again.'
+  };
+
+  function newAttempt() {
+    var t = Math.floor(Date.now() / 1000).toString(36);
+    while (t.length < 8) t = '0' + t;
+    var r = new Uint8Array(10);
+    crypto.getRandomValues(r);
+    var tail = '';
+    for (var i = 0; i < r.length; i++) { var x = r[i].toString(36); tail += x.length < 2 ? '0' + x : x; }
+    return 'a_' + t + tail;
+  }
+  function designFp(c) {
+    var pl = c.place || {};
+    return JSON.stringify([c.product, c.design_code, c.format, c.dedication || '', pl.name || '', pl.lat, pl.lon]);
+  }
+  function designAttempt(content) {
+    var fp = designFp(content);
+    var d = parse(get(sessionStorage, DESIGN_ATTEMPT_KEY), null);
+    if (d && d.a && d.fp === fp && d._at && Date.now() - d._at < DESIGN_ATTEMPT_TTL_MS) return d.a;
+    var a = newAttempt();
+    set(sessionStorage, DESIGN_ATTEMPT_KEY, JSON.stringify({ a: a, fp: fp, _at: Date.now() }));
+    return a;
+  }
+  function designAttemptDrop() { set(sessionStorage, DESIGN_ATTEMPT_KEY, null); }
+
+  /* content: {product, design_code, format, place:{name,lat,lon}, dedication, return_path}.
+     fallbackLink — Payment Link этого формата (в тестовой сборке — ТОЛЬКО тестовая) или null.
+     → Promise<{ok, fallback?, navigated?, message?}>; `navigated` = переход уже был. */
+  function navigateViaDesign(content, fallbackLink) {
+    if (navigated) return Promise.resolve({ ok: false, navigated: true });
+    navigated = true;
+    var attempt = designAttempt(content);
+    return token().catch(function () { return null; }).then(function (tok) {
+      var body = {};
+      for (var k in content) if (Object.prototype.hasOwnProperty.call(content, k)) body[k] = content[k];
+      body.attempt = attempt;
+      if (chanMem && CHANNEL_RE.test(chanMem)) body.channel = chanMem;
+      if (tok) body.token = tok;
+      var ctrl = new AbortController();
+      var timer = setTimeout(function () { ctrl.abort(); }, DESIGN_TIMEOUT_MS);
+      return fetch(DESIGN_ENDPOINT, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body), signal: ctrl.signal,
+      }).then(function (r) {
+        return r.json().catch(function () { return {}; }).then(function (d) { return { status: r.status, data: d }; });
+      }).catch(function () {
+        return { status: 0, data: {} };
+      }).then(function (res) {
+        clearTimeout(timer);
+        var d = res.data || {};
+        if (res.status === 200 && d.id && d.payment_link) {
+          /* токен в client_reference_id сессии (28 + 28 + 31 символ — всегда влезает) */
+          if (tok) markLinked(tok);
+          location.href = d.payment_link;                 /* ⛔ничего к ссылке не дописываем: у неё #фрагмент */
+          return { ok: true };
+        }
+        var unreachable = res.status === 0 || res.status >= 500 || res.status === 404 ||
+                          res.status === 405 || res.status === 501;
+        if (unreachable && fallbackLink) {
+          var ref = buildRef(content.design_code, tok, chanMem);
+          if (tok && ref.indexOf('_a1_' + tok) !== -1) markLinked(tok);
+          location.href = fallbackLink + '?client_reference_id=' + encodeURIComponent(ref);
+          return { ok: true, fallback: true };
+        }
+        if (res.status === 409 || res.status === 410) designAttemptDrop();   /* новая попытка — по новому нажатию */
+        navigated = false;                                   /* перехода не было — кнопка вправе ожить */
+        try { if (d.problems) console.warn('[skn] design refused:', d.error, d.problems); } catch (e) {}
+        return { ok: false, status: res.status, error: d.error || null,
+                 message: DESIGN_MSG[d.error] || DESIGN_MSG._default };
+      });
+    });
+  }
+
   function boot() {
     try { capture(); watch(); flushPending(); } catch (e) {}
     try { captureChannel(); } catch (e) {}          /* канал — отдельно: его сбой не трогает атрибуцию */
@@ -349,6 +447,7 @@
   window.SknAttr = {
     boot: boot, capture: capture, token: token, buildRef: buildRef, revoke: revoke,
     navigateToPayment: navigateToPayment, channelOf: channelOf, captureChannel: captureChannel, channel: channel,
+    navigateViaDesign: navigateViaDesign, designAttempt: designAttempt, designAttemptDrop: designAttemptDrop,
     consent: consent, bumpConsentVer: bumpConsentVer, queue: queue, flushPending: flushPending,
     forget: forget, identifier: identifier, watch: watch, linked: linked, markLinked: markLinked,
     _mem: mem, ENDPOINT: ENDPOINT, TIMEOUT_MS: TIMEOUT_MS, CLIENT_REF_MAX: CLIENT_REF_MAX,
