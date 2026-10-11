@@ -353,7 +353,8 @@
      ⚠️ПОПЫТКА ПРИВЯЗАНА К СОДЕРЖИМОМУ и живёт в sessionStorage: повтор того же дизайна после
        потерянного ответа или F5 идёт с той же попыткой — сервер вернёт ТУ ЖЕ сессию, а не
        создаст вторую. Изменился дизайн — попытка новая. */
-  var DESIGN_ENDPOINT = '/api/design';
+  /* В бою — свой origin по маршруту Worker-а; тестовая сборка подставляет адрес тестового Worker-а на workers.dev */
+  var DESIGN_ENDPOINT = (typeof window !== 'undefined' && window.SKN_DESIGN_ENDPOINT) || '/api/design';
   var DESIGN_TIMEOUT_MS = 15000;
   var DESIGN_ATTEMPT_KEY = 'skn_design_attempt';
   var DESIGN_ATTEMPT_TTL_MS = 7 * 24 * 3600 * 1000;      /* = срок попытки на сервере */
