@@ -416,8 +416,9 @@ let placeGateBox = null, placeGateGo = null;
    Пресет страницы повода — ПРИМЕР (Santorini, «Ten years of us»), а не выбор покупателя. Раньше
    он считался осознанным местом, и пример мог незаметно уйти в оплату. Теперь при SM_PRESET.sample
    перед оплатой покупатель видит дату, время, место и подпись и подтверждает их явно; меняет что-то
-   после подтверждения — спрашиваем снова. Подпись в design-код не входит (печатается текст поля
-   «Dedication line» в Stripe) — окно говорит это прямо. */
+   после подтверждения — спрашиваем снова. Подпись в design-код не входит: с 11.10.2026 она едет в
+   запись дизайна (хранилище, attr.js navigateViaDesign) ровно как в превью — окно так и говорит;
+   лишь при откате на Payment Link (Function недоступна) её печатает поле «Dedication line» в Stripe. */
 let samplePreset = false;
 let nightKey = null;
 let nightGateBox = null, nightGateGo = null;
@@ -465,8 +466,8 @@ function askNightConfirm(onKeep) {
   nightGateBox.querySelector('.g-place').textContent = state.place || 'the place you chose';
   const ded = (state.dedication || '').trim();
   nightGateBox.querySelector('.g-ded').textContent = ded
-    ? `Your line: “${ded}”. On the next page, type it in “Dedication line” — that is the text we print.`
-    : 'Want a line on the print? Type it in “Dedication line” on the next page.';
+    ? `Your line: “${ded}” — that is the text we print.`
+    : 'No line on the print yet — add “Name or a short message” above if you want one.';
   nightGateBox.hidden = false;
   nightGateBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
