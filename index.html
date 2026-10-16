@@ -259,6 +259,26 @@
 .sister-grid span { display:block; margin-top:.7rem; font-family:var(--sans); font-size:.82rem;
   letter-spacing:.14em; text-transform:uppercase; color:var(--gold,#c9a961); }
 @media (max-width:640px){ .sister-grid { grid-template-columns:1fr; max-width:320px; } }
+/* SKN_XMAS:START */
+.sm-xmas { padding:1.5rem 0; border-top:1px solid rgba(201,169,97,.18); border-bottom:1px solid rgba(201,169,97,.18); background:rgba(201,169,97,.05); }
+.sm-xmas-inner { display:flex; align-items:center; justify-content:space-between; gap:2rem; }
+.sm-xmas h2 { font-family:var(--serif); font-weight:500; font-size:clamp(1.4rem,2.4vw,1.9rem); color:var(--moon); margin:.2rem 0 .4rem; }
+.sm-xmas p { font-family:var(--sans); font-weight:300; font-size:.95rem; line-height:1.6; color:var(--moon-sub); margin:0; max-width:40rem; }
+.sm-xmas .sm-cta { white-space:nowrap; flex:none; }
+@media (max-width:860px){ .sm-xmas-inner { flex-direction:column; align-items:flex-start; } }
+/* карточка Christmas в мозаике: вторая крупная плитка (16 клеток), на планшете — лента, на телефоне — во всю ширину */
+.sm-occ-mosaic { grid-auto-flow:dense; }
+@media (min-width:1101px){
+  .sm-occ-mosaic > a.occ-xmas { grid-column:span 2; grid-row:span 2; }
+  .sm-occ-mosaic > a.occ-xmas figure { display:flex; flex-direction:column; height:100%; }
+  .sm-occ-mosaic > a.occ-xmas img { height:100%; object-fit:cover; }
+}
+@media (max-width:1100px) and (min-width:641px){
+  .sm-occ-mosaic > a.occ-xmas { grid-column:span 3; }
+  .sm-occ-mosaic > a.occ-xmas img { height:340px; object-fit:cover; object-position:50% 35%; }
+}
+@media (max-width:640px){ .sm-occ-mosaic > a.occ-xmas { grid-column:span 2; } }
+/* SKN_XMAS:END */
 </style>
 <!-- SKN_GTAG_HEAD:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ.
      Consent Mode v2: до согласия куки не пишутся (UK PECR reg.6). -->
@@ -318,8 +338,9 @@
     <a href="./" class="logo sm-wordmark" aria-label="Sky, That Night — home">
       <span aria-hidden="true">✦</span>&nbsp;SKY, THAT NIGHT
     </a>
-    <button class="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
+    <button class="mobile-menu-btn" aria-label="Open menu" aria-controls="main-nav" aria-expanded="false" onclick="var n=document.getElementById('main-nav');var o=n.classList.toggle('open');this.classList.toggle('active',o);this.setAttribute('aria-expanded',o)">&#9776;</button>
     <nav class="nav" id="main-nav">
+      <a href="occasion-christmas.html" class="nav-xmas">Christmas gifts</a>
       <a href="#design">Design yours</a>
       <a href="#craft">How it works</a>
       <a href="famous-nights.html">Famous Nights</a>
@@ -354,6 +375,18 @@
   </div>
 </section>
 
+<!-- SKN_XMAS_PROMO:START -->
+<section class="sm-xmas" aria-label="Christmas gifts">
+  <div class="container sm-xmas-inner">
+    <div>
+      <div class="section-kicker sm-kicker">Christmas 2026</div>
+      <h2>This Christmas, give them a night to remember.</h2>
+      <p>A personalised star map of a wedding, a first date or the day your family grew. Prints from £34.99 · free UK and US delivery.</p>
+    </div>
+    <a class="sm-cta" href="occasion-christmas.html">Find their Christmas gift</a>
+  </div>
+</section>
+<!-- SKN_XMAS_PROMO:END -->
 <section class="sm-config" id="design">
   <div class="container">
     <div class="sm-preview-wrap">
@@ -519,6 +552,7 @@
     <h2>Occasions.</h2>
     <div class="sm-occgrid sm-occ-mosaic">
       <a href="occasion-met.html"><figure><img src="assets/starmap/occ-met.jpg" alt="Framed star map above a bed — the night we met" loading="lazy"><figcaption>The night you met<span class="occ-sub">London · August 2019</span></figcaption></figure></a>
+      <a href="occasion-christmas.html" class="occ-xmas"><figure><img src="assets/starmap/props-christmas-2.jpg" alt="Star map in a gold Classic frame above an antique mantelpiece dressed for Christmas" loading="lazy"><figcaption>A Christmas gift<span class="occ-sub">Any night they treasure</span></figcaption></figure></a>
       <a href="occasion-proposal.html"><figure><img src="assets/starmap/occ-proposal.jpg" alt="Framed star map on a candlelit mantelpiece — she said yes" loading="lazy"><figcaption>She said yes<span class="occ-sub">Paris · September 2023</span></figcaption></figure></a>
       <a href="occasion-wedding.html"><figure><img src="assets/starmap/occ-wedding.jpg" alt="Framed star map above a console with wedding flowers" loading="lazy"><figcaption>A wedding sky<span class="occ-sub">Rome · June 2024</span></figcaption></figure></a>
       <a href="occasion-born.html"><figure><img src="assets/starmap/occ-born.jpg" alt="Framed star map above a crib in a nursery" loading="lazy"><figcaption>The night they were born<span class="occ-sub">Edinburgh · March 2025</span></figcaption></figure></a>

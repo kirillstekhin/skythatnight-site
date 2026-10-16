@@ -307,8 +307,9 @@
     <a href="./" class="logo sm-wordmark" aria-label="Sky, That Night — home">
       <span aria-hidden="true">✦</span>&nbsp;SKY, THAT NIGHT
     </a>
-    <button class="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
+    <button class="mobile-menu-btn" aria-label="Open menu" aria-controls="main-nav" aria-expanded="false" onclick="var n=document.getElementById('main-nav');var o=n.classList.toggle('open');this.classList.toggle('active',o);this.setAttribute('aria-expanded',o)">&#9776;</button>
     <nav class="nav" id="main-nav">
+      <a href="occasion-christmas.html" class="nav-xmas">Christmas gifts</a>
       <a href="#design">Design yours</a>
       <a href="#craft">How it works</a>
       <a href="famous-nights.html">Famous Nights</a>

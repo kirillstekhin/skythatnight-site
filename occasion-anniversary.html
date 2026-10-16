@@ -377,8 +377,9 @@
     <a href="./" class="logo sm-wordmark" aria-label="Sky, That Night — home">
       <span aria-hidden="true">✦</span>&nbsp;SKY, THAT NIGHT
     </a>
-    <button class="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
+    <button class="mobile-menu-btn" aria-label="Open menu" aria-controls="main-nav" aria-expanded="false" onclick="var n=document.getElementById('main-nav');var o=n.classList.toggle('open');this.classList.toggle('active',o);this.setAttribute('aria-expanded',o)">&#9776;</button>
     <nav class="nav" id="main-nav">
+      <a href="occasion-christmas.html" class="nav-xmas">Christmas gifts</a>
       <a href="./#design">Design yours</a>
       <a href="./#craft">How it works</a>
       <a href="./#faq">FAQ</a>
@@ -483,6 +484,7 @@
         <div class="sm-buy-proof">
           <p class="sm-buy-review"><span class="stars" aria-label="Rated 5 out of 5 stars">★★★★★</span>“It is exactly how it looks online and I’m very happy with it.” <span>— Emily, verified purchase</span></p>
           <p class="sm-buy-when">Preview by email before we print · dispatched in 3–6 working days · free UK &amp; US delivery, tracked</p>
+          <p class="sm-buy-when sm-xmas-link" style="margin-top:.4rem"><a href="occasion-christmas.html" style="color:var(--gold);text-underline-offset:3px">Giving this for Christmas? Explore our gift guide →</a></p>
         </div>
         <div class="sm-code-line">Design code: <code id="sm-code"></code></div>
       </div>
@@ -515,7 +517,7 @@
       <a href="assets/starmap/gallery/themes.jpg" target="_blank" rel="noopener"><figure><img src="assets/starmap/gallery/themes.jpg" alt="The same sky in five finishes — midnight, porcelain, noir, luxe gold and luxe silver" loading="lazy"><figcaption>Five themes</figcaption></figure></a>
       <a href="assets/starmap/gallery/frames-3.jpg" target="_blank" rel="noopener"><figure><img src="assets/starmap/gallery/frames-3.jpg" alt="Gallery classic frames in black, antique gold or antique silver for a personalised star map" loading="lazy"><figcaption>Three frames</figcaption></figure></a>
       <a href="assets/starmap/gallery/personalised.jpg" target="_blank" rel="noopener"><figure><img src="assets/starmap/gallery/personalised.jpg" alt="What you personalise on a custom star map print" loading="lazy"><figcaption>Your night, in four lines</figcaption></figure></a>
-      <a href="assets/starmap/gallery/detail.jpg" target="_blank" rel="noopener"><figure><img src="assets/starmap/gallery/detail.jpg" alt="Close-up of the astronomical detail on the print" loading="lazy"><figcaption>Every star in its true position</figcaption></figure></a>
+      <a href="assets/starmap/gallery/detail-2.jpg" target="_blank" rel="noopener"><figure><img src="assets/starmap/gallery/detail-2.jpg" alt="Close-up of the astronomical detail on the print" loading="lazy"><figcaption>Every star in its true position</figcaption></figure></a>
       <a href="assets/starmap/gallery/sizes.jpg" target="_blank" rel="noopener"><figure><img src="assets/starmap/gallery/sizes.jpg" alt="Star map print sizes shown to scale — 30×40, 40×50 and 50×70 cm" loading="lazy"><figcaption>Three sizes</figcaption></figure></a>
       <a href="assets/starmap/gallery/arrives-2.jpg" target="_blank" rel="noopener"><figure><img src="assets/starmap/gallery/arrives-2.jpg" alt="Prints ship rolled in a tube, framed pieces boxed with protected corners" loading="lazy"><figcaption>How it arrives</figcaption></figure></a>
     </div>

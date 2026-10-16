@@ -355,8 +355,9 @@
     <a href="./" class="logo sm-wordmark" aria-label="Sky, That Night — home">
       <span aria-hidden="true">✦</span>&nbsp;SKY, THAT NIGHT
     </a>
-    <button class="mobile-menu-btn" aria-label="Open menu">&#9776;</button>
+    <button class="mobile-menu-btn" aria-label="Open menu" aria-controls="main-nav" aria-expanded="false" onclick="var n=document.getElementById('main-nav');var o=n.classList.toggle('open');this.classList.toggle('active',o);this.setAttribute('aria-expanded',o)">&#9776;</button>
     <nav class="nav" id="main-nav">
+      <a href="occasion-christmas.html" class="nav-xmas">Christmas gifts</a>
       <a href="#design">Design yours</a>
       <a href="#craft">How it works</a>
       <a href="famous-nights.html">Famous Nights</a>
@@ -467,6 +468,7 @@
         <div class="sm-buy-proof">
           <p class="sm-buy-review"><span class="stars" aria-label="Rated 5 out of 5 stars">★★★★★</span>“It is exactly how it looks online and I’m very happy with it.” <span>— Emily, verified purchase</span></p>
           <p class="sm-buy-when">Preview by email before we print · dispatched in 3–6 working days · free UK &amp; US delivery, tracked</p>
+          <p class="sm-buy-when sm-xmas-link" style="margin-top:.4rem"><a href="occasion-christmas.html" style="color:var(--gold);text-underline-offset:3px">Giving this for Christmas? Explore our gift guide →</a></p>
         </div>
         <div class="sm-code-line">Design code: <code id="sm-code"></code></div>
       </div>
