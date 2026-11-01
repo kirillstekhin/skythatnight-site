@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Etsy Order Preview | Sky, That Night</title>
+<meta name="description" content="See the preview of your personalised star map before we print it. Enter your Etsy order number and the postcode of your delivery address.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://www.skythatnight.com/etsy-preview.html">
+<link rel="icon" href="./assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="./assets/favicon.png?v=2">
+<link rel="apple-touch-icon" href="./assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/style.css?v=3">
+<style>
+  .ep-wrap{max-width:720px;margin:0 auto;padding:48px 16px 64px}
+  .ep-wrap h1{font-family:"EB Garamond",serif;font-weight:500;font-size:2rem;margin:0 0 .5rem;text-wrap:balance}
+  .ep-lead{opacity:.85;margin:0 0 1.5rem;line-height:1.5}
+  .ep-form{display:grid;gap:12px;grid-template-columns:1fr;margin-bottom:1.5rem}
+  @media(min-width:560px){.ep-form{grid-template-columns:1fr 1fr auto;align-items:end}}
+  .ep-form label{display:grid;gap:6px;font-size:.85rem;letter-spacing:.04em;text-transform:uppercase;opacity:.8}
+  .ep-form input{font:inherit;font-size:1rem;padding:10px 12px;border:1px solid rgba(255,255,255,.25);border-radius:6px;background:rgba(255,255,255,.06);color:inherit}
+  .ep-form input:focus{outline:2px solid rgba(255,255,255,.5);outline-offset:2px}
+  .ep-form button{font:inherit;font-weight:600;padding:11px 18px;border-radius:6px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.12);color:inherit;cursor:pointer}
+  .ep-form button:hover{background:rgba(255,255,255,.2)}
+  .ep-status{min-height:1.5em;margin:0 0 1rem;line-height:1.5}
+  .ep-status.err{color:#ffb4a8}
+  .ep-result{display:none}
+  .ep-result img{width:100%;height:auto;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.45);background:#0b1020}
+  .ep-meta{margin:1rem 0;line-height:1.6}
+  .ep-note{border-left:3px solid rgba(255,255,255,.35);padding:8px 14px;margin:1.2rem 0;line-height:1.55}
+  .ep-small{font-size:.9rem;opacity:.75;line-height:1.5}
+  .ep-small a{color:inherit}
+</style>
+</head>
+<body class="sm-night">
+<main class="ep-wrap">
+  <h1>Your order preview</h1>
+  <p class="ep-lead">Every print is drawn for one night only and shown to you before it goes to print. Enter your Etsy order number (it's in your Etsy receipt, e.g. 1234567890) and the postcode of the delivery address you gave at checkout.</p>
+
+  <form class="ep-form" id="ep-form" autocomplete="off">
+    <label>Etsy order number <input id="ep-order" inputmode="numeric" pattern="[0-9 ]*" placeholder="1234567890" required></label>
+    <label>Delivery postcode <input id="ep-postcode" placeholder="e.g. SW1A 1AA" required></label>
+    <button type="submit" id="ep-btn">Show my preview</button>
+  </form>
+  <p class="ep-status" id="ep-status" aria-live="polite"></p>
+
+  <section class="ep-result" id="ep-result">
+    <img id="ep-img" alt="Preview of your personalised print">
+    <p class="ep-meta" id="ep-meta"></p>
+    <div class="ep-note" id="ep-note"></div>
+    <p class="ep-small">This is a screen preview: colours and fine detail are richer in print. The stars are the real sky over your place at the date and time you gave us.</p>
+  </section>
+
+  <p class="ep-small">Previews appear within 24 hours of your purchase. Can't see yours yet, or something needs changing? Message us on Etsy — go to <em>Purchases and reviews</em>, open the order and choose <em>Help with order → Message seller</em>. We'll put the print on hold the moment we hear from you.</p>
+</main>
+<script>
+(function () {
+  var form = document.getElementById("ep-form"), st = document.getElementById("ep-status");
+  var res = document.getElementById("ep-result"), img = document.getElementById("ep-img");
+  var meta = document.getElementById("ep-meta"), note = document.getElementById("ep-note"), btn = document.getElementById("ep-btn");
+  function fmt(iso) { try { return new Date(iso).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" }); } catch (e) { return iso; } }
+  form.addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var order = document.getElementById("ep-order").value.replace(/\D/g, "");
+    var pc = document.getElementById("ep-postcode").value.trim();
+    st.className = "ep-status"; st.textContent = "Looking up your preview…"; res.style.display = "none"; btn.disabled = true;
+    fetch("/api/design/etsy-preview", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ order: order, postcode: pc }) })
+      .then(function (r) { return r.json().then(function (j) { return { s: r.status, j: j }; }); })
+      .then(function (x) {
+        btn.disabled = false;
+        if (x.s === 200 && x.j && x.j.ok) {
+          img.src = x.j.image;
+          meta.textContent = "Night: " + (x.j.night || "—") + " · Place: " + (x.j.place || "—") + " · Format: " + (x.j.format || "—");
+          var after = x.j.print_after ? fmt(x.j.print_after) : "about 25 hours after the preview appeared";
+          note.innerHTML = "<strong>Happy with it?</strong> You don't need to do anything — we start printing after <strong>" + after + "</strong> (UK time). " +
+            "<strong>Need a change?</strong> Message us on Etsy before then and we'll hold the print.";
+          res.style.display = "block"; st.textContent = "";
+        } else if (x.s === 429) {
+          st.className = "ep-status err"; st.textContent = "Too many attempts — please wait a minute and try again.";
+        } else {
+          st.className = "ep-status err";
+          st.textContent = "We couldn't find a preview for that order and postcode. Check the number in your Etsy receipt and the postcode of the delivery address — or your preview may not be ready yet (allow up to 24 hours).";
+        }
+      })
+      .catch(function () { btn.disabled = false; st.className = "ep-status err"; st.textContent = "Something went wrong on our side. Please try again in a few minutes or message us on Etsy."; });
+  });
+})();
+</script>
+</body>
+</html>
