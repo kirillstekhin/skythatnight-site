@@ -206,7 +206,7 @@ const PRICES = {
    (сверяет site_predeploy_check). ⛔DIGITAL_ON_SALE = true — ТОЛЬКО после боевого Price и выкладки
    Worker с ним (порядок — в отчёте 11.11): без них Worker отвечает not_on_sale, и кнопка вела бы в
    ошибку. Тестовая сборка (tools/test_storefront.py) показывает кнопку всегда. */
-const DIGITAL_ON_SALE = false;
+const DIGITAL_ON_SALE = true;
 const DIGITAL_PRICE = 19.00;
 
 /* ⛔СВОИ ССЫЛКИ ЛУНЫ (25.09.2026). До этого луна вела на ссылки звёздной карты: цена и

@@ -254,6 +254,8 @@
 .ty-steps { display:grid; grid-template-columns:repeat(3,1fr); gap:1.4rem; max-width:52rem;
   margin:0 auto 2.6rem; text-align:left; }
 @media (max-width:760px){ .ty-steps { grid-template-columns:1fr; } }
+.ty-steps[hidden] { display:none; }
+#ty-digital { grid-template-columns:1fr; max-width:36rem; }
 .ty-step { padding:1.3rem 1.4rem; border:1px solid rgba(201,169,97,.2); border-radius:3px; }
 .ty-step-n { font-family:var(--sans); font-size:.72rem; letter-spacing:.28em; text-transform:uppercase;
   color:var(--gold); margin-bottom:.6rem; }
@@ -341,7 +343,15 @@
     your email.</p>
     <p class="ty-ref" id="ty-ref"></p>
 
-    <div class="ty-steps">
+    <div class="ty-steps" id="ty-digital" hidden>
+      <div class="ty-step">
+        <div class="ty-step-n">Your digital file</div>
+        <p>We render your night at print resolution and email you a PNG (300&nbsp;dpi) and a PDF
+        within 24 hours. Nothing is printed or posted &mdash; print it at home or at any print shop.
+        Want a change? Reply to that email and we will send a corrected file free.</p>
+      </div>
+    </div>
+    <div class="ty-steps" id="ty-print">
       <div class="ty-step">
         <div class="ty-step-n">Step one</div>
         <p>We render your night at print resolution &mdash; every star above your horizon,
@@ -408,6 +418,13 @@
   /* ссылка на заказ — покупателю, чтобы было что назвать в письме */
   var ref = sid ? sid.slice(-10).toUpperCase() : '';
   document.getElementById('ty-ref').textContent = ref ? 'Order reference ' + ref : '';
+  /* цифровой файл (11.11.2026): печати и доставки нет — другой текст шагов */
+  if (/DIGITAL/.test(q.get('sku') || '')) {
+    document.getElementById('ty-print').hidden = true;
+    document.getElementById('ty-digital').hidden = false;
+    var lead = document.querySelector('.ty-lead');
+    if (lead) lead.textContent = 'Payment received — thank you. Your digital file is being rendered for the exact date, time and place you chose. A confirmation is on its way to your email.';
+  }
 })();
 </script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
