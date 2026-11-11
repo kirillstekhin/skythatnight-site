@@ -371,6 +371,18 @@ const PRICES = {
   classic: { '3040': 69.99, '4050': 79.99, '5070': 89.99 },
 };
 
+/* ⭐ЦИФРОВОЙ ФАЙЛ £19 (11.11.2026, решение владельца D1 в Q4_DECISIONS + «да 9» 11.11; трек S8).
+   Файл печатного качества (PNG 300 dpi + PDF) письмом, без печати и доставки — «подарок последней
+   минуты». ⛔ОТДЕЛЬНАЯ КНОПКА ПОСЛЕ ВЫБОРА РАЗМЕРА, не третий формат рядом с Print/Classic: так решено,
+   чтобы не каннибализировать принт. Размер файла = выбранный размер (DIGITAL3040/4050/5070, одна цена).
+   Оплата — только через хранилище дизайна (Worker /api/design, Price из его сетки): Payment Link у цифры
+   нет, запасного пути на старую ссылку тоже. Цена = fulfil.DIGITAL_PENCE = design_store.SKN = Worker
+   (сверяет site_predeploy_check). ⛔DIGITAL_ON_SALE = true — ТОЛЬКО после боевого Price и выкладки
+   Worker с ним (порядок — в отчёте 11.11): без них Worker отвечает not_on_sale, и кнопка вела бы в
+   ошибку. Тестовая сборка (tools/test_storefront.py) показывает кнопку всегда. */
+const DIGITAL_ON_SALE = false;
+const DIGITAL_PRICE = 19.00;
+
 /* Stripe Payment Links — создать 9 LIVE-линков в Stripe Dashboard (см. STRIPE_SETUP.md)
    и вписать сюда. Каждой ссылке добавляется ?client_reference_id=<design code> автоматически.
    Пустой линк → показываем design-код + email (fallback-блок), деньги не теряем. */
@@ -630,6 +642,7 @@ function refresh() {
   });
   renderFrameColors();
   applyPreviewFrame();
+  renderDigital();
 }
 
 /* Живая рама на превью: реальные пиксели Prodigi-шевронов (border-image, прозрачная
@@ -1019,6 +1032,93 @@ function attachControls() {
       if (placeConfirmed) { go(); return; }
       setBuyPending(false);
       askPlaceConfirm(() => { setBuyPending(true); go(); });
+    }, 300);
+  });
+  attachDigital();
+}
+
+/* ── ЦИФРОВОЙ ФАЙЛ: кнопка под основной покупкой (11.11.2026) ──
+   Создаётся на лету, как подсказка о превью: разметку 40+ страниц (их собирают генераторы) не трогаем.
+   Те же гейты ночи и места, что у «Buy», тот же путь хранилища дизайна (attr.js navigateViaDesign). */
+function digitalFormat() { return 'DIGITAL' + state.size; }
+function digitalCode() { return designCode().replace(/-[A-Z]+\d{4}-[A-Z]+$/, '-' + digitalFormat() + '-NONE'); }
+function renderDigital() {
+  const s = document.querySelector('#sm-digital .d-size');
+  if (s) s.textContent = (SIZE_CM[state.size] || '30x40').replace('x', '\u00d7') + '\u00a0cm';
+}
+function attachDigital() {
+  const on = DIGITAL_ON_SALE || (typeof window !== 'undefined' && window.SKN_TEST_BUILD === true);
+  const anchor = document.querySelector('.sm-preview-note') || document.getElementById('sm-buy');
+  if (!on || !anchor || document.getElementById('sm-digital')) return;
+  const box = document.createElement('div');
+  box.id = 'sm-digital';
+  box.style.cssText = 'margin-top:1.1rem;padding-top:1rem;border-top:1px dashed rgba(201,169,97,.3);font-family:var(--sans);';
+  box.innerHTML =
+    '<div style="font-size:.88rem;color:var(--moon-sub,#c8cfdc);margin-bottom:.55rem">Printing it yourself, or need it tonight?</div>' +
+    '<button type="button" class="sm-digital-buy" style="width:100%;background:transparent;color:var(--gold,#c9a961);' +
+    'border:1px solid var(--gold,#c9a961);border-radius:3px;padding:.75rem 1rem;font:inherit;font-size:.95rem;cursor:pointer">' +
+    'Get the digital file \u2014 \u00a3' + DIGITAL_PRICE.toFixed(2) + '</button>' +
+    '<p style="margin:.55rem 0 0;font-size:.8rem;line-height:1.5;color:var(--moon-faint,#9aa5b8)">' +
+    'A print-ready file of this design, not a printed poster: PNG at 300&nbsp;dpi and PDF, sized ' +
+    '<span class="d-size"></span>. Emailed within 24 hours, usually the same day. Print it at home or at any ' +
+    'photo lab or copy shop. Want something changed? Reply to that email and we redraw it free.</p>';
+  anchor.insertAdjacentElement('afterend', box);
+  renderDigital();
+  const btn = box.querySelector('.sm-digital-buy');
+  const LABEL = btn.textContent;
+  let pending = false;
+  const setPending = on => {
+    if (on && !btn.style.width) btn.style.width = btn.offsetWidth + 'px';
+    pending = on;
+    btn.setAttribute('aria-busy', on ? 'true' : 'false');
+    btn.style.opacity = on ? '0.72' : '';
+    btn.style.cursor = on ? 'progress' : 'pointer';
+    btn.textContent = on ? 'One moment\u2026' : LABEL;
+  };
+  window.addEventListener('pageshow', e => { if (e.persisted) setPending(false); });
+  const problem = msg => {
+    let p = box.querySelector('.d-problem');
+    if (!p) {
+      p = document.createElement('p');
+      p.className = 'd-problem';
+      p.setAttribute('role', 'alert');
+      p.style.cssText = 'margin:.6rem 0 0;font-size:.9rem;line-height:1.45;color:var(--gold,#c9a961);';
+      box.appendChild(p);
+    }
+    p.textContent = msg || '';
+    p.hidden = !msg;
+  };
+  btn.addEventListener('click', () => {
+    if (pending) return;
+    setPending(true);
+    problem('');
+    const go = () => {
+      /* ⛔ТОЛЬКО ЧЕРЕЗ ХРАНИЛИЩЕ ДИЗАЙНА: у цифры нет Payment Link, запасной ссылки — null */
+      if (!(window.SknAttr && window.SknAttr.navigateViaDesign)) {
+        setPending(false);
+        problem('The digital file is not available right now \u2014 email admin@shopcienty.com and we will send you a payment link.');
+        return;
+      }
+      window.SknAttr.navigateViaDesign({
+        product: 'sky', design_code: digitalCode(), format: digitalFormat(),
+        place: { name: state.place, lat: state.lat, lon: state.lon },
+        dedication: state.dedication || '',
+        return_path: location.pathname,
+      }, null).then(r => {
+        if (r.ok) return;
+        setPending(false);
+        if (!r.navigated && r.message) problem(r.message);
+      });
+    };
+    setTimeout(() => {                         // 300 мс — как у «Buy»: blur-автоприменение места
+      if ((samplePreset || isDefaultNight()) && nightKey !== currentNightKey()) {
+        setPending(false);
+        askNightConfirm(() => { setPending(true); go(); });
+        return;
+      }
+      if (placeConfirmed) { go(); return; }
+      setPending(false);
+      askPlaceConfirm(() => { setPending(true); go(); });
     }, 300);
   });
 }
