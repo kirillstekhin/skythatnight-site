@@ -299,6 +299,16 @@
   font-family:var(--sans); font-size:.9rem; color:var(--moon-sub); text-decoration:none; }
 .pp-others a:hover { border-color:var(--gold); color:var(--moon); }
 .pp-others .pp-o-price { color:var(--gold); }
+/* SKN_XMAS_BAR:START */
+.sm-xbar { background:rgba(201,169,97,.08); border-bottom:1px solid rgba(201,169,97,.22); text-align:center; position:relative; z-index:31; }
+[hidden].sm-xbar, .sm-xbar [hidden] { display:none; }
+.sm-xbar a { display:block; padding:.5rem 1rem; font-family:var(--sans); font-size:.82rem; line-height:1.45; letter-spacing:.01em; color:var(--moon-sub); text-decoration:none; }
+.sm-xbar strong { color:var(--gold); font-weight:500; white-space:nowrap; }
+.sm-xbar .xb-more { color:var(--gold); margin-left:.35rem; white-space:nowrap; text-decoration:underline; text-underline-offset:3px; text-decoration-color:rgba(201,169,97,.45); }
+.sm-xbar a:hover .xb-more, .sm-xbar a:focus-visible .xb-more { text-decoration-color:var(--gold); }
+.sm-xbar a:focus-visible { outline:2px solid var(--gold); outline-offset:-3px; }
+@media (max-width:640px){ .sm-xbar a { font-size:.76rem; padding:.45rem .9rem; } }
+/* SKN_XMAS_BAR:END */
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "Personalised Star Map — Print 40×50 cm", "sku": "SKN-PRINT-4050", "mpn": "SKN-PRINT-4050", "brand": {"@type": "Brand", "name": "Sky, That Night"}, "image": "https://www.skythatnight.com/assets/starmap/feed/SKN-PRINT-4050.jpg", "url": "https://www.skythatnight.com/product-skn-print-4050.html", "description": "A museum-grade star map of the exact sky above any place, on any date. Museum-grade giclée print, shipped rolled in a protective tube.", "offers": {"@type": "Offer", "price": "39.99", "priceCurrency": "GBP", "availability": "https://schema.org/InStock", "itemCondition": "https://schema.org/NewCondition", "url": "https://www.skythatnight.com/product-skn-print-4050.html", "validFrom": "2026-08-01", "priceValidUntil": "2027-12-31", "seller": {"@type": "Organization", "name": "Shopcienty Limited"}, "shippingDetails": [{"@type": "OfferShippingDetails", "shippingRate": {"@type": "MonetaryAmount", "value": "0", "currency": "GBP"}, "shippingDestination": {"@type": "DefinedRegion", "addressCountry": "GB"}, "deliveryTime": {"@type": "ShippingDeliveryTime", "handlingTime": {"@type": "QuantitativeValue", "minValue": 3, "maxValue": 6, "unitCode": "DAY"}, "transitTime": {"@type": "QuantitativeValue", "minValue": 1, "maxValue": 3, "unitCode": "DAY"}}}, {"@type": "OfferShippingDetails", "shippingRate": {"@type": "MonetaryAmount", "value": "0", "currency": "GBP"}, "shippingDestination": {"@type": "DefinedRegion", "addressCountry": "US"}, "deliveryTime": {"@type": "ShippingDeliveryTime", "handlingTime": {"@type": "QuantitativeValue", "minValue": 3, "maxValue": 6, "unitCode": "DAY"}, "transitTime": {"@type": "QuantitativeValue", "minValue": 3, "maxValue": 6, "unitCode": "DAY"}}}], "hasMerchantReturnPolicy": {"@type": "MerchantReturnPolicy", "applicableCountry": "GB", "returnPolicyCategory": "https://schema.org/MerchantReturnNotPermitted", "merchantReturnLink": "https://www.skythatnight.com/delivery.html"}}}</script>
 <!-- SKN_GTAG_HEAD:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ.
@@ -350,6 +360,20 @@
 <!-- SKN_GTAG_HEAD:END -->
 </head>
 <body class="sm-night">
+<!-- SKN_XMAS_BAR:START -->
+<div class="sm-xbar">
+  <a href="occasion-christmas.html#christmas-dates">Christmas: aim to order by <span class="xb-seg" data-until="2026-12-09T00:00:00Z"><strong>Tue 8 Dec</strong> (framed)</span><span class="xb-sep"> · </span><span class="xb-seg" data-until="2026-12-12T00:00:00Z"><strong>Fri 11 Dec</strong> (prints)</span> for UK delivery <span class="xb-more">Dates&nbsp;&amp;&nbsp;details&nbsp;→</span></a>
+</div>
+<script>
+/* плашка гаснет сама: прошедшая дата прячется, после последней — вся плашка (как .occ-date, gen_christmas_page) */
+(function(){
+  var b=document.querySelector('.sm-xbar'); if(!b) return; var now=Date.now(), left=0, segs=b.querySelectorAll('.xb-seg');
+  [].forEach.call(segs,function(s){ if(now>=Date.parse(s.getAttribute('data-until'))) s.hidden=true; else left++; });
+  if(!left){ b.hidden=true; return; }
+  if(left<segs.length) [].forEach.call(b.querySelectorAll('.xb-sep'),function(s){ s.hidden=true; });
+})();
+</script>
+<!-- SKN_XMAS_BAR:END -->
 <header>
   <div class="container header-inner">
     <a href="./" class="logo sm-wordmark" aria-label="Sky, That Night — home">
