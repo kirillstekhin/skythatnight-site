@@ -1190,7 +1190,7 @@ window.SM_RESET_OWN = function () {
 function renderXmasBy() {
   const buy = document.getElementById('sm-buy');
   if (!buy) return;
-  const want = state.frameType === 'print' ? '(prints)' : '(framed)';
+  const want = state.frameType === 'print' ? 'prints' : 'framed';   /* сегмент может быть «(framed & prints)» */
   let hit = null;
   document.querySelectorAll('.sm-xbar .xb-seg[data-until]').forEach(sg => { if (sg.textContent.indexOf(want) !== -1) hit = sg; });
   let el = document.getElementById('sm-xmas-by');
