@@ -420,7 +420,25 @@
         if (res.status === 200 && d.id && d.payment_link) {
           /* токен в client_reference_id сессии (28 + 28 + 31 символ — всегда влезает) */
           if (tok) markLinked(tok);
-          location.href = d.payment_link;                 /* ⛔ничего к ссылке не дописываем: у неё #фрагмент */
+          /* «в корзину» для Pinterest (25.11.2026): только если тег уже загружен — а он грузится
+             лишь после согласия на cookies. Дизайн сохранён, ссылка на оплату есть. Даём маячку
+             300 мс уйти до перехода; без тега переход сразу, как раньше. */
+          var pinGo = false;
+          try {
+            if (window.pintrk) {
+              var fm = /^(PRINT|CLASSIC|DIGITAL)(\d{4})$/.exec(content.format || '');
+              var pid = fm ? 'SKN-' + (content.product === 'moon' ? 'MOON-' : '') +
+                        (fm[1] === 'DIGITAL' ? 'DIGITAL' : fm[1] + '-' + fm[2]) : '';
+              window.pintrk('track', 'addtocart', {
+                event_id: 'atc_' + d.id, currency: 'GBP', order_quantity: 1,
+                line_items: pid ? [{ product_id: pid, product_quantity: 1 }] : []
+              });
+              pinGo = true;
+            }
+          } catch (e) {}
+          var link = d.payment_link;                      /* ⛔ничего к ссылке не дописываем: у неё #фрагмент */
+          if (pinGo) setTimeout(function () { location.href = link; }, 300);
+          else location.href = link;
           return { ok: true };
         }
         var unreachable = res.status === 0 || res.status >= 500 || res.status === 404 ||

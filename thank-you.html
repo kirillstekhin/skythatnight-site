@@ -265,7 +265,7 @@
   color:var(--moon-faint); max-width:38rem; margin:0 auto 2rem; }
 .ty-note a { color:var(--gold); }
 </style>
-<script src="assets/attr.js?v=8" defer></script>
+<script src="assets/attr.js?v=9" defer></script>
 <!-- SKN_GTAG_HEAD:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ.
      Consent Mode v2: до согласия куки не пишутся (UK PECR reg.6). -->
 <script>
@@ -414,6 +414,42 @@
      оплата не проверялась, защитой от повтора был localStorage одного браузера.
      Такое число нельзя считать ни продажами, ни выручкой. Экономика считается по
      Stripe и Etsy (tools/price_check.py, unit_economics.py, snapshot_state.py). */
+
+  /* ✅СОБЫТИЕ ПОКУПКИ ДЛЯ PINTEREST ВЕРНУЛОСЬ 25.11.2026 («да» владельца) — но не из URL.
+     Сумму, валюту и SKU отдаёт /api/design/order-status, и только если Stripe подтверждает:
+     сессия complete + paid, ≤ 72 ч. Повтор открытия страницы — тот же event_id (= номер
+     сессии), Pinterest его схлопывает. Только при согласии на cookies (PECR): нет согласия —
+     нет тега и нет события; согласие дали здесь же, в баннере, — событие уходит после клика. */
+  var pinSent = false;
+  function sknPinPurchase() {
+    if (pinSent || !sid || !window.pintrk) return;
+    var ok = false;
+    try { ok = localStorage.getItem('skn_consent') === 'granted'; } catch (e) {}
+    if (!ok) return;
+    pinSent = true;
+    fetch('/api/design/order-status?session_id=' + encodeURIComponent(sid), { credentials: 'omit' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || d.paid !== true || !d.order_id) return;
+        var qty = 0;
+        var items = (d.items || []).map(function (it) {
+          qty += it.quantity || 1;
+          return { product_id: it.product_id, product_quantity: it.quantity, product_price: it.price };
+        });
+        pintrk('track', 'checkout', {
+          event_id: d.order_id, order_id: d.order_id,
+          value: d.value, currency: d.currency,
+          order_quantity: qty || 1, line_items: items
+        });
+      })
+      .catch(function () {});
+  }
+  sknPinPurchase();
+  /* баннер стоит НИЖЕ этого скрипта (генерит gen_gtag.py) — слушаем всплытие на document:
+     onclick кнопки (decide → sknPin) срабатывает раньше */
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'skn-consent-yes') setTimeout(sknPinPurchase, 0);
+  });
 
   /* ссылка на заказ — покупателю, чтобы было что назвать в письме */
   var ref = sid ? sid.slice(-10).toUpperCase() : '';
