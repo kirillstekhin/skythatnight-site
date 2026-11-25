@@ -2086,6 +2086,11 @@ html:has(.sm-night) { background: #081124; }
 .sm-preview-note { margin-top:.65rem; font-size:.8rem; letter-spacing:.02em;
   color:var(--gold,#c9a961); text-align:center; }
 #design { scroll-margin-top: 140px; }
+/* аудит 25.11: шапка прилипает (sticky), а на тёмных страницах была прозрачной на ВСЕХ ширинах —
+   на десктопе меню и логотип ложились поверх конструктора и цены. Сплошной ночной фон везде;
+   html body — сильнее инлайн-аннекса страниц (.sm-night header { background: transparent }). */
+html body.sm-night header { background: rgba(8,17,36,.96); }
+@supports (backdrop-filter: blur(6px)) { html body.sm-night header { background: rgba(8,17,36,.88); backdrop-filter: blur(6px); } }
 @media (max-width: 760px) {
   #design { scroll-margin-top: 96px; }
   body.sm-night header, .sm-night header { background: var(--night-deep, #081124); }
@@ -2106,3 +2111,17 @@ html:has(.sm-night) { background: #081124; }
 @media (max-width: 720px) {
   .sm-reviews-row { grid-template-columns: 1fr; gap: 2.4rem; }
 }
+
+/* ═══ аудит 25.11: срок к Рождеству у Buy · закреплённая кнопка на телефоне (starmap.js) ═══ */
+.sm-xmas-by { margin:.2rem 0 .75rem; font-family:var(--sans); font-size:.84rem; line-height:1.45;
+  color:var(--gold,#c9a961); text-align:center; }
+.sm-xmas-by[hidden], #sm-sticky-buy[hidden] { display:none; }
+#sm-sticky-buy { position:fixed; left:0; right:0; bottom:0; z-index:40; display:flex; align-items:center;
+  justify-content:space-between; gap:1rem; padding:.7rem 1rem calc(.7rem + env(safe-area-inset-bottom));
+  background:rgba(8,17,36,.97); border-top:1px solid rgba(201,169,97,.35); font-family:var(--sans); }
+#sm-sticky-buy .ssb-price { color:var(--moon,#eaf0ff); font-size:1.05rem; letter-spacing:.02em; }
+#sm-sticky-buy .ssb-go { background:var(--gold,#c9a961); color:#081124; border:0; border-radius:3px;
+  padding:.7rem 1.3rem; font:inherit; font-size:.95rem; font-weight:500; cursor:pointer; }
+#sm-sticky-buy .ssb-go:focus-visible { outline:2px solid var(--moon,#eaf0ff); outline-offset:2px; }
+body.sm-has-sticky-buy { padding-bottom:4.2rem; }
+@media (min-width: 761px) { #sm-sticky-buy { display:none !important; } }

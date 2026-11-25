@@ -643,6 +643,7 @@ function refresh() {
   renderFrameColors();
   applyPreviewFrame();
   renderDigital();
+  renderXmasBy();
 }
 
 /* Живая рама на превью: реальные пиксели Prodigi-шевронов (border-image, прозрачная
@@ -1035,6 +1036,7 @@ function attachControls() {
     }, 300);
   });
   attachDigital();
+  attachStickyBuy();
 }
 
 /* ── ЦИФРОВОЙ ФАЙЛ: кнопка под основной покупкой (11.11.2026) ──
@@ -1054,7 +1056,7 @@ function attachDigital() {
   box.id = 'sm-digital';
   box.style.cssText = 'margin-top:1.1rem;padding-top:1rem;border-top:1px dashed rgba(201,169,97,.3);font-family:var(--sans);';
   box.innerHTML =
-    '<div style="font-size:.88rem;color:var(--moon-sub,#c8cfdc);margin-bottom:.55rem">Printing it yourself, or need it tonight?</div>' +
+    '<div style="font-size:.88rem;color:var(--moon-sub,#c8cfdc);margin-bottom:.55rem">Printing it yourself, or short on time?</div>' +
     '<button type="button" class="sm-digital-buy" style="width:100%;background:transparent;color:var(--gold,#c9a961);' +
     'border:1px solid var(--gold,#c9a961);border-radius:3px;padding:.75rem 1rem;font:inherit;font-size:.95rem;cursor:pointer">' +
     'Get the digital file \u2014 \u00a3' + DIGITAL_PRICE.toFixed(2) + '</button>' +
@@ -1181,4 +1183,66 @@ window.SM_RESET_OWN = function () {
   refresh();
   setTimeout(function () { var pl = document.getElementById('sm-place'); if (pl) pl.focus(); }, 600);
 };
+
+/* ── СРОК К РОЖДЕСТВУ У КНОПКИ BUY (аудит 25.11) ─────────────────────────────
+   Даты — только из плашки .sm-xbar (xmas_bar.py ← gen_christmas_page.DATES): сегмент с data-until
+   и «(framed)»/«(prints)». Нет плашки или дата прошла — строки нет. Формулировка «aim to», как в плашке. */
+function renderXmasBy() {
+  const buy = document.getElementById('sm-buy');
+  if (!buy) return;
+  const want = state.frameType === 'print' ? '(prints)' : '(framed)';
+  let hit = null;
+  document.querySelectorAll('.sm-xbar .xb-seg[data-until]').forEach(sg => { if (sg.textContent.indexOf(want) !== -1) hit = sg; });
+  let el = document.getElementById('sm-xmas-by');
+  const until = hit ? Date.parse(hit.getAttribute('data-until')) : NaN;
+  const now = Date.now();
+  if (!(until > now)) { if (el) el.hidden = true; return; }
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'sm-xmas-by';
+    el.className = 'sm-xmas-by';
+    buy.parentNode.insertBefore(el, buy);
+  }
+  const when = (hit.querySelector('strong') || {}).textContent || '';
+  const days = Math.ceil((until - now) / 86400000);
+  el.textContent = `For UK Christmas, aim to order by ${when}` + (days <= 1 ? ' \u2014 today is the last day' : ` \u2014 ${days} days left`);
+  el.hidden = false;
+}
+
+/* ── ЗАКРЕПЛЁННАЯ КНОПКА НА ТЕЛЕФОНЕ (аудит 25.11) ──────────────────────────
+   На ширине ≤760 Buy стоит на ~3,7 экрана вниз. Пока #sm-buy не виден, внизу — полоса «цена + Buy».
+   Нажатие НЕ покупает: прокручивает к настоящей кнопке, чтобы покупатель увидел свой дизайн.
+   Баннер cookies (.skn-consent.on) — главнее: пока он виден, полосы нет. */
+function attachStickyBuy() {
+  const buy = document.getElementById('sm-buy');
+  if (!buy || document.getElementById('sm-sticky-buy') || typeof IntersectionObserver === 'undefined') return;
+  const bar = document.createElement('div');
+  bar.id = 'sm-sticky-buy';
+  bar.hidden = true;
+  bar.innerHTML = '<span class="ssb-price"></span><button type="button" class="ssb-go">Design &amp; buy</button>';
+  document.body.appendChild(bar);
+  const mq = window.matchMedia('(max-width: 760px)');
+  let buyVisible = true, started = false;
+  const update = () => {
+    const consentOn = !!document.querySelector('.skn-consent.on');
+    const show = mq.matches && started && !buyVisible && !consentOn;
+    if (show) {
+      const p = document.getElementById('sm-price');
+      bar.querySelector('.ssb-price').textContent = p ? p.textContent : '';
+    }
+    bar.hidden = !show;
+    document.body.classList.toggle('sm-has-sticky-buy', show);
+  };
+  new IntersectionObserver(es => { buyVisible = es[0].isIntersecting; update(); }).observe(buy);
+  /* до первой прокрутки полосы нет: первый экран — герой, а не панель покупки */
+  window.addEventListener('scroll', () => { if (!started && window.scrollY > 300) { started = true; update(); } }, { passive: true });
+  document.addEventListener('click', () => setTimeout(update, 50));   /* баннер cookies закрыли */
+  if (mq.addEventListener) mq.addEventListener('change', update);
+  bar.querySelector('.ssb-go').addEventListener('click', () => {
+    buy.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+  setInterval(update, 2000);   /* цена сменилась при выборе формата за пределами экрана */
+}
+
 })();
+
