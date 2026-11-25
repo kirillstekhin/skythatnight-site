@@ -345,9 +345,16 @@
     pintrk('page');
   }
 
-  try { if (localStorage.getItem('skn_consent') === 'granted') sknPin(); } catch (e) {}
+  /* Basic mode (аудит 25.11): сам gtag.js грузится ТОЛЬКО после «Accept» — до выбора и при отказе
+     к Google не уходит ничего, как и сказано в privacy.html. Очередь dataLayer копит consent/config до загрузки. */
+  function sknGtag() {
+    if (window.__sknGtag) return; window.__sknGtag = 1;
+    var s = document.createElement('script'); s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=AW-18367610518';
+    document.head.appendChild(s);
+  }
+  try { if (localStorage.getItem('skn_consent') === 'granted') { sknGtag(); sknPin(); } } catch (e) {}
 </script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18367610518"></script>
 <style>
   .skn-consent { position:fixed; left:0; right:0; bottom:0; z-index:9999; display:none;
     gap:1rem; align-items:center; justify-content:center; flex-wrap:wrap;
@@ -661,7 +668,7 @@
           'ad_storage': 'granted', 'ad_user_data': 'granted',
           'ad_personalization': 'granted', 'analytics_storage': 'granted'
         });
-        try { sknPin(); } catch (e) {}          /* Pinterest — тоже только после «да» */
+        try { sknGtag(); sknPin(); } catch (e) {}   /* Google и Pinterest — только после «да» */
       }
       bar.classList.remove('on');
     }
