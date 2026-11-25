@@ -427,9 +427,13 @@
      сессия complete + paid, ≤ 72 ч. Повтор открытия страницы — тот же event_id (= номер
      сессии), Pinterest его схлопывает. Только при согласии на cookies (PECR): нет согласия —
      нет тега и нет события; согласие дали здесь же, в баннере, — событие уходит после клика. */
+  /* ✅GOOGLE ADS — ТА ЖЕ ПРОВЕРКА (25.11.2026, «да» владельца): conversion «Purchase - legacy unverified»
+     (AW-18367610518/IZrUCL3o398cEJb9rbZE, тег сайта) уходит только после paid:true от order-status,
+     с фактической суммой и transaction_id = номер заказа — Google отбрасывает повтор с тем же id.
+     Только при согласии: gtag.js грузится лишь после «Accept» (gen_gtag, Basic mode). */
   var pinSent = false;
   function sknPinPurchase() {
-    if (pinSent || !sid || !window.pintrk) return;
+    if (pinSent || !sid) return;
     var ok = false;
     try { ok = localStorage.getItem('skn_consent') === 'granted'; } catch (e) {}
     if (!ok) return;
@@ -438,6 +442,13 @@
       .then(function (r) { return r.json(); })
       .then(function (d) {
         if (!d || d.paid !== true || !d.order_id) return;
+        if (typeof gtag === 'function') {
+          gtag('event', 'conversion', {
+            send_to: 'AW-18367610518/IZrUCL3o398cEJb9rbZE',
+            value: d.value, currency: d.currency, transaction_id: d.order_id
+          });
+        }
+        if (!window.pintrk) return;
         var qty = 0;
         var items = (d.items || []).map(function (it) {
           qty += it.quantity || 1;
