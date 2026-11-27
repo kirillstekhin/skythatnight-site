@@ -1036,6 +1036,7 @@ function attachControls() {
     }, 300);
   });
   attachDigital();
+  attachTrust();
   renderXmasBy();   /* после attachDigital: строке «Too late for post?» нужен #sm-digital */
   attachStickyBuy();
 }
@@ -1220,6 +1221,30 @@ function renderXmasBy() {
   const days = Math.ceil((until - now) / 86400000);
   el.textContent = `For UK Christmas, aim to order by ${when}` + (days <= 1 ? ' \u2014 today is the last day' : ` \u2014 ${days} days left`);
   el.hidden = false;
+}
+
+/* ── ДОВЕРИЕ У КНОПКИ (аудит 25.11, пакет 2) ──────────────────────────────
+   Настоящие фото наших образцов (июль 2026, только кадрирование) и единственный отзыв Etsy (пробелы перед запятыми убраны, слова те же).
+   Рейтинг числом не показываем: «5.0 (1 review)» убеждает меньше, чем сам текст. Новые отзывы — сюда руками. */
+function attachTrust() {
+  const after = document.getElementById('sm-digital') || document.querySelector('.sm-preview-note') || document.getElementById('sm-buy');
+  if (!after || document.getElementById('sm-trust')) return;
+  const box = document.createElement('div');
+  box.id = 'sm-trust';
+  box.className = 'sm-trust';
+  const ph = (f, alt) => `<img src="assets/starmap/real/${f}" alt="${alt}" width="480" height="480" loading="lazy">`;
+  box.innerHTML =
+    '<div class="st-photos">' +
+      ph('real-frame-gold.jpg', 'Our gold Classic frame, photographed on a table') +
+      ph('real-print-navy.jpg', 'Close-up of a printed navy star map with place, date and coordinates') +
+      ph('real-frame-corner.jpg', 'Corner of the gold Classic frame up close') +
+    '</div>' +
+    '<p class="st-cap">Real photos of our own samples, not mock-ups.</p>' +
+    '<blockquote class="st-review"><span class="st-stars" aria-label="5 out of 5 stars">★★★★★</span> ' +
+      '“Beautiful engagement gift, well presented, shipped promptly, seller very helpful with any queries, would definitely order again from seller.”' +
+      '<footer>Etsy buyer · <a href="https://www.etsy.com/shop/SkyThatNight#reviews" target="_blank" rel="noopener">Read it on Etsy</a></footer>' +
+    '</blockquote>';
+  after.insertAdjacentElement('afterend', box);
 }
 
 /* ── ЗАКРЕПЛЁННАЯ КНОПКА НА ТЕЛЕФОНЕ (аудит 25.11) ──────────────────────────
