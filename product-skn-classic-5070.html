@@ -368,15 +368,18 @@
 </head>
 <body class="sm-night">
 <!-- SKN_XMAS_BAR:START -->
-<div class="sm-xbar">
-  <a href="occasion-christmas.html#christmas-dates">Christmas: aim to order by <span class="xb-seg" data-until="2026-12-15T00:00:00Z"><strong>Mon 14 Dec</strong> (framed &amp; prints)</span> for UK delivery <span class="xb-more">Dates&nbsp;&amp;&nbsp;details&nbsp;→</span></a>
+<div class="sm-xbar" data-end="2026-12-25T00:00:00Z">
+  <a class="xb-dates" href="occasion-christmas.html#christmas-dates">Christmas: aim to order by <span class="xb-seg" data-until="2026-12-15T00:00:00Z"><strong>Mon 14 Dec</strong> (framed &amp; prints)</span> for UK delivery <span class="xb-more">Dates&nbsp;&amp;&nbsp;details&nbsp;→</span></a>
+  <a class="xb-digital" data-digital href="index.html#sm-digital" hidden>Too late for Christmas post? <strong>Get the digital file — £19</strong>, emailed within 24 hours <span class="xb-more">How&nbsp;it&nbsp;works&nbsp;→</span></a>
 </div>
 <script>
-/* плашка гаснет сама: прошедшая дата прячется, после последней — вся плашка (как .occ-date, gen_christmas_page) */
+/* плашка гаснет сама: прошедшая дата прячется; после последней — предложение цифрового файла до data-end, потом вся плашка */
 (function(){
   var b=document.querySelector('.sm-xbar'); if(!b) return; var now=Date.now(), left=0, segs=b.querySelectorAll('.xb-seg');
   [].forEach.call(segs,function(s){ if(now>=Date.parse(s.getAttribute('data-until'))) s.hidden=true; else left++; });
-  if(!left){ b.hidden=true; return; }
+  if(!left){ var d=b.querySelector('.xb-digital');
+    if(d && now<Date.parse(b.getAttribute('data-end'))){ b.querySelector('.xb-dates').hidden=true; d.hidden=false; } else b.hidden=true;
+    return; }
   if(left<segs.length) [].forEach.call(b.querySelectorAll('.xb-sep'),function(s){ s.hidden=true; });
 })();
 </script>
@@ -565,7 +568,7 @@
 <script>window.SM_PRESET = {"frameType":"classic","size":"5070"};</script>
 <script>(function(){var d=document.querySelector('.sm-more');if(d&&window.matchMedia('(min-width:981px)').matches){d.open=true;}})();</script>
 <script src="assets/attr.js?v=9" defer></script>
-<script src="assets/starmap.js?v=48" defer></script>
+<script src="assets/starmap.js?v=49" defer></script>
   <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "37e86f27b7714771b7bce229313bee6b"}'></script>
 <!-- SKN_GTAG_BAR:START — генерится gen_gtag.py, РУКАМИ НЕ ПРАВИТЬ. -->
 <div class="skn-consent" id="skn-consent" role="region" aria-label="Cookie choice">

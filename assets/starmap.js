@@ -1036,6 +1036,7 @@ function attachControls() {
     }, 300);
   });
   attachDigital();
+  renderXmasBy();   /* после attachDigital: строке «Too late for post?» нужен #sm-digital */
   attachStickyBuy();
 }
 
@@ -1066,6 +1067,9 @@ function attachDigital() {
     'photo lab or copy shop. Want something changed? Reply to that email and we redraw it free.</p>';
   anchor.insertAdjacentElement('afterend', box);
   renderDigital();
+  /* плашка «Too late for Christmas post?» ведёт сюда: на странице с конфигуратором — к этой кнопке, без перехода */
+  document.querySelectorAll('.sm-xbar a[data-digital]').forEach(a => a.setAttribute('href', '#sm-digital'));
+  if (location.hash === '#sm-digital') setTimeout(() => box.scrollIntoView({ block: 'center' }), 300);
   const btn = box.querySelector('.sm-digital-buy');
   const LABEL = btn.textContent;
   let pending = false;
@@ -1196,12 +1200,21 @@ function renderXmasBy() {
   let el = document.getElementById('sm-xmas-by');
   const until = hit ? Date.parse(hit.getAttribute('data-until')) : NaN;
   const now = Date.now();
-  if (!(until > now)) { if (el) el.hidden = true; return; }
+  const bar = document.querySelector('.sm-xbar[data-end]');
+  /* после последней даты и до Рождества (data-end плашки) — про цифровой файл, если он есть на странице */
+  const late = hit && !(until > now) && bar && now < Date.parse(bar.getAttribute('data-end'))
+    && document.getElementById('sm-digital');
+  if (!(until > now) && !late) { if (el) el.hidden = true; return; }
   if (!el) {
     el = document.createElement('div');
     el.id = 'sm-xmas-by';
     el.className = 'sm-xmas-by';
     buy.parentNode.insertBefore(el, buy);
+  }
+  if (late) {
+    el.textContent = 'Too late for Christmas post? The digital file below is emailed within 24 hours.';
+    el.hidden = false;
+    return;
   }
   const when = (hit.querySelector('strong') || {}).textContent || '';
   const days = Math.ceil((until - now) / 86400000);
