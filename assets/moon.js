@@ -228,7 +228,7 @@ const isDefaultNight = () => state.dateStr === DEFAULT_NIGHT[0] && state.timeStr
 const state = {
   dateStr: DEFAULT_NIGHT[0], timeStr: DEFAULT_NIGHT[1],
   place: 'London, United Kingdom', lat: 51.5074, lon: -0.1278, tz: 1, iana: 'Europe/London',
-  dedication: 'The Moon That Night',
+  dedication: '',
   /* дефолт print, а не framed — цена совпадает с обещанием «from £26.99» (см. starmap.js 10.09) */
   theme: 'midnight', frameType: 'print', size: '3040', frameColor: 'white',
 };
@@ -254,6 +254,71 @@ let placeConfirmed = false;
 let placeGateBox = null, placeGateGo = null;
 
 function hidePlaceGate() { if (placeGateBox) placeGateBox.hidden = true; }
+
+/* ⛔ГЕЙТ СТРОКИ (28.11.2026). Поле строки открывалось со ЗНАЧЕНИЕМ «The Moon That Night», а не подсказкой:
+   покупатель принимал его за часть дизайна. 7 из 16 печатных файлов сайта ушли с названием бренда
+   вместо своих слов; покупатель написал после превью, что не нашёл, где это менять.
+   Теперь поле пустое, пустая строка печатает прежний дефолт (рендер выше и fulfil.default_dedication
+   не менялись — превью и печать совпадают), а перед оплатой ОДИН раз спрашиваем. */
+const DEFAULT_LINE = 'The Moon That Night';
+let lineConfirmed = false;
+let lineGateBox = null, lineGateGo = null;
+
+function hideLineGate() { if (lineGateBox) lineGateBox.hidden = true; }
+const lineNeedsAsk = () => !lineConfirmed && !(state.dedication || '').trim();
+
+function askLineConfirm(onKeep) {
+  const input = document.getElementById('sm-dedication');
+  if (!input) { lineConfirmed = true; onKeep(); return; }   // разметки нет — покупку не запираем
+  lineGateGo = onKeep;
+  if (!lineGateBox) {
+    lineGateBox = document.createElement('div');
+    lineGateBox.className = 'sm-line-gate';
+    lineGateBox.style.cssText =
+      'margin:.55rem 0;padding:.7rem .9rem;border:1px solid #c9a961;border-radius:6px;' +
+      'font-size:.9rem;line-height:1.5;';
+    lineGateBox.innerHTML =
+      'Your print will say <strong></strong> under the moon. Would you like your own words instead, ' +
+      'like a name or “The night we met”?' +
+      '<div style="margin-top:.55rem;display:flex;gap:.6rem;flex-wrap:wrap">' +
+      '<button type="button" class="sm-gate-change" style="background:#c9a961;color:#111;border:0;' +
+      'padding:.45rem .95rem;border-radius:4px;cursor:pointer;font:inherit">Add my own line</button>' +
+      '<button type="button" class="sm-gate-keep" style="background:transparent;color:inherit;' +
+      'border:1px solid currentColor;padding:.45rem .95rem;border-radius:4px;cursor:pointer;' +
+      'font:inherit;opacity:.85">Keep it as it is</button></div>';
+    input.insertAdjacentElement('afterend', lineGateBox);
+    lineGateBox.querySelector('.sm-gate-keep').addEventListener('click', () => {
+      lineConfirmed = true; hideLineGate();
+      if (lineGateGo) lineGateGo();
+    });
+    lineGateBox.querySelector('.sm-gate-change').addEventListener('click', () => {
+      hideLineGate();
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      input.focus();
+    });
+  }
+  lineGateBox.querySelector('strong').textContent = '“' + DEFAULT_LINE + '”';
+  lineGateBox.hidden = false;
+  lineGateBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* Вопросы перед оплатой — по очереди: ночь (если она по умолчанию/пример), строка, место.
+   Каждый ждёт человека: кнопка на это время живая (setPend(false)). */
+function runBuyGates(go, setPend) {
+  if ((isDefaultNight()) && nightKey !== currentNightKey()) {
+    setPend(false);
+    askNightConfirm(() => { setPend(true); runBuyGates(go, setPend); });
+    return;
+  }
+  if (lineNeedsAsk()) {
+    setPend(false);
+    askLineConfirm(() => { setPend(true); runBuyGates(go, setPend); });
+    return;
+  }
+  if (placeConfirmed) { go(); return; }
+  setPend(false);
+  askPlaceConfirm(() => { setPend(true); go(); });
+}
 
 function askPlaceConfirm(onKeep) {
   const echo = document.getElementById('sm-place-echo');
@@ -324,7 +389,7 @@ function askNightConfirm(onKeep) {
       'font:inherit;opacity:.85">No — let me change it</button></div>';
     anchor.insertAdjacentElement('beforebegin', nightGateBox);
     nightGateBox.querySelector('.sm-gate-keep').addEventListener('click', () => {
-      nightKey = currentNightKey(); placeConfirmed = true; hideNightGate();
+      nightKey = currentNightKey(); placeConfirmed = true; lineConfirmed = true; hideNightGate();
       if (nightGateGo) nightGateGo();
     });
     nightGateBox.querySelector('.sm-gate-change').addEventListener('click', () => {
@@ -503,7 +568,9 @@ function attachGeocode() {
   }
 
   function apply(res) {
-    state.place = [res.name, res.country].filter(Boolean).join(', ');
+    /* 28.11.2026: город-государство печатался дважды («X, X») — покупатель просил убрать повтор. */
+    const sameAsCountry = res.country && res.name && res.name.trim().toLowerCase() === res.country.trim().toLowerCase();
+    state.place = sameAsCountry ? res.name : [res.name, res.country].filter(Boolean).join(', ');
     state.lat = res.latitude; state.lon = res.longitude;
     state.iana = res.timezone || 'UTC';
     input.value = state.place;
@@ -654,6 +721,7 @@ function attachControls() {
   document.getElementById('sm-time').addEventListener('change', e => { if (e.target.value) { state.timeStr = e.target.value; refresh(); } });
   document.getElementById('sm-dedication').addEventListener('input', e => {
     state.dedication = e.target.value.slice(0, 40);
+    hideLineGate();
     refresh();
   });
   document.querySelectorAll('.sm-theme').forEach(btn => btn.addEventListener('click', () => {
@@ -780,14 +848,7 @@ function attachControls() {
     setTimeout(() => {
       /* ⛔ГЕЙТ МЕСТА ЖДЁТ ЧЕЛОВЕКА, А НЕ СЕРВЕР. Пока он открыт, кнопка обязана быть живой:
          иначе «One moment…» висит над вопросом, на который ответить должен покупатель. */
-      if (isDefaultNight() && nightKey !== currentNightKey()) {
-        setBuyPending(false);
-        askNightConfirm(() => { setBuyPending(true); go(); });
-        return;
-      }
-      if (placeConfirmed) { go(); return; }
-      setBuyPending(false);
-      askPlaceConfirm(() => { setBuyPending(true); go(); });
+      runBuyGates(go, setBuyPending);
     }, 300);
   });
   attachDigital();
@@ -867,14 +928,7 @@ function attachDigital() {
       });
     };
     setTimeout(() => {                         // 300 мс — как у «Buy»: blur-автоприменение места
-      if (isDefaultNight() && nightKey !== currentNightKey()) {
-        setPending(false);
-        askNightConfirm(() => { setPending(true); go(); });
-        return;
-      }
-      if (placeConfirmed) { go(); return; }
-      setPending(false);
-      askPlaceConfirm(() => { setPending(true); go(); });
+      runBuyGates(go, setPending);
     }, 300);
   });
 }
